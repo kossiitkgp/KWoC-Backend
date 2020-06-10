@@ -5,7 +5,7 @@ import (
 	"os"
 	"log"
 
-	"kwoc-backend/routes"
+	"kwoc20-backend/routes"
 )
 
 
