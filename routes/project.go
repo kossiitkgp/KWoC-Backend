@@ -17,27 +17,34 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &project)
 	if err != nil {
-		panic(err)
+	  http.Error(w, err.Error(), http.StatusBadRequest)
+	  return 		
 	}
 
 	
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		panic("failed to connect DB")
+		 http.Error(w, err.Error(), http.StatusInternalServerError)
+		 return
 	}
 	defer db.Close()
 
-	// need to add error handling here
-	db.Create(&models.Project{
-		Name: project.Name,
-		Desc: project.Desc,
-		Tags: project.Tags,
-		RepoLink: project.RepoLink,
-		ComChannel: project.ComChannel,
-	})
+	err = db.Create(&models.Project{
+				Name: project.Name,
+				Desc: project.Desc,
+				Tags: project.Tags,
+				RepoLink: project.RepoLink,
+				ComChannel: project.ComChannel,
+			}).Error;
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "success"}`))
+
 }
 
 
@@ -46,12 +53,17 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open("sqlite3", "kwoc.db")
     if err != nil {
-        panic("failed to connect database")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
     }
     defer db.Close()
 
     var projects []models.Project
-    db.Find(&projects)
+    err = db.Find(&projects).Error
+    if err != nil {
+    	http.Error(w, err.Error(), http.StatusBadRequest)
+    	return
+    }
 	
 	w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(projects)
