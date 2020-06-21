@@ -17,6 +17,6 @@ type Mentor struct{
 	gorm.Model
 	Name string
 	Email string
-	acc_tok string
-	git_han string
+	Acc_tok string
+	Git_han string
 }
