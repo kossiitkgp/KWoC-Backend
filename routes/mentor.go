@@ -30,9 +30,9 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 
 	err = db.Create(&models.Mentor{
 				Name: Mentor.Name,
-				email: Mentor.Email,
-				github_handle: project.git_han,
-				access_token: project.acc_tok,
+				Email: Mentor.Email,
+				Github_handle: Mentor.Git_han,
+				Access_token: Mentor.Acc_tok,
 			}).Error;
 
 	if err != nil {
