@@ -12,3 +12,11 @@ type Project struct {
 	RepoLink string
 	ComChannel string
 }
+
+type Mentor struct{
+	gorm.Model
+	Name string
+	Email string
+	acc_tok string
+	git_han string
+}
