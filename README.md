@@ -44,3 +44,5 @@ Also uses `golanglint-ci` for linting code.
 - Run `go run main.go` in the terminal
 
 - Run `go build` to build into a single binary.
+
+- Run `gofmt -s -w .` to lint all the files in one go.
