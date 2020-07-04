@@ -17,13 +17,15 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &project)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		return
 	}
 
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		return
 	}
 	defer db.Close()
@@ -37,7 +39,8 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	}).Error
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		return
 	}
 
@@ -51,7 +54,8 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		return
 	}
 	defer db.Close()
@@ -59,7 +63,8 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	var projects []models.Project
 	err = db.Find(&projects).Error
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		return
 	}
 
