@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
 	"kwoc20-backend/models"
@@ -27,10 +28,10 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 
 	// using the code obtained from above to get AccessToken from Github
 	req, _ := json.Marshal(map[string]interface{}{
-		"client_id":     "74557dcb91016b10b54b",
-		"client_secret": "594d9e729a47a5d8e944edc792530342841caaf0",
+		"client_id":     os.Getenv("client_id"),
+		"client_secret": os.Getenv("client_secret"),
 		"code":          mentorOAuth["code"],
-		"state":         "PAKKA RANDOM",
+		"state":         os.Getenv("state"),
 	})
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
 	if err != nil {
