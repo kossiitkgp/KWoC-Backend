@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -13,6 +12,7 @@ import (
 
 	"kwoc20-backend/controllers"
 	"kwoc20-backend/models"
+	logs "kwoc20-backend/utils/logs/pkg"
 )
 
 func initialMigration() {
@@ -42,6 +42,14 @@ func main() {
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+port,
-		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router)))
+	logs.Logger.Log("msg", "Starting server on port "+port)
+
+	error := http.ListenAndServe(":"+port,
+		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
+	if error != nil {
+		logs.Logger.Log("error", error)
+		os.Exit(1)
+	}
+
+	
 }

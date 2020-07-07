@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jinzhu/gorm"
+	logs "kwoc20-backend/utils/logs/pkg"
 
 	"kwoc20-backend/models"
 )
@@ -19,6 +20,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 
@@ -26,6 +28,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 	defer db.Close()
@@ -41,11 +44,13 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "success"}`))
+	logs.Logger.Log("message", "Succesfully registered project details")
 
 }
 
@@ -65,6 +70,7 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 

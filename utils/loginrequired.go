@@ -36,11 +36,13 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
+			logs.Logger.Log("message", err.Error())
 			return
 		}
 
 		if !token.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
+			logs.Logger.Log("message", "Invalid Token")
 			return
 		}
 
@@ -49,7 +51,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		dbStr := "test.db"
 		db, err := gorm.Open("sqlite3", dbStr)
 		if err != nil {
-			panic("Failed to connect to the Database!")
+			logs.Logger.Log("message", "Failed to connect to the Database!")
+			os.Exit(1)
 		}
 		defer db.Close()
 

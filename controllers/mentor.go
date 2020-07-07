@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"kwoc20-backend/models"
+	logs "kwoc20-backend/utils/logs/pkg"
 
 	"github.com/jinzhu/gorm"
 )
 
-// MentorOauth Handler for Github OAuth of Mentor
+// MentorOAuth Handler for Github OAuth of Mentor
 func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	// get the code from frontend
 	var mentorOAuth1 interface{}
@@ -23,6 +24,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 
@@ -37,6 +39,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 	defer res.Body.Close()
@@ -52,6 +55,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
@@ -59,6 +63,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 	defer res1.Body.Close()
@@ -87,6 +92,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 
@@ -94,6 +100,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		logs.Logger.Log("message", err.Error())
 		return
 	}
 	defer db.Close()
@@ -108,6 +115,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+	logs.Logger.Log("message", err.Error())
 	return
 
 }
