@@ -31,7 +31,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		"client_id":     os.Getenv("client_id"),
 		"client_secret": os.Getenv("client_secret"),
 		"code":          mentorOAuth["code"],
-		"state":         os.Getenv("state"),
+		"state":         mentorOAuth["state"],
 	})
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
 	if err != nil {
@@ -71,6 +71,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		"username": mentor["login"],
 		"name":     mentor["name"],
 		"email":    mentor["email"],
+		"type":     mentorOAuth["state"],
 	})
 
 	w.WriteHeader(http.StatusOK)
