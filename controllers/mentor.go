@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"fmt"
 
 	"kwoc20-backend/models"
 	logs "kwoc20-backend/utils/logs/pkg"
 
 	"github.com/jinzhu/gorm"
+	"github.com/go-kit/kit/log/level"
 )
 
 // MentorOAuth Handler for Github OAuth of Mentor
@@ -24,7 +26,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -39,7 +41,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res.Body.Close()
@@ -55,7 +57,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
@@ -63,7 +65,7 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res1.Body.Close()
@@ -92,7 +94,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -100,7 +102,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer db.Close()
@@ -115,7 +117,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-	logs.Logger.Log("message", err.Error())
+	level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 	return
 
 }

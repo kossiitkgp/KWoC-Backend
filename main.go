@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/go-kit/kit/log/level"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"kwoc20-backend/controllers"
@@ -42,12 +43,12 @@ func main() {
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
-	logs.Logger.Log("msg", "Starting server on port "+port)
+	level.Info(logs.Logger).Log("msg", "Starting server on port "+port)
 
 	error := http.ListenAndServe(":"+port,
 		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
 	if error != nil {
-		logs.Logger.Log("error", error)
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",error))
 		os.Exit(1)
 	}
 

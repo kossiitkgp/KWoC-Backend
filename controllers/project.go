@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
+	"github.com/go-kit/kit/log/level"
 	logs "kwoc20-backend/utils/logs/pkg"
 
 	"kwoc20-backend/models"
@@ -20,7 +22,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -28,7 +30,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer db.Close()
@@ -44,13 +46,13 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "success"}`))
-	logs.Logger.Log("message", "Succesfully registered project details")
+	level.Info(logs.Logger).Log("message", "Succesfully registered project details")
 
 }
 
@@ -70,7 +72,7 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		logs.Logger.Log("message", err.Error())
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
