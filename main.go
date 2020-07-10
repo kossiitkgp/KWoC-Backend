@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"log"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	
-	"kwoc20-backend/routes"
+
+	"kwoc20-backend/controllers"
 	"kwoc20-backend/models"
 )
 
@@ -25,23 +26,22 @@ func initialMigration() {
 	db.AutoMigrate(&models.Project{})
 }
 
-
-
 func main() {
-	
+
 	initialMigration()
-	
+
 	port := os.Getenv("PORT")
-    if port == "" {
-        port = "5000"
+	if port == "" {
+		port = "5000"
 	}
 
 	router := mux.NewRouter().StrictSlash(true)
-	
-	router.HandleFunc("/mentor", routes.MentorReg).Methods("POST")
-	router.HandleFunc("/project", routes.ProjectReg).Methods("POST")
-	router.HandleFunc("/project/all", routes.ProjectGet).Methods("GET")
-	
-	log.Fatal(http.ListenAndServe(":"+port, router))
-}
 
+	router.HandleFunc("/UserOAuth", controllers.MentorOAuth).Methods("POST")
+	router.HandleFunc("/mentor", controllers.MentorReg).Methods("POST")
+	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
+	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
+
+	log.Fatal(http.ListenAndServe(":"+port,
+		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router)))
+}
