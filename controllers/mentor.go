@@ -1,18 +1,14 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
 
 	"kwoc20-backend/models"
 
 	"github.com/jinzhu/gorm"
 )
-
 
 //MentorReg Handler for Registering Mentors
 func MentorReg(w http.ResponseWriter, r *http.Request) {

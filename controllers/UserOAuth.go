@@ -1,3 +1,13 @@
+package controllers
+
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+)
 
 // MentorOauth Handler for Github OAuth of Mentor
 func UserOAuth(w http.ResponseWriter, r *http.Request) {
