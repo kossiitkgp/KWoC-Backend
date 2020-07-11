@@ -1,6 +1,6 @@
 
 // MentorOauth Handler for Github OAuth of Mentor
-func MentorOAuth(w http.ResponseWriter, r *http.Request) {
+func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	// get the code from frontend
 	var mentorOAuth1 interface{}
 	body, _ := ioutil.ReadAll(r.Body)
