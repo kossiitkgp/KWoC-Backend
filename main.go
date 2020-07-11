@@ -43,12 +43,18 @@ func main() {
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
-	level.Info(logs.Logger).Log("msg", "Starting server on port "+port)
+	logErr := level.Info(logs.Logger).Log("msg", fmt.Sprintf("Starting server on port "+port))
+	if logErr != nil {
+		panic("Log Error")
+	}
 
 	error := http.ListenAndServe(":"+port,
 		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
 	if error != nil {
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",error))
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",error))
+		if logErr != nil {
+			panic("Log Error")
+		}
 		os.Exit(1)
 	}
 

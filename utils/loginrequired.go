@@ -29,6 +29,10 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		tokenStr := r.Header.Get("Bearer")
 		if tokenStr == "" {
 			w.WriteHeader(http.StatusBadRequest)
+			logErr := level.Error(logs.Logger).Log("error", "Empty Get request")
+			if logErr != nil {
+				panic("Log Error")
+			}
 			return
 		}
 
@@ -41,13 +45,19 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
-			level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+			logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+			if logErr != nil {
+				panic("Log Error")
+			}
 			return
 		}
 
 		if !token.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
-			level.Debug(logs.Logger).Log("message", "Invalid Token")
+			logErr := level.Debug(logs.Logger).Log("message", "Invalid Token")
+			if logErr != nil {
+				panic("Log Error")
+			}
 			return
 		}
 
@@ -56,7 +66,10 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		dbStr := "test.db"
 		db, err := gorm.Open("sqlite3", dbStr)
 		if err != nil {
-			level.Error(logs.Logger).Log("error", "Failed to connect to the Database!")
+			logErr := level.Error(logs.Logger).Log("error", "Failed to connect to the Database!")
+			if logErr != nil {
+				panic("Log Error")
+			}
 			os.Exit(1)
 		}
 		defer db.Close()

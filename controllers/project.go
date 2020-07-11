@@ -17,20 +17,53 @@ import (
 func ProjectReg(w http.ResponseWriter, r *http.Request) {
 
 	var project models.Project
-	body, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(body, &project)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
+		return
+	}
+	err = json.Unmarshal(body, &project)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr != nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
 		return
 	}
 
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr != nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
 		return
 	}
 	defer db.Close()
@@ -45,15 +78,32 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr != nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "success"}`))
-	level.Info(logs.Logger).Log("message", "Succesfully registered project details")
-
+	_, writeErr := w.Write([]byte(`{"message": "success"}`))
+	if writeErr !=nil {
+		logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		if logErr != nil {
+			panic("Log Error")
+		}
+	}
+	logErr := level.Info(logs.Logger).Log("message", "Succesfully registered project details")
+	if logErr != nil {
+		panic("Log Error")
+	}
 }
 
 //ProjectGet endpoint to fetch all projects
@@ -62,7 +112,18 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
+
 		return
 	}
 	defer db.Close()
@@ -71,11 +132,36 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	err = db.Find(&projects).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(projects)
+	err = json.NewEncoder(w).Encode(projects)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+			if logErr != nil {
+				panic("Log Error")
+			}
+		}
+		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		if logErr != nil {
+			panic("Log Error")
+		}
+		return
+	}
+
 }
