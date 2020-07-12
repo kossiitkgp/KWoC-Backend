@@ -38,7 +38,7 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/mentor/oauth", controllers.MentorOAuth).Methods("POST")
+	router.HandleFunc("/oauth", controllers.UserOAuth).Methods("POST")
 	router.HandleFunc("/mentor", controllers.MentorReg).Methods("POST")
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
