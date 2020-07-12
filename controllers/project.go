@@ -22,15 +22,9 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	err = json.Unmarshal(body, &project)
@@ -38,15 +32,9 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -55,15 +43,9 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer db.Close()
@@ -80,30 +62,18 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, writeErr := w.Write([]byte(`{"message": "success"}`))
 	if writeErr !=nil {
-		logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 	}
-	logErr := level.Info(logs.Logger).Log("message", "Succesfully registered project details")
-	if logErr != nil {
-		panic("Log Error")
-	}
+	_ = level.Info(logs.Logger).Log("message", "Succesfully registered project details")
 }
 
 //ProjectGet endpoint to fetch all projects
@@ -114,15 +84,9 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 
 		return
 	}
@@ -134,15 +98,9 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -152,15 +110,9 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 

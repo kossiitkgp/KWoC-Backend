@@ -25,15 +25,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	err = json.Unmarshal(body, &mentorOAuth1)
@@ -41,23 +35,14 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	mentorOAuth, ok := mentorOAuth1.(map[string]interface{})
 	if !ok {
-		logErr := level.Error(logs.Logger).Log("error", "JSON mapping unsuccessful")
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", "JSON mapping unsuccessful")
 		return
 	}
 
@@ -72,15 +57,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
@@ -88,15 +67,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res.Body.Close()
@@ -105,15 +78,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -128,15 +95,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr != nil {
-			logErr := level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error", fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
@@ -145,15 +106,9 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res1.Body.Close()
@@ -162,32 +117,20 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
 	var mentor1 interface{}
 	err = json.Unmarshal(resBody1, &mentor1)
 	if err != nil {
-		logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",err))
-			if logErr != nil {
-				panic("Log Error")
-			}
+		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",err))
 	}
 	mentor, ok := mentor1.(map[string]interface{})
 	if !ok {
-		logErr := level.Error(logs.Logger).Log("error", "JSON mapping unsuccessful")
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", "JSON mapping unsuccessful")
 		return
 	}
 	mentorData, err := json.Marshal(map[string]interface{}{
@@ -199,25 +142,16 @@ func MentorOAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	_, writeErr := w.Write(mentorData)
 	if writeErr !=nil {
-		logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 	}
 
 }
@@ -231,15 +165,9 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	err = json.Unmarshal(body, &mentor)
@@ -247,15 +175,9 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -264,15 +186,9 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 		if writeErr !=nil {
-			logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-			if logErr != nil {
-				panic("Log Error")
-			}
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 		}
-		logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer db.Close()
@@ -288,13 +204,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
 	if writeErr !=nil {
-		logErr := level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		if logErr != nil {
-			panic("Log Error")
-		}
+		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
 	}
-	logErr := level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-	if logErr != nil {
-		panic("Log Error")
-	}
+	_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 }
