@@ -7,6 +7,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"fmt"
+
+	logs "kwoc20-backend/utils/logs/pkg"
+
+	"github.com/go-kit/kit/log/level"
 )
 
 // MentorOauth Handler for Github OAuth of Mentor
@@ -18,7 +23,11 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	mentorOAuth, _ := mentorOAuth1.(map[string]interface{})
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 
@@ -32,7 +41,11 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res.Body.Close()
@@ -47,21 +60,38 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	req1, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
 	res1, err := client.Do(req1)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 		return
 	}
 	defer res1.Body.Close()
 	resBody1, _ := ioutil.ReadAll(res1.Body)
 
 	var mentor1 interface{}
-	json.Unmarshal(resBody1, &mentor1)
+	err = json.Unmarshal(resBody1, &mentor1)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		if writeErr !=nil {
+			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+		}
+		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		return
+	}
 	mentor, _ := mentor1.(map[string]interface{})
 	mentorData, _ := json.Marshal(map[string]interface{}{
 		"username": mentor["login"],
@@ -71,6 +101,10 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(mentorData)
+	_, writeErr := w.Write(mentorData)
+	if writeErr !=nil {
+		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+	}
+	_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 
 }
