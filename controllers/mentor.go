@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"os"
-	"strings"
 	"fmt"
 
 	"kwoc20-backend/models"
