@@ -3,9 +3,14 @@ package utils
 import (
 	"context"
 	"net/http"
+	"os"
+	"fmt"
+
+	logs "kwoc20-backend/utils/logs/pkg"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
+	"github.com/go-kit/kit/log/level"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" //For SQLite Dialect
 )
 
@@ -24,6 +29,7 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		tokenStr := r.Header.Get("Bearer")
 		if tokenStr == "" {
 			w.WriteHeader(http.StatusBadRequest)
+			_ = level.Error(logs.Logger).Log("error", "Empty Get request")
 			return
 		}
 
@@ -36,11 +42,13 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
+			_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
 			return
 		}
 
 		if !token.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
+			_ = level.Debug(logs.Logger).Log("message", "Invalid Token")
 			return
 		}
 
@@ -49,7 +57,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		dbStr := "test.db"
 		db, err := gorm.Open("sqlite3", dbStr)
 		if err != nil {
-			panic("Failed to connect to the Database!")
+			_ = level.Error(logs.Logger).Log("error", "Failed to connect to the Database!")
+			os.Exit(1)
 		}
 		defer db.Close()
 

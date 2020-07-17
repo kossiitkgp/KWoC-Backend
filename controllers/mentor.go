@@ -5,8 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"kwoc20-backend/models"
+	"fmt"
 
+	"kwoc20-backend/models"
+	logs "kwoc20-backend/utils/logs/pkg"
+
+	"github.com/go-kit/kit/log/level"
 	"github.com/jinzhu/gorm"
 )
 
@@ -19,6 +23,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 
@@ -26,20 +31,26 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer db.Close()
 
-	db.Create(&models.Mentor{
+	err = db.Create(&models.Mentor{
 		Name:         mentor.Name,
 		Email:        mentor.Email,
 		GithubHandle: mentor.GithubHandle,
 		AccessToken:  mentor.AccessToken,
-	})
+	}).Error
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-	return
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message" : "success"}`))
 
 }

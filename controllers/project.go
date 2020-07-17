@@ -2,9 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	logs "kwoc20-backend/utils/logs/pkg"
+
+	"github.com/go-kit/kit/log/level"
 	"github.com/jinzhu/gorm"
 
 	"kwoc20-backend/models"
@@ -19,6 +23,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 
@@ -26,6 +31,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer db.Close()
@@ -41,6 +47,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 
@@ -56,6 +63,7 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer db.Close()
@@ -65,9 +73,19 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(projects)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(projects)
+	w.Write([]byte(`{ "message" : "success" }`))
+
 }

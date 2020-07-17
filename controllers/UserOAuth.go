@@ -3,10 +3,15 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+
+	logs "kwoc20-backend/utils/logs/pkg"
+
+	"github.com/go-kit/kit/log/level"
 )
 
 // MentorOauth Handler for Github OAuth of Mentor
@@ -15,12 +20,13 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	var mentorOAuth1 interface{}
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &mentorOAuth1)
-	mentorOAuth, _ := mentorOAuth1.(map[string]interface{})
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
+	mentorOAuth, _ := mentorOAuth1.(map[string]interface{})
 
 	// using the code obtained from above to get AccessToken from Github
 	req, _ := json.Marshal(map[string]interface{}{
@@ -33,6 +39,7 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer res.Body.Close()
@@ -48,6 +55,7 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
@@ -55,13 +63,20 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer res1.Body.Close()
 	resBody1, _ := ioutil.ReadAll(res1.Body)
 
 	var mentor1 interface{}
-	json.Unmarshal(resBody1, &mentor1)
+	err = json.Unmarshal(resBody1, &mentor1)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		return
+	}
 	mentor, _ := mentor1.(map[string]interface{})
 	mentorData, _ := json.Marshal(map[string]interface{}{
 		"username": mentor["login"],
@@ -72,5 +87,4 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(mentorData)
-
 }
