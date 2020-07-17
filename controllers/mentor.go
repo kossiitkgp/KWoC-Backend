@@ -10,59 +10,47 @@ import (
 	"kwoc20-backend/models"
 	logs "kwoc20-backend/utils/logs/pkg"
 
-	"github.com/jinzhu/gorm"
 	"github.com/go-kit/kit/log/level"
+	"github.com/jinzhu/gorm"
 )
 
 //MentorReg Handler for Registering Mentors
 func MentorReg(w http.ResponseWriter, r *http.Request) {
 
 	var mentor models.Mentor
-	body, err := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &mentor)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		if writeErr !=nil {
-			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		}
-		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
-		return
-	}
-	err = json.Unmarshal(body, &mentor)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		if writeErr !=nil {
-			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		}
-		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		if writeErr !=nil {
-			_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
-		}
-		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
 		return
 	}
 	defer db.Close()
 
-	db.Create(&models.Mentor{
+	err = db.Create(&models.Mentor{
 		Name:         mentor.Name,
 		Email:        mentor.Email,
 		GithubHandle: mentor.GithubHandle,
 		AccessToken:  mentor.AccessToken,
-	})
+	}).Error
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusInternalServerError)
-	_, writeErr := w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-	if writeErr !=nil {
-		_ = level.Warn(logs.Logger).Log("error",fmt.Sprintf("%v",writeErr))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		return
 	}
-	_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message" : "success"}`))
+
 }
