@@ -5,11 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	// logs "kwoc20-backend/utils/logs/pkg"
-
 	"github.com/jinzhu/gorm"
 
 	"kwoc20-backend/models"
+	utils "kwoc20-backend/utils"
+	
 )
 
 //ProjectReg endpoint to register project details
@@ -19,18 +19,15 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &project)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// utils.handleErr(w, 500, err)
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 	defer db.Close()
@@ -44,9 +41,8 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	}).Error
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
@@ -60,9 +56,8 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 	defer db.Close()
@@ -70,17 +65,15 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	var projects []models.Project
 	err = db.Find(&projects).Error
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(projects)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		// level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		utils.LOG.Println(err)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
