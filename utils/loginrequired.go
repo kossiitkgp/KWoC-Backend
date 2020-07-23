@@ -4,13 +4,9 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"fmt"
-
-	logs "kwoc20-backend/utils/logs/pkg"
-
+	
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
-	"github.com/go-kit/kit/log/level"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" //For SQLite Dialect
 )
 
@@ -28,8 +24,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenStr := r.Header.Get("Bearer")
 		if tokenStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			_ = level.Error(logs.Logger).Log("error", "Empty Get request")
+			http.Error(w, "Empty GET request", 400)
+			LOG.Println("Empty Get request")
 			return
 		}
 
@@ -41,14 +37,14 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		})
 
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",err))
+			http.Error(w, "Empty GET request", 401)
+			LOG.Println(err)
 			return
 		}
 
 		if !token.Valid {
-			w.WriteHeader(http.StatusUnauthorized)
-			_ = level.Debug(logs.Logger).Log("message", "Invalid Token")
+			http.Error(w, "Invalid Token", 401)
+			LOG.Println("Invalid Token")
 			return
 		}
 
@@ -57,7 +53,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		dbStr := "test.db"
 		db, err := gorm.Open("sqlite3", dbStr)
 		if err != nil {
-			_ = level.Error(logs.Logger).Log("error", "Failed to connect to the Database!")
+			http.Error(w, "Failed to connect to the Database!", 500)
+			LOG.Println(err)
 			os.Exit(1)
 		}
 		defer db.Close()

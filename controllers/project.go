@@ -19,15 +19,15 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &project)
 	if err != nil {
-		utils.LOG.Println(err)
 		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		utils.LOG.Println(err)
 		http.Error(w, err.Error(), 500)
+		utils.LOG.Println(err)
 		return
 	}
 	defer db.Close()
@@ -47,7 +47,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "success"}`))
+	w.Write([]byte(`success`))
 
 }
 
@@ -56,8 +56,8 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
-		utils.LOG.Println(err)
 		http.Error(w, err.Error(), 500)
+		utils.LOG.Println(err)
 		return
 	}
 	defer db.Close()
@@ -65,19 +65,19 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	var projects []models.Project
 	err = db.Find(&projects).Error
 	if err != nil {
-		utils.LOG.Println(err)
 		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(projects)
 	if err != nil {
-		utils.LOG.Println(err)
 		http.Error(w, err.Error(), 500)
+		utils.LOG.Println(err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{ "message" : "success" }`))
+	w.Write([]byte(`success`))
 
 }

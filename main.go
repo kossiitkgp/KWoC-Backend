@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"log"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/go-kit/kit/log/level"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"kwoc20-backend/controllers"
 	"kwoc20-backend/models"
-	logs "kwoc20-backend/utils/logs/pkg"
 )
 
 func initialMigration() {
@@ -43,12 +42,13 @@ func main() {
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
-	_ = level.Info(logs.Logger).Log("msg", fmt.Sprintf("Starting server on port "+port))
-
-	error := http.ListenAndServe(":"+port,
+	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags | log.Lshortfile)
+	mainLogger.Println("Starting server on port "+port)
+	
+	err := http.ListenAndServe(":"+port,
 		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
-	if error != nil {
-		_ = level.Error(logs.Logger).Log("error", fmt.Sprintf("%v",error))
+	if err != nil {
+		mainLogger.Println("Error in Starting ",err)
 		os.Exit(1)
 	}
 

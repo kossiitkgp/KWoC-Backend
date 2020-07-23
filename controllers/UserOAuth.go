@@ -3,15 +3,12 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
-	logs "kwoc20-backend/utils/logs/pkg"
-
-	"github.com/go-kit/kit/log/level"
+	utils "kwoc20-backend/utils"
 )
 
 // MentorOauth Handler for Github OAuth of Mentor
@@ -21,9 +18,8 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &mentorOAuth1)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 	mentorOAuth, _ := mentorOAuth1.(map[string]interface{})
@@ -37,9 +33,8 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	})
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 	defer res.Body.Close()
@@ -53,17 +48,15 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	req1, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
 	res1, err := client.Do(req1)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 	defer res1.Body.Close()
@@ -72,9 +65,8 @@ func UserOAuth(w http.ResponseWriter, r *http.Request) {
 	var mentor1 interface{}
 	err = json.Unmarshal(resBody1, &mentor1)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
-		level.Error(logs.Logger).Log("error", fmt.Sprintf("%v", err))
+		http.Error(w, err.Error(), 400)
+		utils.LOG.Println(err)
 		return
 	}
 	mentor, _ := mentor1.(map[string]interface{})
