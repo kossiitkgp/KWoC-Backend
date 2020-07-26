@@ -39,6 +39,12 @@ Also uses `golanglint-ci` for linting code.
 ## Set up
 - Clone the repo.
 
+- You can use the Makefile for automating the commands. Run `make help` for a list of commands.
+
+- Currently, only two(subject to change) commands are supported - 
+* `make lint` - Run the lint checks
+* `make build` - For building the codebase
+
 - Run `go get` to install the dependencies
 
 - Run `go run main.go` in the terminal
