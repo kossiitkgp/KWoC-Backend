@@ -1,3 +1,4 @@
 tmp/
 *.db
 kwoc20-backend
+.DS_Store
