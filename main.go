@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"log"
+	"reflect"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -13,6 +14,7 @@ import (
 
 	"kwoc20-backend/controllers"
 	"kwoc20-backend/models"
+	"kwoc20-backend/utils"
 )
 
 func initialMigration() {
@@ -37,14 +39,14 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/oauth", controllers.UserOAuth).Methods("POST")
+	router.HandleFunc("/oauth", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("POST")
 	router.HandleFunc("/mentor", controllers.MentorReg).Methods("POST")
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
 	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags | log.Lshortfile)
 	mainLogger.Println("Starting server on port "+port)
-	
+
 	err := http.ListenAndServe(":"+port,
 		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
 	if err != nil {
@@ -52,5 +54,4 @@ func main() {
 		os.Exit(1)
 	}
 
-	
 }

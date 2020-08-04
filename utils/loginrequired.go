@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
-	
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" //For SQLite Dialect
@@ -29,7 +29,7 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			return
 		}
 
-		jwtKey := []byte("OneRandomSecretKey!!@@!")
+		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
