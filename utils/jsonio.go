@@ -1,10 +1,11 @@
 package utils
 
 import (
-    "io/ioutil"
-    "encoding/json"
-    "net/http"
-    "reflect"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"reflect"
 )
 
 type ErrorMessage struct {
@@ -34,6 +35,7 @@ func JsonIO(next func(interface{}, *http.Request) (interface{}, bool), inputType
 
         response, ok := next(jsonPointer, r)
         if !ok {
+            LOG.Println(fmt.Sprintf("%+v", response))
             w.WriteHeader(http.StatusBadRequest)
             w.Header().Set("Content-type", "application/json")
             w.Write([]byte(`{"message": "Invalid Request"}`))

@@ -29,14 +29,18 @@ type OAuthOutput struct {
 	Type string `json:"type"`
 	IsNewUser bool `json:"isNewUser"`
 	JWT string `json:"jwt"`
+	AccessToken string `json:"accessToken"`
 }
 
 // MentorOauth Handler for Github OAuth of Mentor
 func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	// get the code from frontend
-	mentorOAuth, ok := js.(OAuthInput)
+	mentorOAuth := &OAuthInput{
+		Code: r.URL.Query().Get("code"),
+		State: r.URL.Query().Get("state"),
+	}
 
-	if !ok {
+	if mentorOAuth.Code == "" || mentorOAuth.State == "" {
 		return &utils.ErrorMessage{
 			Message: "Type Mismatch",
 		}, false
@@ -57,7 +61,6 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	}
 	defer res.Body.Close()
 	resBody, _ := ioutil.ReadAll(res.Body)
-
 	resBodyString := string(resBody)
 	accessTokenPart := strings.Split(resBodyString, "&")[0]
 	accessToken := strings.Split(accessTokenPart, "=")[1]
@@ -91,6 +94,24 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 
 	user, _ := userdata.(map[string]interface{})
 
+	gh_username, ok1 := user["login"].(string)
+	gh_name, ok2 := user["name"].(string)
+	gh_email, ok3 := user["email"].(string)
+
+	if !ok1 {
+		return &utils.ErrorMessage{
+			Message: "GithubHandle not found",
+		}, false
+	}
+
+	if !ok2 {
+		gh_name = ""
+	}
+
+	if !ok3 {
+		gh_email = ""
+	}
+
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
 		return utils.ErrorMessage{
@@ -100,15 +121,17 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	defer db.Close()
 
 	chkUser := models.Mentor{}
-	db.Where(&models.Mentor{GithubHandle: user["login"].(string)}).First(&chkUser)
+	db.Where(&models.Mentor{GithubHandle: gh_username}).First(&chkUser)
 	if chkUser.ID == 0 {
 		// New User
 		oauthdata := &OAuthOutput{
-			Username: user["login"].(string),
-			Name: string(user["name"].(string)),
-			Email: user["email"].(string),
+			Username: gh_username,
+			Name: gh_name,
+			Email: gh_username,
 			Type: mentorOAuth.State,
+			IsNewUser: true,
 			JWT: "",
+			AccessToken: accessToken,
 		}
 		utils.LOG.Println(fmt.Sprintf("New User: %+v", oauthdata))
 		return oauthdata, true
@@ -132,11 +155,12 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 		}, false
 	}
 	oauthdata := &OAuthOutput{
-		Username: user["login"].(string),
-		Name: string(user["name"].(string)),
-		Email: user["email"].(string),
+		Username: gh_username,
+		Name: gh_name,
+		Email: gh_email,
 		Type: mentorOAuth.State,
 		JWT: tokenStr,
+		AccessToken: accessToken,
 	}
 
 	return oauthdata, true

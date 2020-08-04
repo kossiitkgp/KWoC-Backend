@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"log"
 	"reflect"
 
 	"github.com/gorilla/handlers"
@@ -14,6 +14,7 @@ import (
 
 	"kwoc20-backend/controllers"
 	"kwoc20-backend/models"
+	"kwoc20-backend/routes"
 	"kwoc20-backend/utils"
 )
 
@@ -25,6 +26,7 @@ func initialMigration() {
 	}
 	defer db.Close()
 
+	db.AutoMigrate(&models.Mentor{})
 	db.AutoMigrate(&models.Project{})
 }
 
@@ -39,11 +41,13 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/oauth", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("POST")
+	router.HandleFunc("/oauth", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("GET")
 	router.HandleFunc("/mentor", controllers.MentorReg).Methods("POST")
 	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
 	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
 
+	testSubRoute := router.PathPrefix("/test/").Subrouter()
+	routes.RegisterTest(testSubRoute)
 	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags | log.Lshortfile)
 	mainLogger.Println("Starting server on port "+port)
 
