@@ -11,11 +11,11 @@
 		<button id="btn">Login with Github</button>
 
 		<script>
+			var timer;
 			document.getElementById("btn").onclick = (e) => {
 				console.log("Hello")
 				let client_id = document.getElementById("cid").value;
 				let popup = window.open(`https://github.com/login/oauth/authorize?client_id=${client_id}&state=mentor&allow_signup=true`);
-				let timer;
 				timer = setInterval(() => {
 					if (popup.location.href.startsWith("http://lvh.me:5000/oauth") && popup.document.body.innerText.length > 0){
 						console.log(popup.document.body.innerText);

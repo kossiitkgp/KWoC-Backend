@@ -4,16 +4,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	
+
 	"kwoc20-backend/models"
-	utils "kwoc20-backend/utils"
-	
-	"github.com/jinzhu/gorm"
+	"kwoc20-backend/utils"
 )
 
 //MentorReg Handler for Registering Mentors
 func MentorReg(w http.ResponseWriter, r *http.Request) {
-
 	var mentor models.Mentor
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &mentor)
@@ -23,12 +20,7 @@ func MentorReg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
-		return
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
 	err = db.Create(&models.Mentor{

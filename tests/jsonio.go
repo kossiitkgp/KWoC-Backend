@@ -1,38 +1,31 @@
-package main
+package tests
 
 import (
     "kwoc20-backend/utils"
     "net/http"
-    "reflect"
 )
 
-type MarshalType struct {
+type TestMarshalType struct {
     Message string `json:"message"`
 }
 
-func testFunc(r interface{}, req *http.Request) (interface{}, bool) {
+func JsonioTestFunc(r interface{}, req *http.Request) (interface{}, bool) {
     switch r.(type) {
-    case *MarshalType:
+    case *TestMarshalType:
         break
     default:
-        return &MarshalType{}, false
+        return &TestMarshalType{}, false
     }
 
-    requestBody := r.(*MarshalType)
+    requestBody := r.(*TestMarshalType)
     utils.LOG.Println((*requestBody).Message)
     if (*requestBody).Message == "" {
-        return &MarshalType{}, false
+        return &TestMarshalType{}, false
     }
 
-    answer := &MarshalType{
+    answer := &TestMarshalType{
         Message: "Message received",
     }
 
     return answer, true
-}
-
-func main() {
-    http.HandleFunc("/", utils.JsonIO(testFunc, reflect.TypeOf(MarshalType{})))
-
-    http.ListenAndServe(":2000", nil)
 }

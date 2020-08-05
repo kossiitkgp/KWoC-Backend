@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/dgrijalva/jwt-go"
 
 	"kwoc20-backend/models"
@@ -112,12 +111,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 		gh_email = ""
 	}
 
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		return utils.ErrorMessage{
-			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, false
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
 	chkUser := models.Mentor{}

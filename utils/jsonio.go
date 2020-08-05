@@ -23,6 +23,19 @@ type ErrorMessage struct {
 // See tests/jsonio.go for reference.
 func JsonIO(next func(interface{}, *http.Request) (interface{}, bool), inputType reflect.Type) func(http.ResponseWriter, *http.Request) {
     return func(w http.ResponseWriter, r *http.Request) {
+        defer func() {
+            if recv := recover(); recv != nil {
+                response := &ErrorMessage{
+                    Message: "Internal Server Error",
+                }
+                w.WriteHeader(http.StatusInternalServerError)
+                w.Header().Set("Content-type", "application/json")
+                resBody, _ := json.Marshal(response)
+                w.Write(resBody)
+                return
+            }
+        }()
+
         body, _ := ioutil.ReadAll(r.Body)
 
         jsonData := reflect.New(inputType)

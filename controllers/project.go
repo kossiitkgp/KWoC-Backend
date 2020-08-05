@@ -5,11 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
-
 	"kwoc20-backend/models"
 	utils "kwoc20-backend/utils"
-	
 )
 
 //ProjectReg endpoint to register project details
@@ -24,12 +21,7 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
-		return
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
 	err = db.Create(&models.Project{
@@ -54,16 +46,11 @@ func ProjectReg(w http.ResponseWriter, r *http.Request) {
 //ProjectGet endpoint to fetch all projects
 // INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
-		return
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
 	var projects []models.Project
-	err = db.Find(&projects).Error
+	err := db.Find(&projects).Error
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		utils.LOG.Println(err)

@@ -1,53 +1,41 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"reflect"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
-	"kwoc20-backend/controllers"
-	"kwoc20-backend/models"
 	"kwoc20-backend/routes"
 	"kwoc20-backend/utils"
 )
 
-func initialMigration() {
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		fmt.Println(err.Error())
-		panic("failed to connect database")
-	}
-	defer db.Close()
-
-	db.AutoMigrate(&models.Mentor{})
-	db.AutoMigrate(&models.Project{})
-}
-
 func main() {
 
-	initialMigration()
+	utils.InitialMigration()
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
 	}
 
-	router := mux.NewRouter().StrictSlash(true)
+	router := mux.NewRouter()
+	if m := os.Getenv("MODE"); m == "dev" {
+		testSubRoute := router.PathPrefix("/test").Subrouter()
+		routes.RegisterTest(testSubRoute)
+	}
 
-	router.HandleFunc("/oauth", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("GET")
-	router.HandleFunc("/mentor", controllers.MentorReg).Methods("POST")
-	router.HandleFunc("/project", controllers.ProjectReg).Methods("POST")
-	router.HandleFunc("/project/all", controllers.ProjectGet).Methods("GET")
+	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
+	routes.RegisterOAuth(oauthSubRoute)
 
-	testSubRoute := router.PathPrefix("/test/").Subrouter()
-	routes.RegisterTest(testSubRoute)
+	mentorSubRoute := router.PathPrefix("/mentor").Subrouter()
+	routes.RegisterMentor(mentorSubRoute)
+
+	projectSubRoute := router.PathPrefix("/project").Subrouter()
+	routes.RegisterProject(projectSubRoute)
+
 	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags | log.Lshortfile)
 	mainLogger.Println("Starting server on port "+port)
 
