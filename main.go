@@ -22,10 +22,10 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	if m := os.Getenv("MODE"); m == "dev" {
-		testSubRoute := router.PathPrefix("/test").Subrouter()
-		routes.RegisterTest(testSubRoute)
-	}
+	// if m := os.Getenv("MODE"); m == "dev" {
+	// 	testSubRoute := router.PathPrefix("/test").Subrouter()
+	// 	routes.RegisterTest(testSubRoute)
+	// }
 
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)

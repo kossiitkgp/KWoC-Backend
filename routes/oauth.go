@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"reflect"
-
 	"github.com/gorilla/mux"
 
 	"kwoc20-backend/controllers"
@@ -10,6 +8,6 @@ import (
 )
 
 func RegisterOAuth(r *mux.Router) {
-	r.HandleFunc("", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("POST")
+	r.HandleFunc("", utils.JsonIO(controllers.UserOAuth)).Methods("POST")
 
 }

@@ -32,7 +32,9 @@ type OAuthOutput struct {
 }
 
 // MentorOauth Handler for Github OAuth of Mentor
-func UserOAuth(js interface{}, r *http.Request) (interface{}, int) {
+func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
+	
+	return js["name"], 200
 	// get the code from frontend
 	mentorOAuth := &OAuthInput{
 		Code: r.URL.Query().Get("code"),

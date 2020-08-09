@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 )
 
 type ErrorMessage struct {
@@ -21,7 +20,7 @@ type ErrorMessage struct {
 // - Use type switches to cast input interface{} to your Input struct
 // - Cast response struct pointer to interface{}.
 // See tests/jsonio.go for reference.
-func JsonIO(next func(interface{}, *http.Request) (interface{}, int), inputType reflect.Type) func(http.ResponseWriter, *http.Request) {
+func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
@@ -38,12 +37,12 @@ func JsonIO(next func(interface{}, *http.Request) (interface{}, int), inputType 
 
 		body, _ := ioutil.ReadAll(r.Body)
 
-		jsonData := reflect.New(inputType)
-		jsonPointer := jsonData.Interface()
-		_ = json.Unmarshal(body, jsonPointer)
+		var jsonData1 interface{}
+		_ = json.Unmarshal(body, &jsonData1)
+		jsonData := jsonData1.(map[string]interface{})
 
 
-		response, statusCode := next(jsonPointer, r)
+		response, statusCode := next(jsonData, r)
 		// if statusCode is not in 200s
 		if statusCode/100 > 2 {
 			LOG.Println(fmt.Sprintf("%+v", response))

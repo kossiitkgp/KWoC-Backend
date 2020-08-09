@@ -3,28 +3,28 @@ package controllers
 import (
 	"net/http"
 
-	"kwoc20-backend/models"
-	"kwoc20-backend/utils"
+	// "kwoc20-backend/models"
+	// "kwoc20-backend/utils"
 )
 
 // After Being checked by LoginRequired Middleware
-func MentorReg(req interface{}, r *http.Request) (interface{}, int) {
-	mentorData := req.(map[string]string)
+func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	
+	return req["yoyo"], 200
+	// db := utils.GetDB()
+	// defer db.Close()
 
-	db := utils.GetDB()
-	defer db.Close()
+	// err := db.Create(&models.Mentor{
+	// 	Name:         req["name"],
+	// 	Email:        req["email"],
+	// 	Username: 	  req["username"],
+	// }).Error
 
-	err := db.Create(&models.Mentor{
-		Name:         mentorData["name"],
-		Email:        mentorData["email"],
-		Username: 	  mentorData["username"],
-	}).Error
+	// if err != nil {
+	// 	return "database issue", 500
+	// }
 
-	if err != nil {
-		return "database issue", 500
-	}
-
-	return "success", 200
+	// return "success", 200
 }
 
 //MentorReg Handler for Registering Mentors
