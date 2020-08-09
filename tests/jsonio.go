@@ -9,23 +9,23 @@ type TestMarshalType struct {
     Message string `json:"message"`
 }
 
-func JsonioTestFunc(r interface{}, req *http.Request) (interface{}, bool) {
+func JsonioTestFunc(r interface{}, req *http.Request) (interface{}, int) {
     switch r.(type) {
     case *TestMarshalType:
         break
     default:
-        return &TestMarshalType{}, false
+        return &TestMarshalType{}, 500
     }
 
     requestBody := r.(*TestMarshalType)
     utils.LOG.Println((*requestBody).Message)
     if (*requestBody).Message == "" {
-        return &TestMarshalType{}, false
+        return &TestMarshalType{}, 400
     }
 
     answer := &TestMarshalType{
         Message: "Message received",
     }
 
-    return answer, true
+    return answer, 200
 }

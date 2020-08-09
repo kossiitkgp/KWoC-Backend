@@ -14,14 +14,14 @@ type ErrorMessage struct {
 
 // JsonIO Middleware for JSON input and output
 // Parameters of next: JSON as interface{}, Same request r (for other needs)
-// Output of next: A struct pointer converted to interface{} and a bool ok
+// Output of next: A struct pointer converted to interface{} and a int statusCode
 // Reference Usage:
 // - Declare input and output structure as structs with json tags
 // - Pass the input struct type as inputType
 // - Use type switches to cast input interface{} to your Input struct
 // - Cast response struct pointer to interface{}.
 // See tests/jsonio.go for reference.
-func JsonIO(next func(interface{}, *http.Request) (interface{}, bool), inputType reflect.Type) func(http.ResponseWriter, *http.Request) {
+func JsonIO(next func(interface{}, *http.Request) (interface{}, int), inputType reflect.Type) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
@@ -43,10 +43,11 @@ func JsonIO(next func(interface{}, *http.Request) (interface{}, bool), inputType
 		_ = json.Unmarshal(body, jsonPointer)
 
 
-		response, ok := next(jsonPointer, r)
-		if !ok {
+		response, statusCode := next(jsonPointer, r)
+		// if statusCode is not in 200s
+		if statusCode/100 > 2 {
 			LOG.Println(fmt.Sprintf("%+v", response))
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(statusCode)
 			w.Header().Set("Content-type", "application/json")
 			w.Write([]byte(`{"message": "Invalid Request"}`))
 			return
@@ -54,9 +55,10 @@ func JsonIO(next func(interface{}, *http.Request) (interface{}, bool), inputType
 
 		resBody, _ := json.Marshal(response)
 
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(statusCode)
 		w.Header().Set("Content-type", "application/json")
 		_, _ = w.Write(resBody)
 	}
 }
 
+ 

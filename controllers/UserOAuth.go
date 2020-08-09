@@ -32,7 +32,7 @@ type OAuthOutput struct {
 }
 
 // MentorOauth Handler for Github OAuth of Mentor
-func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
+func UserOAuth(js interface{}, r *http.Request) (interface{}, int) {
 	// get the code from frontend
 	mentorOAuth := &OAuthInput{
 		Code: r.URL.Query().Get("code"),
@@ -42,7 +42,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if mentorOAuth.Code == "" || mentorOAuth.State == "" {
 		return &utils.ErrorMessage{
 			Message: "Type Mismatch",
-		}, false
+		}, 400
 	}
 
 	// using the code obtained from above to get AccessToken from Github
@@ -56,7 +56,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if err != nil {
 		return &utils.ErrorMessage{
 			Message: fmt.Sprintf("Error occurred: %s", err),
-		}, false
+		}, 500
 	}
 	defer res.Body.Close()
 	resBody, _ := ioutil.ReadAll(res.Body)
@@ -70,14 +70,14 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if err != nil {
 		return &utils.ErrorMessage{
 			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, false
+		}, 500
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
 	res1, err := client.Do(req1)
 	if err != nil {
 		return &utils.ErrorMessage{
 			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, false
+		}, 500
 	}
 	defer res1.Body.Close()
 
@@ -88,7 +88,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if err != nil {
 		return &utils.ErrorMessage{
 			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, false
+		}, 500
 	}
 
 	user, _ := userdata.(map[string]interface{})
@@ -100,7 +100,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if !ok1 {
 		return &utils.ErrorMessage{
 			Message: "GithubHandle not found",
-		}, false
+		}, 500
 	}
 
 	if !ok2 {
@@ -128,7 +128,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 			AccessToken: accessToken,
 		}
 		utils.LOG.Println(fmt.Sprintf("New User: %+v", oauthdata))
-		return oauthdata, true
+		return oauthdata, 200
 	}
 
 	// Returning user
@@ -146,7 +146,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 	if err != nil {
 		return &utils.ErrorMessage{
 			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, false
+		}, 500
 	}
 	oauthdata := &OAuthOutput{
 		Username: gh_username,
@@ -157,5 +157,5 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, bool) {
 		AccessToken: accessToken,
 	}
 
-	return oauthdata, true
+	return oauthdata, 200
 }

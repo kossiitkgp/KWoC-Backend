@@ -10,6 +10,6 @@ import (
 )
 
 func RegisterOAuth(r *mux.Router) {
-	r.HandleFunc("", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("GET")
+	r.HandleFunc("", utils.JsonIO(controllers.UserOAuth, reflect.TypeOf(controllers.OAuthInput{}))).Methods("POST")
 
 }
