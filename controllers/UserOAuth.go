@@ -115,7 +115,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, int) {
 	defer db.Close()
 
 	chkUser := models.Mentor{}
-	db.Where(&models.Mentor{GithubHandle: gh_username}).First(&chkUser)
+	db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)
 	if chkUser.ID == 0 {
 		// New User
 		oauthdata := &OAuthOutput{
@@ -135,7 +135,7 @@ func UserOAuth(js interface{}, r *http.Request) (interface{}, int) {
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &utils.Claims{
-		Username: chkUser.GithubHandle,
+		Username: chkUser.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

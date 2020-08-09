@@ -7,8 +7,8 @@ import (
 //Mentor model
 type Mentor struct {
 	gorm.Model
-	Name         string
-	Email        string
-	AccessToken  string
-	GithubHandle string
+	
+	Name string
+	Email string
+	Username string
 }
