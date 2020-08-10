@@ -8,13 +8,14 @@ import (
 )
 
 // After Being checked by LoginRequired Middleware
-func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
+func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
-	err := db.Create(&models.Mentor{
+	err := db.Create(&models.Student{
 		Name:         req["name"].(string),
 		Email:        req["email"].(string),
+		College:      req["college"].(string),
 		Username: 	  req["username"].(string),
 	}).Error
 
