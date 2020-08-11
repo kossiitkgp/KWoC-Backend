@@ -10,8 +10,8 @@ import (
 
 // TEMP 
 // Discuss and add 2 middlewares - JWT Required, JSON Marshalling
-func RegisterMentor(r *mux.Router) {
-	r.HandleFunc("", utils.LoginRequired(utils.JsonIO(controllers.MentorReg))).Methods("POST")
+func RegisterStudent(r *mux.Router) {
+	r.HandleFunc("", utils.LoginRequired(utils.JsonIO(controllers.StudentReg))).Methods("POST")
 
 }
 

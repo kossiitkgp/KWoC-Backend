@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"kwoc20-backend/models"
@@ -24,4 +25,31 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	}
 
 	return "success", 200
+}
+
+func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{}, int){
+	// return "name", 200
+	username := req["username"].(string)
+
+	student := models.Student{}
+	db := utils.GetDB()
+	defer db.Close()
+	db.Where("name = ?", username).First(&student)
+
+	if student.ID == 0 {
+		return "no user", 400
+	}
+
+	type Response map[string]interface{}
+	res := Response{
+		"username" : username,
+		"name": student.Name,
+	}
+
+	return res, 200
+	
+}
+
+func StudentStats (username string) interface{} {
+	return fmt.Sprintf("stats of %s", username)
 }

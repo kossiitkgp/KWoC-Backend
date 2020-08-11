@@ -24,3 +24,26 @@ func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	return "success", 200
 }
+
+func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, int){
+	// return "name", 200
+	username := req["username"].(string)
+
+	mentor := models.Mentor{}
+	db := utils.GetDB()
+	defer db.Close()
+	db.Where("name = ?", username).First(&mentor)
+
+	if mentor.ID == 0 {
+		return "no user", 400
+	}
+
+	type Response map[string]interface{}
+	res := Response{
+		"username" : username,
+		"name": mentor.Name,
+	}
+
+	return res, 200
+}
+
