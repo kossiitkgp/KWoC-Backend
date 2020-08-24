@@ -21,6 +21,7 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	}).Error
 
 	if err != nil {
+		fmt.Println("err is ",err)
 		return "database issue", 500
 	}
 

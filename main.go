@@ -33,6 +33,9 @@ func main() {
 	mentorSubRoute := router.PathPrefix("/mentor").Subrouter()
 	routes.RegisterMentor(mentorSubRoute)
 
+	studentSubRoute := router.PathPrefix("/student").Subrouter()
+	routes.RegisterStudent(studentSubRoute)
+
 	projectSubRoute := router.PathPrefix("/project").Subrouter()
 	routes.RegisterProject(projectSubRoute)
 

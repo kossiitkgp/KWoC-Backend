@@ -19,6 +19,7 @@ func InitialMigration() {
 
 	db.AutoMigrate(&models.Mentor{})
 	db.AutoMigrate(&models.Project{})
+	db.AutoMigrate(&models.Student{})
 }
 
 func GetDB() *gorm.DB {
