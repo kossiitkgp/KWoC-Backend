@@ -16,49 +16,24 @@ import (
 	"kwoc20-backend/utils"
 )
 
-type OAuthInput struct {
-	Code string `json:"code"`
-	State string `json:"state"`
-}
-
-type OAuthOutput struct {
-	Username string `json:"username"`
-	Name string `json:"name"`
-	Email string `json:"email"`
-	Type string `json:"type"`
-	IsNewUser bool `json:"isNewUser"`
-	JWT string `json:"jwt"`
-	AccessToken string `json:"accessToken"`
-}
-
-// MentorOauth Handler for Github OAuth of Mentor
+// Handler for UserOAuth
 func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	
-	return js["name"], 200
-	// get the code from frontend
-	mentorOAuth := &OAuthInput{
-		Code: r.URL.Query().Get("code"),
-		State: r.URL.Query().Get("state"),
-	}
-
-	if mentorOAuth.Code == "" || mentorOAuth.State == "" {
-		return &utils.ErrorMessage{
-			Message: "Type Mismatch",
-		}, 400
+	// return error if no state or no code
+	if js["code"] == "" || js["state"] == "" {
+		return "type mismatch", 400
 	}
 
 	// using the code obtained from above to get AccessToken from Github
 	req, _ := json.Marshal(map[string]interface{}{
 		"client_id":     os.Getenv("client_id"),
 		"client_secret": os.Getenv("client_secret"),
-		"code":          mentorOAuth.Code,
-		"state":         mentorOAuth.State,
+		"code":          js["code"],
+		"state":         js["state"],
 	})
 	res, err := http.Post("https://github.com/login/oauth/access_token", "application/json", bytes.NewBuffer(req))
 	if err != nil {
-		return &utils.ErrorMessage{
-			Message: fmt.Sprintf("Error occurred: %s", err),
-		}, 500
+		return fmt.Sprintf("Error occurred: %s", err), 500
 	}
 	defer res.Body.Close()
 	resBody, _ := ioutil.ReadAll(res.Body)
@@ -70,16 +45,12 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	client := &http.Client{}
 	req1, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
-		return &utils.ErrorMessage{
-			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, 500
+		return fmt.Sprintf("Error occurred: %+v", err), 500
 	}
 	req1.Header.Add("Authorization", "token "+accessToken)
 	res1, err := client.Do(req1)
 	if err != nil {
-		return &utils.ErrorMessage{
-			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, 500
+		return fmt.Sprintf("Error occurred: %+v", err), 500
 	}
 	defer res1.Body.Close()
 
@@ -118,22 +89,8 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	chkUser := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)
-	if chkUser.ID == 0 {
-		// New User
-		oauthdata := &OAuthOutput{
-			Username: gh_username,
-			Name: gh_name,
-			Email: gh_username,
-			Type: mentorOAuth.State,
-			IsNewUser: true,
-			JWT: "",
-			AccessToken: accessToken,
-		}
-		utils.LOG.Println(fmt.Sprintf("New User: %+v", oauthdata))
-		return oauthdata, 200
-	}
 
-	// Returning user
+	// Creating a JWT token
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &utils.Claims{
@@ -146,18 +103,34 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenStr, err := token.SignedString(jwtKey)
 	if err != nil {
-		return &utils.ErrorMessage{
-			Message: fmt.Sprintf("Error occurred: %+v", err),
-		}, 500
+		return fmt.Sprintf("Error occurred: %+v", err), 500
 	}
-	oauthdata := &OAuthOutput{
-		Username: gh_username,
-		Name: gh_name,
-		Email: gh_email,
-		Type: mentorOAuth.State,
-		JWT: tokenStr,
-		AccessToken: accessToken,
+	
+	if chkUser.ID == 0 {
+		// New User
+		resNewUser := map[string]string{
+			"username": gh_username,
+			"name": gh_name,
+			"email": gh_email,
+			"type": js["state"].(string),
+			"jwt": tokenStr,
+			"accessToken": accessToken,
+		}
+		
+		utils.LOG.Println(fmt.Sprintf("New User: %+v", resNewUser))
+		return resNewUser, 200
 	}
 
-	return oauthdata, 200
+	
+	resOldUser := map[string]string {
+		"username": gh_username,
+		"name": gh_name,
+		"email": gh_email,
+		"type": js["state"].(string),
+		"jwt": tokenStr,
+		"accessToken": accessToken,
+	}
+	
+	return resOldUser, 200
+	
 }
