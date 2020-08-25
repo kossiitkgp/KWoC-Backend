@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"kwoc20-backend/models"
@@ -8,42 +9,48 @@ import (
 )
 
 // After Being checked by LoginRequired Middleware
-func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
+func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
-	err := db.Create(&models.Mentor{
+	err := db.Create(&models.Student{
 		Name:         req["name"].(string),
 		Email:        req["email"].(string),
+		College:      req["college"].(string),
 		Username: 	  req["username"].(string),
 	}).Error
 
 	if err != nil {
+		fmt.Println("err is ",err)
 		return "database issue", 500
 	}
 
 	return "success", 200
 }
 
-func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, int){
+func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{}, int){
 	// return "name", 200
 	username := req["username"].(string)
 
-	mentor := models.Mentor{}
+	student := models.Student{}
 	db := utils.GetDB()
 	defer db.Close()
-	db.Where("name = ?", username).First(&mentor)
+	db.Where("name = ?", username).First(&student)
 
-	if mentor.ID == 0 {
+	if student.ID == 0 {
 		return "no user", 400
 	}
 
 	type Response map[string]interface{}
 	res := Response{
 		"username" : username,
-		"name": mentor.Name,
+		"name": student.Name,
 	}
 
 	return res, 200
+	
 }
 
+func StudentStats (username string) interface{} {
+	return fmt.Sprintf("stats of %s", username)
+}

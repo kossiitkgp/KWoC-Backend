@@ -2,68 +2,48 @@ package controllers
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
-
-	"github.com/jinzhu/gorm"
 
 	"kwoc20-backend/models"
 	utils "kwoc20-backend/utils"
-	
 )
 
 //ProjectReg endpoint to register project details
-func ProjectReg(w http.ResponseWriter, r *http.Request) {
+func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 
-	var project models.Project
-	body, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(body, &project)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		utils.LOG.Println(err)
-		return
-	}
-
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
-		return
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
-	err = db.Create(&models.Project{
-		Name:       project.Name,
-		Desc:       project.Desc,
-		Tags:       project.Tags,
-		RepoLink:   project.RepoLink,
-		ComChannel: project.ComChannel,
+	gh_username := req["username"].(string)
+	mentor := models.Mentor{}
+	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
+
+	err := db.Create(&models.Project{
+		Name:       req["name"].(string),
+		Desc:       req["desc"].(string),
+		Tags:       req["tags"].(string),
+		RepoLink:   req["repoLink"].(string),
+		ComChannel: req["comChannel"].(string),
+		MentorID   : mentor.ID,
 	}).Error
 
 	if err != nil {
 		utils.LOG.Println(err)
-		http.Error(w, err.Error(), 500)
-		return
+		return err.Error(), 500
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`success`))
+	return "success", 200
 
 }
 
 //ProjectGet endpoint to fetch all projects
 // INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
 func ProjectGet(w http.ResponseWriter, r *http.Request) {
-	db, err := gorm.Open("sqlite3", "kwoc.db")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
-		return
-	}
+	db := utils.GetDB()
 	defer db.Close()
 
 	var projects []models.Project
-	err = db.Find(&projects).Error
+	err := db.Find(&projects).Error
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		utils.LOG.Println(err)

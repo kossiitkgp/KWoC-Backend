@@ -5,10 +5,14 @@ import (
 )
 
 //Mentor model
-type Mentor struct {
+type Student struct {
 	gorm.Model
 	
 	Name string
 	Email string
+	College string	
 	Username string
+
+	MidsCleared bool
+	EndsCleared bool
 }
