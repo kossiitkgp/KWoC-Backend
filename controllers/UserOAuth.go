@@ -141,7 +141,8 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		"jwt": tokenStr,
 		"accessToken": accessToken,
 	}
-	
+	// remove this now only
+	fmt.Println("delte ",resOldUser)
 	return resOldUser, 200
 	
 }
