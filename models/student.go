@@ -12,4 +12,7 @@ type Student struct {
 	Email string
 	College string	
 	Username string
+
+	MidsCleared bool
+	EndsCleared bool
 }

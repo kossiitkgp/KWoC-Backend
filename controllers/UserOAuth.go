@@ -87,14 +87,23 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
-	chkUser := models.Mentor{}
-	db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)
-
+	var isNewUser uint
+	if(js["state"] == "mentor") {
+		chkUser := models.Mentor{}
+		db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)	
+		isNewUser = chkUser.ID
+	} else {
+		chkUser := models.Student{}
+		db.Where(&models.Student{Username: gh_username}).First(&chkUser)
+		isNewUser = chkUser.ID
+	}
+	
+	
 	// Creating a JWT token
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &utils.Claims{
-		Username: chkUser.Username,
+		Username: gh_username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -106,13 +115,14 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		return fmt.Sprintf("Error occurred: %+v", err), 500
 	}
 	
-	if chkUser.ID == 0 {
+	if isNewUser == 0 {
 		// New User
-		resNewUser := map[string]string{
+		resNewUser := map[string]interface{}{
 			"username": gh_username,
 			"name": gh_name,
 			"email": gh_email,
-			"type": js["state"].(string),
+			"type": js["state"],
+			"isNewUser": 1,
 			"jwt": tokenStr,
 			"accessToken": accessToken,
 		}
@@ -122,11 +132,12 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	}
 
 	
-	resOldUser := map[string]string {
+	resOldUser := map[string]interface{} {
 		"username": gh_username,
 		"name": gh_name,
 		"email": gh_email,
-		"type": js["state"].(string),
+		"type": js["state"],
+		"isNewUser": 0,
 		"jwt": tokenStr,
 		"accessToken": accessToken,
 	}
