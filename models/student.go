@@ -7,12 +7,9 @@ import (
 //Mentor model
 type Student struct {
 	gorm.Model
-	
-	Name string
-	Email string
-	College string	
-	Username string
 
-	MidsCleared bool
-	EndsCleared bool
+	Name     string
+	Email    string
+	College  string
+	Username string
 }
