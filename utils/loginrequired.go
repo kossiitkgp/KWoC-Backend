@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -23,11 +24,12 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenStr := r.Header.Get("Bearer")
 		if tokenStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
+			http.Error(w, "Empty GET request", 400)
+			LOG.Println("Empty Get request")
 			return
 		}
 
-		jwtKey := []byte("OneRandomSecretKey!!@@!")
+		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
@@ -35,12 +37,14 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		})
 
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "Empty GET request", 401)
+			LOG.Println(err)
 			return
 		}
 
 		if !token.Valid {
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "Invalid Token", 401)
+			LOG.Println("Invalid Token")
 			return
 		}
 
@@ -49,7 +53,9 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		dbStr := "test.db"
 		db, err := gorm.Open("sqlite3", dbStr)
 		if err != nil {
-			panic("Failed to connect to the Database!")
+			http.Error(w, "Failed to connect to the Database!", 500)
+			LOG.Println(err)
+			os.Exit(1)
 		}
 		defer db.Close()
 

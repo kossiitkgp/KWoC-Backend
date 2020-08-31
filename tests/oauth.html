@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>OAuth Test</title>
+	</head>
+	<body>
+		<p>Access this page over http://lvh.me:5000/test/oauth</p>
+		<p>Create a github app. In the redirect url, put: http://lvh.me:5000/oauth</p>
+		<p>Keep an eye at the console</p>
+		<input type="text" placeholder="client_id" id="cid">
+		<button id="btn">Login with Github</button>
+
+		<script>
+			var timer;
+			document.getElementById("btn").onclick = (e) => {
+				console.log("Hello")
+				let client_id = document.getElementById("cid").value;
+				let popup = window.open(`https://github.com/login/oauth/authorize?client_id=${client_id}&state=mentor&allow_signup=true`);
+				timer = setInterval(() => {
+					if (popup.location.href.startsWith("http://lvh.me:5000/oauth") && popup.document.body.innerText.length > 0){
+						console.log(popup.document.body.innerText);
+						let data = JSON.parse(popup.document.body.innerText);
+						console.log(data);
+						popup.close();
+						clearInterval(timer);
+					}
+				}, 100);
+
+				//e.preventDefault();
+			}
+
+		</script>
+	</body>
+</html>
