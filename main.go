@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"kwoc20-backend/routes"
@@ -44,8 +43,7 @@ func main() {
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
 
-	err := http.ListenAndServe(":"+port,
-		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
+	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
 		mainLogger.Println("Error in Starting ", err)
 		os.Exit(1)
