@@ -29,7 +29,7 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			return
 		}
 
-		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
+		jwtKey := []byte("secret")
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
