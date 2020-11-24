@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"kwoc20-backend/routes"
@@ -39,13 +38,13 @@ func main() {
 	projectSubRoute := router.PathPrefix("/project").Subrouter()
 	routes.RegisterProject(projectSubRoute)
 
-	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags | log.Lshortfile)
-	mainLogger.Println("Starting server on port "+port)
+	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags|log.Lshortfile)
+	mainLogger.Println("Starting server on port " + port)
 
 	err := http.ListenAndServe(":"+port,
-		handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(router))
+		router)
 	if err != nil {
-		mainLogger.Println("Error in Starting ",err)
+		mainLogger.Println("Error in Starting ", err)
 		os.Exit(1)
 	}
 
