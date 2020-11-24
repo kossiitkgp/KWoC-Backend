@@ -41,8 +41,9 @@ func main() {
 	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags|log.Lshortfile)
 	mainLogger.Println("Starting server on port " + port)
 
-	err := http.ListenAndServe(":"+port,
-		router)
+	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
+
+	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
 		mainLogger.Println("Error in Starting ", err)
 		os.Exit(1)
