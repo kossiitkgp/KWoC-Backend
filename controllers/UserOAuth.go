@@ -18,7 +18,7 @@ import (
 
 // Handler for UserOAuth
 func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
-	
+
 	// return error if no state or no code
 	if js["code"] == "" || js["state"] == "" {
 		return "type mismatch", 400
@@ -64,7 +64,9 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		}, 500
 	}
 
-	user, _ := userdata.(map[string]interface{})
+	user, ok0 := userdata.(map[string]interface{})
+
+	fmt.Printf("%+v %+v %+v\n", resBody1, ok0, user)
 
 	gh_username, ok1 := user["login"].(string)
 	gh_name, ok2 := user["name"].(string)
@@ -88,17 +90,16 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	defer db.Close()
 
 	var isNewUser uint
-	if(js["state"] == "mentor") {
+	if js["state"] == "mentor" {
 		chkUser := models.Mentor{}
-		db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)	
+		db.Where(&models.Mentor{Username: gh_username}).First(&chkUser)
 		isNewUser = chkUser.ID
 	} else {
 		chkUser := models.Student{}
 		db.Where(&models.Student{Username: gh_username}).First(&chkUser)
 		isNewUser = chkUser.ID
 	}
-	
-	
+
 	// Creating a JWT token
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	expirationTime := time.Now().Add(30 * time.Minute)
@@ -114,35 +115,34 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	if err != nil {
 		return fmt.Sprintf("Error occurred: %+v", err), 500
 	}
-	
+
 	if isNewUser == 0 {
 		// New User
 		resNewUser := map[string]interface{}{
-			"username": gh_username,
-			"name": gh_name,
-			"email": gh_email,
-			"type": js["state"],
-			"isNewUser": 1,
-			"jwt": tokenStr,
+			"username":    gh_username,
+			"name":        gh_name,
+			"email":       gh_email,
+			"type":        js["state"],
+			"isNewUser":   1,
+			"jwt":         tokenStr,
 			"accessToken": accessToken,
 		}
-		
+
 		utils.LOG.Println(fmt.Sprintf("New User: %+v", resNewUser))
 		return resNewUser, 200
 	}
 
-	
-	resOldUser := map[string]interface{} {
-		"username": gh_username,
-		"name": gh_name,
-		"email": gh_email,
-		"type": js["state"],
-		"isNewUser": 0,
-		"jwt": tokenStr,
+	resOldUser := map[string]interface{}{
+		"username":    gh_username,
+		"name":        gh_name,
+		"email":       gh_email,
+		"type":        js["state"],
+		"isNewUser":   0,
+		"jwt":         tokenStr,
 		"accessToken": accessToken,
 	}
 	// remove this now only
-	fmt.Println("delte ",resOldUser)
+	fmt.Println("delte ", resOldUser)
 	return resOldUser, 200
-	
+
 }
