@@ -2,12 +2,13 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite" //For SQLite Dialect
+	_ "github.com/jinzhu/gorm/dialects/mysql" // For MySQL Dialect
 )
 
 //CtxUserString type for using with context
@@ -49,9 +50,22 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		}
 
 		ctx := r.Context()
+		DatabaseUsername := os.Getenv("DATABASE_USERNAME")
+		DatabasePassword := os.Getenv("DATABASE_PASSWORD")
+		DatabaseName := os.Getenv("DATABASE_NAME")
+		DatabaseHost := os.Getenv("DATABASE_HOST")
+		DatabasePort := os.Getenv("DATABASE_PORT")
 
-		dbStr := "test.db"
-		db, err := gorm.Open("sqlite3", dbStr)
+		DatabaseURI := fmt.Sprintf(
+			"%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			DatabaseUsername,
+			DatabasePassword,
+			DatabaseHost,
+			DatabasePort,
+			DatabaseName,
+		)
+
+		db, err := gorm.Open("mysql", DatabaseURI)
 		if err != nil {
 			http.Error(w, "Failed to connect to the Database!", 500)
 			LOG.Println(err)

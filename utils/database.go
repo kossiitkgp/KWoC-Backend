@@ -31,7 +31,7 @@ func GetDB() *gorm.DB {
 	DatabasePort := os.Getenv("DATABASE_PORT")
 
 	DatabaseURI := fmt.Sprintf(
-		"%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		"%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		DatabaseUsername,
 		DatabasePassword,
 		DatabaseHost,
