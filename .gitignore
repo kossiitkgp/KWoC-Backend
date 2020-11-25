@@ -3,3 +3,5 @@ tmp/
 kwoc20-backend
 .DS_Store
 .env
+*.db-journal
+*.swp
