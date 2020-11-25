@@ -70,7 +70,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	gh_name, ok2 := user["name"].(string)
 	gh_email, ok3 := user["email"].(string)
 
-	fmt.Printf("%+v %+v\n", gh_username, ok1)
+	fmt.Printf("%+v %+v %+v\n", ok1, ok2, ok3)
 	if !ok1 {
 		return &utils.ErrorMessage{
 			Message: "GithubHandle not found",
