@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"runtime/debug"
 )
 
 type ErrorMessage struct {
@@ -24,6 +25,9 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
+				fmt.Println("Kuch to locha hai")
+				fmt.Printf("%+v\n", recv)
+				debug.PrintStack()
 				response := &ErrorMessage{
 					Message: "Internal Server Error",
 				}
@@ -39,7 +43,13 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 
 		var jsonData1 interface{}
 		_ = json.Unmarshal(body, &jsonData1)
-		jsonData := jsonData1.(map[string]interface{})
+		var jsonData map[string]interface{}
+		if jsonData1 == nil {
+			LOG.Println("Mil gya")
+			jsonData = make(map[string]interface{})
+		} else {
+			jsonData = jsonData1.(map[string]interface{})
+		}
 
 
 		response, statusCode := next(jsonData, r)
