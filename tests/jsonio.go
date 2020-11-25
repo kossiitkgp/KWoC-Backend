@@ -1,4 +1,4 @@
-// package tests
+package tests
 
 // import (
 //     "kwoc20-backend/utils"

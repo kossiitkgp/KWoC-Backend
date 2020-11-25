@@ -14,21 +14,21 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	defer db.Close()
 
 	err := db.Create(&models.Student{
-		Name:         req["name"].(string),
-		Email:        req["email"].(string),
-		College:      req["college"].(string),
-		Username: 	  req["username"].(string),
+		Name:     req["name"].(string),
+		Email:    req["email"].(string),
+		College:  req["college"].(string),
+		Username: req["username"].(string),
 	}).Error
 
 	if err != nil {
-		fmt.Println("err is ",err)
+		fmt.Println("err is ", err)
 		return "database issue", 500
 	}
 
 	return "success", 200
 }
 
-func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{}, int){
+func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	// return "name", 200
 	username := req["username"].(string)
 
@@ -42,14 +42,14 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 
 	type Response map[string]interface{}
 	res := Response{
-		"name": student.Name,
+		"name":    student.Name,
 		"college": student.College,
 	}
 
 	return res, 200
-	
+
 }
 
-func StudentStats (username string) interface{} {
+func StudentStats(username string) interface{} {
 	return fmt.Sprintf("stats of %s", username)
 }
