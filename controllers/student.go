@@ -35,16 +35,15 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 	student := models.Student{}
 	db := utils.GetDB()
 	defer db.Close()
-	db.Where("name = ?", username).First(&student)
-
+	db.Where(&models.Student{Username: username}).First(&student)
 	if student.ID == 0 {
 		return "no user", 400
 	}
 
 	type Response map[string]interface{}
 	res := Response{
-		"username" : username,
 		"name": student.Name,
+		"college": student.College,
 	}
 
 	return res, 200
