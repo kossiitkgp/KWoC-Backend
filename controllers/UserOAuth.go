@@ -68,9 +68,9 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	fmt.Printf("%+v %+v %+v\n", resBody1, ok0, user)
 
-	gh_username, ok1 := user["login"].(string)
-	gh_name, ok2 := user["name"].(string)
-	gh_email, ok3 := user["email"].(string)
+	gh_username, ok1 := user["login"]
+	gh_name, ok2 := user["name"]
+	gh_email, ok3 := user["email"]
 
 	if !ok1 {
 		return &utils.ErrorMessage{
