@@ -24,7 +24,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
-		MentorID   : mentor.ID,
+		MentorID:   mentor.ID,
 	}).Error
 
 	if err != nil {
