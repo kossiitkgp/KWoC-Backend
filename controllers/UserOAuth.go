@@ -26,8 +26,8 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	// using the code obtained from above to get AccessToken from Github
 	req, _ := json.Marshal(map[string]interface{}{
-		"client_id":     "74557dcb91016b10b54b",
-		"client_secret": "594d9e729a47a5d8e944edc792530342841caaf0",
+		"client_id":     os.Getenv("client_id"),
+		"client_secret": os.Getenv("client_secret"),
 		"code":          js["code"],
 		"state":         js["state"],
 	})
@@ -101,7 +101,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	// Creating a JWT token
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
-	expirationTime := time.Now().Add(30 * time.Minute)
+	expirationTime := time.Now().Add(50*24*time.Hour)
 	claims := &utils.Claims{
 		Username: gh_username,
 		StandardClaims: jwt.StandardClaims{

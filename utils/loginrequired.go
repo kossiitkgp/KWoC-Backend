@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"math/rand"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -20,6 +22,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+
 //LoginRequired Middleware to protect endpoints
 func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +32,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			LOG.Println("Empty Get request")
 			return
 		}
-
-		jwtKey := []byte("secret")
+		
+		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
