@@ -46,8 +46,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			LOG.Println("Empty Get request")
 			return
 		}
-		secret_string := generateRandomString(6)
-		jwtKey := []byte(secret_string)
+		
+		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
