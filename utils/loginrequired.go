@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"math/rand"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -20,6 +22,21 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// generates a random string with length given as a parameter
+func generateRandomString(length int) string {
+	characters := "abcdefghijklmnopqrstuvwxyz"
+	// characters to be used in the random string can be added in this string
+	n := len(characters)
+
+	rand.Seed(time.Now().UnixNano())
+	random_string := "" 
+	for i:=1; i<=length; i++ {
+		random_number := rand.Intn(n)
+		random_string += string(characters[int(random_number)])
+	}
+	return random_string
+}
+
 //LoginRequired Middleware to protect endpoints
 func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +46,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			LOG.Println("Empty Get request")
 			return
 		}
-
-		jwtKey := []byte("secret")
+		secret_string := generateRandomString(6)
+		jwtKey := []byte(secret_string)
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {

@@ -101,7 +101,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 
 	// Creating a JWT token
 	jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
-	expirationTime := time.Now().Add(30 * time.Minute)
+	expirationTime := time.Now().Add(50*24*time.Hour)
 	claims := &utils.Claims{
 		Username: gh_username,
 		StandardClaims: jwt.StandardClaims{
