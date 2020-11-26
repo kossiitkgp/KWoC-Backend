@@ -22,20 +22,6 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-// generates a random string with length given as a parameter
-func generateRandomString(length int) string {
-	characters := "abcdefghijklmnopqrstuvwxyz"
-	// characters to be used in the random string can be added in this string
-	n := len(characters)
-
-	rand.Seed(time.Now().UnixNano())
-	random_string := "" 
-	for i:=1; i<=length; i++ {
-		random_number := rand.Intn(n)
-		random_string += string(characters[int(random_number)])
-	}
-	return random_string
-}
 
 //LoginRequired Middleware to protect endpoints
 func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
