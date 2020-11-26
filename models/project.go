@@ -8,7 +8,7 @@ import (
 type Project struct {
 	gorm.Model
 	Name       string
-	Desc       string
+	Desc       string `gorm:"size:2550"`
 	Tags       string
 	RepoLink   string
 	ComChannel string
