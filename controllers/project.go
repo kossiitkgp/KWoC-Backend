@@ -61,3 +61,56 @@ func ProjectGet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`success`))
 
 }
+
+func AllProjects(w http.ResponseWriter, r *http.Request) {
+	db := utils.GetDB()
+	defer db.Close()
+
+	var projects []models.Project
+	type project_and_mentor struct {
+		ProjectName       		string
+		ProjectDesc       		string
+		ProjectTags       		string
+		ProjectRepoLink   		string
+		ProjectComChannel 		string
+		MentorName 				string	
+		MentorUsername 			string
+		MentorEmail				string
+	}
+
+	err := db.Find(&projects).Error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var data []project_and_mentor
+	for _, project := range projects {
+		var mentor models.Mentor
+		var project_and_mentor_x project_and_mentor
+		err := db.First(&mentor, project.MentorID).Error
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		
+		project_and_mentor_x.ProjectName = 			project.Name
+		project_and_mentor_x.ProjectDesc = 			project.Desc
+		project_and_mentor_x.ProjectTags = 			project.Tags
+		project_and_mentor_x.ProjectRepoLink = 		project.RepoLink
+		project_and_mentor_x.ProjectComChannel = 	project.ComChannel
+		project_and_mentor_x.MentorName = 			mentor.Name
+		project_and_mentor_x.MentorUsername = 		mentor.Username
+		project_and_mentor_x.MentorEmail = 			mentor.Email
+
+		data = append(data, project_and_mentor_x)	
+	}
+	data_json, err := json.Marshal(data)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data_json)
+}
