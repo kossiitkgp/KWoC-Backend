@@ -38,9 +38,9 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 
 	var projects []models.Project
 	db.Where("mentor_id = ?", mentor.ID).Find(&projects)
-	
+
 	var secondary_projects []models.Project
-	db.Where("second_mentor_id = ?", mentor.ID).Find(&secondary_projects)
+	db.Where("secondary_mentor_id = ?", mentor.ID).Find(&secondary_projects)
 
 	all_projects := append(projects, secondary_projects...)
 	// projects_json, err := json.Marshal(projects)

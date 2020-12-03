@@ -94,9 +94,9 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			mentor_names     = append(mentor_names, secondary_mentor.Name)
+			mentor_names = append(mentor_names, secondary_mentor.Name)
 			mentor_usernames = append(mentor_usernames, secondary_mentor.Username)
-			mentor_emails    = append(mentor_emails, secondary_mentor.Email)
+			mentor_emails = append(mentor_emails, secondary_mentor.Email)
 		}
 
 		project_and_mentor_x.ProjectName = project.Name
