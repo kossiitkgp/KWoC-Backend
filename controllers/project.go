@@ -15,6 +15,14 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	defer db.Close()
 
 	gh_username := req["username"].(string)
+
+	ctx_user := r.Context().Value("user").(string)
+
+	if ctx_user != gh_username {
+		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		return "Corrupt JWT", 403
+	}
+
 	mentor := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
 
