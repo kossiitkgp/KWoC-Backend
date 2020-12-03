@@ -20,7 +20,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 	if ctx_user != gh_username {
 		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
-		return "Corrupt JWT", 403
+		return "Corrupt JWT", http.StatusForbidden
 	}
 
 	mentor := models.Mentor{}
@@ -37,10 +37,10 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 	if err != nil {
 		utils.LOG.Println(err)
-		return err.Error(), 500
+		return err.Error(), http.StatusInternalServerError
 	}
 
-	return "success", 200
+	return "success", http.StatusOK
 
 }
 
