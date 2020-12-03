@@ -38,6 +38,11 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 
 	var projects []models.Project
 	db.Where("mentor_id = ?", mentor.ID).Find(&projects)
+	
+	var secondary_projects []models.Project
+	db.Where("second_mentor_id = ?", mentor.ID).Find(&secondary_projects)
+
+	all_projects := append(projects, secondary_projects...)
 	// projects_json, err := json.Marshal(projects)
 
 	// var projects []models.Project
@@ -47,7 +52,7 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 	type Response map[string]interface{}
 	res := Response{
 		"name":     mentor.Name,
-		"projects": projects,
+		"projects": all_projects,
 	}
 
 	return res, 200

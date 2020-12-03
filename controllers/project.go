@@ -46,26 +46,76 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 //ProjectGet endpoint to fetch all projects
 // INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
-func ProjectGet(w http.ResponseWriter, r *http.Request) {
+func AllProjects(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	defer db.Close()
 
 	var projects []models.Project
+	type project_and_mentor struct {
+		ProjectName       string
+		ProjectDesc       string
+		ProjectTags       string
+		ProjectRepoLink   string
+		ProjectComChannel string
+		MentorName        []string
+		MentorUsername    []string
+		MentorEmail       []string
+	}
+
 	err := db.Find(&projects).Error
 	if err != nil {
-		http.Error(w, err.Error(), 400)
-		utils.LOG.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(projects)
+	var data []project_and_mentor
+	for _, project := range projects {
+
+		mentor_names := make([]string, 1)
+		mentor_usernames := make([]string, 1)
+		mentor_emails := make([]string, 1)
+
+		var mentor models.Mentor
+		var secondary_mentor models.Mentor
+
+		var project_and_mentor_x project_and_mentor
+		err := db.First(&mentor, project.MentorID).Error
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		mentor_names[0] = mentor.Name
+		mentor_usernames[0] = mentor.Username
+		mentor_emails[0] = mentor.Email
+
+		if project.SecondaryMentorID != 0 {
+			err := db.First(&secondary_mentor, project.SecondaryMentorID).Error
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			mentor_names     = append(mentor_names, secondary_mentor.Name)
+			mentor_usernames = append(mentor_usernames, secondary_mentor.Username)
+			mentor_emails    = append(mentor_emails, secondary_mentor.Email)
+		}
+
+		project_and_mentor_x.ProjectName = project.Name
+		project_and_mentor_x.ProjectDesc = project.Desc
+		project_and_mentor_x.ProjectTags = project.Tags
+		project_and_mentor_x.ProjectRepoLink = project.RepoLink
+		project_and_mentor_x.ProjectComChannel = project.ComChannel
+		project_and_mentor_x.MentorName = mentor_names
+		project_and_mentor_x.MentorUsername = mentor_usernames
+		project_and_mentor_x.MentorEmail = mentor_emails
+
+		data = append(data, project_and_mentor_x)
+	}
+	data_json, err := json.Marshal(data)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
-		utils.LOG.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`success`))
-
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data_json)
 }

@@ -13,4 +13,5 @@ type Project struct {
 	RepoLink   string
 	ComChannel string
 	MentorID   uint
+	SecondaryMentorID uint
 }
