@@ -16,7 +16,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 	gh_username := req["username"].(string)
 
-	ctx_user := r.Context().Value("user").(string)
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
 	if ctx_user != gh_username {
 		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
