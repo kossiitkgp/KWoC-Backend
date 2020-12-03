@@ -15,6 +15,14 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	defer db.Close()
 
 	gh_username := req["username"].(string)
+
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	if ctx_user != gh_username {
+		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		return "Corrupt JWT", http.StatusForbidden
+	}
+
 	mentor := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
 
@@ -29,10 +37,10 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 	if err != nil {
 		utils.LOG.Println(err)
-		return err.Error(), 500
+		return err.Error(), http.StatusInternalServerError
 	}
 
-	return "success", 200
+	return "success", http.StatusOK
 
 }
 

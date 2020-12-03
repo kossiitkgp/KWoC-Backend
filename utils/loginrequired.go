@@ -2,13 +2,11 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql" // For MySQL Dialect
+	// _ "github.com/jinzhu/gorm/dialects/mysql" // For MySQL Dialect
 )
 
 //CtxUserString type for using with context
@@ -20,7 +18,6 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-
 //LoginRequired Middleware to protect endpoints
 func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +27,7 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 			LOG.Println("Empty Get request")
 			return
 		}
-		
+
 		jwtKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 
 		claims := &Claims{}
@@ -51,31 +48,31 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		}
 
 		ctx := r.Context()
-		DatabaseUsername := os.Getenv("DATABASE_USERNAME")
-		DatabasePassword := os.Getenv("DATABASE_PASSWORD")
-		DatabaseName := os.Getenv("DATABASE_NAME")
-		DatabaseHost := os.Getenv("DATABASE_HOST")
-		DatabasePort := os.Getenv("DATABASE_PORT")
+		// DatabaseUsername := os.Getenv("DATABASE_USERNAME")
+		// DatabasePassword := os.Getenv("DATABASE_PASSWORD")
+		// DatabaseName := os.Getenv("DATABASE_NAME")
+		// DatabaseHost := os.Getenv("DATABASE_HOST")
+		// DatabasePort := os.Getenv("DATABASE_PORT")
 
-		DatabaseURI := fmt.Sprintf(
-			"%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-			DatabaseUsername,
-			DatabasePassword,
-			DatabaseHost,
-			DatabasePort,
-			DatabaseName,
-		)
+		// DatabaseURI := fmt.Sprintf(
+		// 	"%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		// 	DatabaseUsername,
+		// 	DatabasePassword,
+		// 	DatabaseHost,
+		// 	DatabasePort,
+		// 	DatabaseName,
+		// )
 
-		db, err := gorm.Open("mysql", DatabaseURI)
-		if err != nil {
-			http.Error(w, "Failed to connect to the Database!", 500)
-			LOG.Println(err)
-			os.Exit(1)
-		}
-		defer db.Close()
+		// db, err := gorm.Open("mysql", DatabaseURI)
+		// if err != nil {
+		// 	http.Error(w, "Failed to connect to the Database!", 500)
+		// 	LOG.Println(err)
+		// 	os.Exit(1)
+		// }
+		// defer db.Close()
 
-		var user interface{} //Instance of Mentor/Mentee model
-		newctx := context.WithValue(ctx, CtxUserString("user"), user)
+		// var user interface{} //Instance of Mentor/Mentee model
+		newctx := context.WithValue(ctx, CtxUserString("user"), claims.Username)
 		req := r.WithContext(newctx)
 
 		next(w, req)
