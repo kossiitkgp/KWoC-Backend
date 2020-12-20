@@ -44,6 +44,7 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 	res := Response{
 		"name":    student.Name,
 		"college": student.College,
+		"evals": student.Evals,
 	}
 
 	return res, 200
