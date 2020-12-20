@@ -12,4 +12,5 @@ type Student struct {
 	Email    string
 	College  string
 	Username string
+	Evals    int 	`gorm:"default:0"`
 }
