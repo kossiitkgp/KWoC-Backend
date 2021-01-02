@@ -72,7 +72,8 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 	db.Where(&models.Student{Username: gh_username}).First(&student)
 
 	student.BlogLink = req["bloglink"].(string)
-	db.Save(&student)
+	student.Evals = 2
+        db.Save(&student)
 
 	
 	return "success", http.StatusOK
