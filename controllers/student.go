@@ -74,10 +74,6 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 	student.BlogLink = req["bloglink"].(string)
 	db.save(&student)
 
-	if err != nil {
-		utils.LOG.Println(err)
-		return err.Error(), http.StatusInternalServerError
-	}
-
+	
 	return "success", http.StatusOK
 }
