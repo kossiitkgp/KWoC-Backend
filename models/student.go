@@ -13,4 +13,5 @@ type Student struct {
 	College  string
 	Username string
 	Evals    int 	`gorm:"default:0"`
+	BlogLink string `gorm:"size:2550"`
 }

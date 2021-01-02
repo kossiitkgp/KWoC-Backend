@@ -54,3 +54,26 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 func StudentStats(username string) interface{} {
 	return fmt.Sprintf("stats of %s", username)
 }
+
+func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	db := utils.GetDB()
+	defer db.Close()
+
+	gh_username := req["username"].(string)
+
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	if ctx_user != gh_username {
+		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		return "Corrupt JWT", http.StatusForbidden
+	}
+
+	student := models.Student{}
+	db.Where(&models.Student{Username: gh_username}).First(&student)
+
+	student.BlogLink = req["bloglink"].(string)
+	db.Save(&student)
+
+	
+	return "success", http.StatusOK
+}
