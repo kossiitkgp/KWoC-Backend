@@ -26,8 +26,14 @@ type Project struct {
 	Branch            string
 	README            string `gorm:"size:255000000"`
 	ProjectStatus     bool
-	Mentor         	  Mentor // foreign key
-	SecondaryMentor   Mentor // foreign key
+
+	// for stats
+	LastCommitSHA string
+	LastPRID string
+
+	// foreign keys
+	Mentor         	  Mentor 
+	SecondaryMentor   Mentor 
 }
 
 // Commits Model
