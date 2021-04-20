@@ -22,6 +22,9 @@ type Project struct {
 	Tags              string
 	RepoLink          string
 	ComChannel        string
+	Branch            string
+	README            string `gorm:"size:255000000"`
+	ProjectStatus     bool
 	Mentor         	  Mentor
 	SecondaryMentor   Mentor
 }
