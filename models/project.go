@@ -4,6 +4,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+//Mentor model
+type Mentor struct {
+	gorm.Model
+
+	ID 		 uint
+	Name     string
+	Email    string
+	Username string
+}
+
 //Project Model
 type Project struct {
 	gorm.Model
@@ -12,6 +22,6 @@ type Project struct {
 	Tags              string
 	RepoLink          string
 	ComChannel        string
-	MentorID          uint
-	SecondaryMentorID uint
+	Mentor         	  Mentor
+	SecondaryMentor   Mentor
 }

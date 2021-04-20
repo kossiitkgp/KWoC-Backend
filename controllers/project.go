@@ -32,7 +32,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
-		MentorID:   mentor.ID,
+		Mentor:   mentor,
 	}).Error
 
 	if err != nil {
@@ -68,49 +68,49 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var data []project_and_mentor
-	for _, project := range projects {
+	// var data []project_and_mentor
+	// for _, project := range projects {
 
-		mentor_names := make([]string, 1)
-		mentor_usernames := make([]string, 1)
-		mentor_emails := make([]string, 1)
+	// 	mentor_names := make([]string, 1)
+	// 	mentor_usernames := make([]string, 1)
+	// 	mentor_emails := make([]string, 1)
 
-		var mentor models.Mentor
-		var secondary_mentor models.Mentor
+	// 	var mentor models.Mentor
+	// 	var secondary_mentor models.Mentor
 
-		var project_and_mentor_x project_and_mentor
-		err := db.First(&mentor, project.MentorID).Error
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		mentor_names[0] = mentor.Name
-		mentor_usernames[0] = mentor.Username
-		mentor_emails[0] = mentor.Email
+	// 	var project_and_mentor_x project_and_mentor
+	// 	err := db.First(&mentor, project.MentorID).Error
+	// 	if err != nil {
+	// 		w.WriteHeader(http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// 	mentor_names[0] = mentor.Name
+	// 	mentor_usernames[0] = mentor.Username
+	// 	mentor_emails[0] = mentor.Email
 
-		if project.SecondaryMentorID != 0 {
-			err := db.First(&secondary_mentor, project.SecondaryMentorID).Error
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			mentor_names = append(mentor_names, secondary_mentor.Name)
-			mentor_usernames = append(mentor_usernames, secondary_mentor.Username)
-			mentor_emails = append(mentor_emails, secondary_mentor.Email)
-		}
+	// 	if project.SecondaryMentorID != 0 {
+	// 		err := db.First(&secondary_mentor, project.SecondaryMentorID).Error
+	// 		if err != nil {
+	// 			w.WriteHeader(http.StatusInternalServerError)
+	// 			return
+	// 		}
+	// 		mentor_names = append(mentor_names, secondary_mentor.Name)
+	// 		mentor_usernames = append(mentor_usernames, secondary_mentor.Username)
+	// 		mentor_emails = append(mentor_emails, secondary_mentor.Email)
+	// 	}
 
-		project_and_mentor_x.ProjectName = project.Name
-		project_and_mentor_x.ProjectDesc = project.Desc
-		project_and_mentor_x.ProjectTags = project.Tags
-		project_and_mentor_x.ProjectRepoLink = project.RepoLink
-		project_and_mentor_x.ProjectComChannel = project.ComChannel
-		project_and_mentor_x.MentorName = mentor_names
-		project_and_mentor_x.MentorUsername = mentor_usernames
-		project_and_mentor_x.MentorEmail = mentor_emails
+	// 	project_and_mentor_x.ProjectName = project.Name
+	// 	project_and_mentor_x.ProjectDesc = project.Desc
+	// 	project_and_mentor_x.ProjectTags = project.Tags
+	// 	project_and_mentor_x.ProjectRepoLink = project.RepoLink
+	// 	project_and_mentor_x.ProjectComChannel = project.ComChannel
+	// 	project_and_mentor_x.MentorName = mentor_names
+	// 	project_and_mentor_x.MentorUsername = mentor_usernames
+	// 	project_and_mentor_x.MentorEmail = mentor_emails
 
-		data = append(data, project_and_mentor_x)
-	}
-	data_json, err := json.Marshal(data)
+	// 	data = append(data, project_and_mentor_x)
+	// }
+	data_json, err := json.Marshal("TO BE WORKED ON")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
