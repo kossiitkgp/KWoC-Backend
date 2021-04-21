@@ -31,6 +31,12 @@ type Project struct {
 	LastCommitSHA string
 	LastPRID string
 
+	// stats table
+	CommitCount uint
+	PRCount uint
+	AddedLines uint
+	RemovedLines uint
+
 	// foreign keys
 	Mentor         	  Mentor 
 	SecondaryMentor   Mentor 
