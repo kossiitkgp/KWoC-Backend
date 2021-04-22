@@ -1,4 +1,4 @@
-// TODO - FIGURE OUT A WAY TO RUN THIS FILE
+// FIGURE OUT A WAY TO RUN THIS FILE
 package utils
 
 import (
@@ -10,10 +10,43 @@ import (
 	"os"
 )
 
-
 func main() {
 	// testing
 	FetchLatestCommits("lttkgp/metadata-extractor", "master")
+	
+}
+
+func GetExtension(filename string) string{
+	split_arr := strings.Split(filename, ".")
+	extension := "." + split_arr[len(split_arr)-1]
+	return extension
+}
+
+func GetLanguagesFromFilenames(filenames []string) []string{
+	var languages []string
+
+	json_file, err := os.Open("languages.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer json_file.Close()
+
+	var ext2Lang map[string]string
+	ext2Lang_bytes, _ := ioutil.ReadAll(json_file)
+	_ = json.Unmarshal(ext2Lang_bytes, &ext2Lang)
+
+	// parse the file extensions
+	exts := make(map[string]bool)
+	for i := range filenames{
+		exts[GetExtension(filenames[i])] = true
+	}
+
+	// Get extension
+	for key,_ := range exts {
+		languages = append(languages, ext2Lang[key])
+	}
+
+	return languages
 }
 
 func IsBeforeKWoC(timestamp string) bool{
@@ -28,7 +61,7 @@ func MakeRequest(URL string) (string, string){
 	fmt.Println("url is ", URL)
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", URL, nil)
-	req.Header.Set("Authorization", "token "+os.Getenv("GITHUB_STATS_TOKEN"))
+	req.Header.Set("Authorization", "token " + os.Getenv("GITHUB_STATS_TOKEN"))
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Err is", err)
@@ -93,6 +126,18 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		commit_message := commit_info_map["message"]
 		fmt.Println("needed info -> message ", commit_message)
 
+		//Fetches the tech on which student worked using file names
+		files_arr, _ := commit_info["files"].([]interface{})
+		var file_names []string
+		for j := range files_arr {
+			file_map := files_arr[j].(map[string]interface{})
+			file_name := file_map["filename"].(string)
+			file_names = append(file_names, file_name)
+		}
+		languages_worked := GetLanguagesFromFilenames(file_names)
+		fmt.Println("languages worked is ", languages_worked)
+
+
 		// TODO: Save the commit message in the the DB, the commit model contains 
 		// URL  : commit_url
 		// Message : commit_message
@@ -126,7 +171,12 @@ func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a pro
 	API_URL := "https://api.github.com/repos/" + repo + "/commits?sha=" + branch
 	for LATEST_COMMITS_FETCHED == false {
 		LATEST_COMMITS_FETCHED, API_URL = FilterAndSaveCommits(API_URL, LAST_COMMIT_SHA)
+		fmt.Println("API_URL IS -----------------", API_URL)
+		fmt.Println("LAST_COMMITS_FETCHED IS -----------------------", LATEST_COMMITS_FETCHED)
 	}
+	
+	
+	
 }
 
 func FetchLatestPRs(repo string) {
