@@ -50,6 +50,7 @@ type Commits struct{
 	Message string
 	LinesAdded uint
 	LinesRemoved uint
+	SHA string
 	
 	Project Project // foreign key
 	Student Student // foreign key
@@ -61,6 +62,7 @@ type PullRequest struct {
 	ID	uint
 	URL string
 	Title string
+	CreatedAt string
 	
 	Project Project //foreign key
 	Student Student // foreign key

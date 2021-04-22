@@ -1,4 +1,4 @@
-// FIGURE OUT A WAY TO RUN THIS FILE
+// TODO: FIGURE OUT A WAY TO RUN THIS FILE
 package utils
 
 import (
@@ -12,7 +12,8 @@ import (
 
 func main() {
 	// testing
-	FetchLatestCommits("lttkgp/metadata-extractor", "master")
+	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
+	FetchLatestPulls("kossiitkgp/kwoc20-backend")
 	
 }
 
@@ -94,7 +95,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		// 	continue
 		// }
 		if(IsBeforeKWoC(commit_date) || commits[i]["sha"] == LAST_COMMIT_SHA) {
-			// TODO: Update the LAST COMMIT SHA of the project
+			// TODO: Update the LAST COMMIT SHA of the project, IT SHOULD BE OF FIRST PAGE
 			return true, ""
 		}
 		
@@ -136,13 +137,14 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		}
 		languages_worked := GetLanguagesFromFilenames(file_names)
 		fmt.Println("languages worked is ", languages_worked)
-
+		//TODO: Update the Languages Worked Field under Student row
 
 		// TODO: Save the commit message in the the DB, the commit model contains 
 		// URL  : commit_url
 		// Message : commit_message
 		// LinesAdded : lines_added
 		// LinesRemoved: lines_removed
+		// SHA : commits[i][sha]
 		
 		// project: that will be parameter passed or from the repo name, u can get the object
 		// student : you can get the student object based on "student_username"
@@ -153,8 +155,8 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		// Take the Project object and increase the commit_count by 1
 	}
 
+	// TODO: Update the last commit SHA of the project with commits[0]'s SHA in the FIRST PAGE
 	if(link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"next\"") == false) {
-		// TODO: Update the last commit SHA of the project with commits[0]'s SHA
 		return true,""
 	} else {
 		untrimmed_next_url := strings.Split(link_in_headers, ">")[0]
@@ -166,7 +168,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 
 func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a project Object will be passed
 	fmt.Println("repo is ",repo)
-	LAST_COMMIT_SHA := "" // TOOD: need to be fetched from Project object 
+	LAST_COMMIT_SHA := "" // TODO: need to be fetched from Project object 
 	LATEST_COMMITS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/commits?sha=" + branch
 	for LATEST_COMMITS_FETCHED == false {
@@ -174,11 +176,67 @@ func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a pro
 		fmt.Println("API_URL IS -----------------", API_URL)
 		fmt.Println("LAST_COMMITS_FETCHED IS -----------------------", LATEST_COMMITS_FETCHED)
 	}
-	
-	
-	
 }
 
-func FetchLatestPRs(repo string) {
-	fmt.Println("repo is ",repo)
+
+func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
+	res, link_in_headers := MakeRequest(API_URL)
+	resBytes := []byte(res)
+
+	var pulls []map[string]interface{}
+	err := json.Unmarshal(resBytes, &pulls)
+	if err != nil {
+		fmt.Println("err in unmarshal commits ",err)
+	}
+
+	for i := range pulls {
+		pull_date := pulls[i]["created_at"].(string)
+		
+		if(IsBeforeKWoC(pull_date) || pull_date == LAST_PULL_DATE) {
+			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE
+			return true, ""
+		}
+
+		pull_url := pulls[i]["html_url"].(string)
+		title := pulls[i]["title"].(string)
+		fmt.Println("pul_url is ", pull_url)//remove this print later
+		fmt.Println("Pull ttle is ",title) // remove this later
+
+		// TODO: Save in DB the pull request in pull request Table
+		// the fields are
+		// URL: pull_url
+		// Title: title
+		// PullID: pull_id
+
+		// TODO: Update the stats summary
+		// Increase the PR count in Project row , and Student Row
+	}
+
+	// TODO: Update the last commit ID of the pulls with pulls[0]
+	// NEED TO UPDATE THE PULL ID, IF ITS THE FIRST PAGE 
+
+	if(link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"next\"") == false) {
+		return true,""
+	} else {
+		untrimmed_next_url := strings.Split(link_in_headers, ">")[0]
+		next_url := strings.TrimLeft(untrimmed_next_url, "<")
+		return false, next_url
+	}
+
+
 }
+
+
+func FetchLatestPulls(repo string) { // TODO: Here mostly a project object will be passed
+	fmt.Println("repo is ",repo)
+	LAST_PULL_DATE := "" // TODO: need to be fetched from Project Object
+	LATEST_PULLS_FETCHED := false
+	API_URL := "https://api.github.com/repos/" + repo + "/pulls?state=all"
+	for LATEST_PULLS_FETCHED == false {
+		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE)
+		fmt.Println("API_URL IS ----- ", API_URL)
+		fmt.Println("LATEST_PULLS_FETCHED ", LATEST_PULLS_FETCHED)
+	}
+
+}
+
