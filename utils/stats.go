@@ -1,4 +1,4 @@
-// TODO: FIGURE OUT A WAY TO RUN THIS FILE
+// TODO : FIGURE OUT A WAY TO RUN THIS FILE
 package utils
 
 import (
@@ -86,16 +86,21 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		fmt.Println("err in unmarshal commits ",err)
 	}
 
+
 	for i := range commits {
 		// need to check if commit date is after KWoC coding period began or NOT
 		commit_info_map := commits[i]["commit"].(map[string]interface{})
 		commit_info_author_map := commit_info_map["author"].(map[string]interface{})
 		commit_date := commit_info_author_map["date"].(string)
-		// if(IsBeforeKWoC(commit_date)){
-		// 	continue
-		// }
+		
+		// For the first page Save the latest commit's SHA
+		if ((link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"prev\"") == false) && (IsBeforeKWoC(commit_date) == false) && (i == 0)) {
+			latest_commit_sha := commits[i]["sha"].(string)
+			fmt.Println("This is the latest SHA of the project ", latest_commit_sha)
+			// TODO: save the above in DB of the project above
+		}
+
 		if(IsBeforeKWoC(commit_date) || commits[i]["sha"] == LAST_COMMIT_SHA) {
-			// TODO: Update the LAST COMMIT SHA of the project, IT SHOULD BE OF FIRST PAGE
 			return true, ""
 		}
 		
@@ -191,6 +196,13 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 
 	for i := range pulls {
 		pull_date := pulls[i]["created_at"].(string)
+
+		// For the first page Save the latest pull's created date
+		if ((link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"prev\"") == false) && (IsBeforeKWoC(pull_date) == false) && (i == 0)) {
+			latest_pull_date := pulls[i]["created_at"].(string)
+			fmt.Println("This is the latest pull date of the project ", latest_pull_date)
+			// TODO: save the above in DB of the project above
+		}
 		
 		if(IsBeforeKWoC(pull_date) || pull_date == LAST_PULL_DATE) {
 			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE
