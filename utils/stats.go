@@ -10,10 +10,11 @@ import (
 	"os"
 )
 
-func main() {
+func Testing() string{
 	// testing
 	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
 	FetchLatestPulls("kossiitkgp/kwoc20-backend")
+	return "testing for now"
 	
 }
 

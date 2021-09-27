@@ -6,6 +6,7 @@ import (
 
 	"kwoc20-backend/models"
 	utils "kwoc20-backend/utils"
+	"fmt"
 )
 
 //ProjectReg endpoint to register project details
@@ -118,4 +119,11 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data_json)
+}
+
+// Run stats of all projects
+func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	test := utils.Testing();
+	fmt.Println("test recieved is ", test)
+	return "test",200
 }
