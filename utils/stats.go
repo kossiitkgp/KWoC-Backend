@@ -1,4 +1,3 @@
-// TODO : FIGURE OUT A WAY TO RUN THIS FILE
 package utils
 
 import (
