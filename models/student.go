@@ -14,4 +14,11 @@ type Student struct {
 	Username string
 	Evals    int 	`gorm:"default:0"`
 	BlogLink string `gorm:"size:2550"`
+
+	// stats table
+	CommitCount uint
+	PRCount uint
+	AddedLines uint
+	RemovedLines uint
+	TechWorked string
 }
