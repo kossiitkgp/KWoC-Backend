@@ -234,6 +234,10 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		title := pulls[i]["title"].(string)
 		fmt.Println("pul_url is ", pull_url)//remove this print later
 		fmt.Println("Pull ttle is ",title) // remove this later
+		
+		user_info, _ := pulls[i]["user"].(map[string]interface{})
+		pr_author := user_info["login"]
+		fmt.Println("Author of PR is ", pr_author)
 
 		// TODO: Save in DB the pull request in pull request Table
 		// the fields are
