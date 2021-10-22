@@ -7,12 +7,33 @@ import (
 	"encoding/json"
 	"strings"
 	"os"
+
+	"kwoc20-backend/models"
 )
 
 func Testing() string{
 	// testing
+	// fetch all projects PR
+	// FetchLatestPulls("kossiitkgp/kwoc20-backend")
+	db := GetDB()
+	defer db.Close()
+
+	var projects []models.Project
+
+	err := db.Find(&projects).Error
+	if err != nil {
+		fmt.Println("Error in Fetching projects - TODO - Log this")
+	}
+
+	fmt.Println("We are testing Pulls ---------------------")
+	for _, project := range projects {
+		trimmed_repo_link := strings.Replace(project.RepoLink,"https://github.com/", "",1)
+		FetchLatestPulls(trimmed_repo_link, project.LastPullDate)
+	}
+
+	
+	
 	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
-	FetchLatestPulls("kossiitkgp/kwoc20-backend")
 	return "testing for now"
 	
 }
@@ -222,6 +243,7 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 
 		// TODO: Update the stats summary
 		// Increase the PR count in Project row , and Student Row
+		// Foregin Key stuff - Guys halp!!!!
 	}
 
 	// TODO: Update the last commit ID of the pulls with pulls[0]
@@ -239,9 +261,9 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 }
 
 
-func FetchLatestPulls(repo string) { // TODO: Here mostly a project object will be passed
+func FetchLatestPulls(repo string, last_pull_date string) { 
 	fmt.Println("repo is ",repo)
-	LAST_PULL_DATE := "" // TODO: need to be fetched from Project Object
+	LAST_PULL_DATE := last_pull_date
 	LATEST_PULLS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/pulls?state=all"
 	for LATEST_PULLS_FETCHED == false {

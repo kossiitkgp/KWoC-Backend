@@ -29,7 +29,7 @@ type Project struct {
 
 	// for stats
 	LastCommitSHA string
-	LastPRID string
+	LastPullDate string
 
 	// stats table
 	CommitCount uint
