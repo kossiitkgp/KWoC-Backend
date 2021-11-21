@@ -34,7 +34,11 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Header().Set("Content-type", "application/json")
 				resBody, _ := json.Marshal(response)
-				w.Write(resBody)
+				_, err := w.Write(resBody)
+				if err != nil {
+					fmt.Print("ISSUE")
+				}
+
 				return
 			}
 		}()
@@ -57,7 +61,10 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 			LOG.Println(fmt.Sprintf("%+v", response))
 			w.WriteHeader(statusCode)
 			w.Header().Set("Content-type", "application/json")
-			w.Write([]byte(`{"message": "Invalid Request"}`))
+			_, err := w.Write([]byte(`{"message": "Invalid Request"}`))
+			if err != nil {
+				fmt.Print("ISSUE")
+			}
 			return
 		}
 
