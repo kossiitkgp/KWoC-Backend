@@ -134,6 +134,10 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		db := utils.GetDB()
 		defer db.Close()
 	
+		name := req["name"].(string)
+		fmt.Print(name)
+		projects := models.Project{}
+		db.Where(&models.Project{Name: name}).First(&projects)
 		
 	
 }
