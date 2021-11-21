@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
 	"kwoc20-backend/models"
 	utils "kwoc20-backend/utils"
-	"fmt"
 )
 
 //ProjectReg endpoint to register project details
@@ -33,7 +33,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
-		Mentor:   mentor,
+		Mentor:     mentor,
 	}).Error
 
 	if err != nil {
@@ -123,7 +123,7 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 
 // Run stats of all projects
 func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
-	test := utils.Testing();
+	test := utils.Testing()
 	fmt.Println("test recieved is ", test)
-	return "test",200
+	return "test", 200
 }

@@ -44,7 +44,7 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 	res := Response{
 		"name":    student.Name,
 		"college": student.College,
-		"evals": student.Evals,
+		"evals":   student.Evals,
 	}
 
 	return res, 200
@@ -73,8 +73,7 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 
 	student.BlogLink = req["bloglink"].(string)
 	student.Evals = 2
-        db.Save(&student)
+	db.Save(&student)
 
-	
 	return "success", http.StatusOK
 }
