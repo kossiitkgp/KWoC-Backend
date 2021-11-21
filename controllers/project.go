@@ -128,7 +128,12 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	return "test", 200
 }
 
-//ProjectDetails fetch endpoint 
+//ProjectDetails fetch endpoint  
 func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	
+		db := utils.GetDB()
+		defer db.Close()
+	
+		
 	
 }
