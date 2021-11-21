@@ -127,3 +127,8 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	fmt.Println("test recieved is ", test)
 	return "test", 200
 }
+
+//ProjectDetails fetch endpoint 
+func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	
+}
