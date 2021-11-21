@@ -112,7 +112,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		commit_date := commit_info_author_map["date"].(string)
 
 		// For the first page Save the latest commit's SHA
-		if (link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"prev\"") == false) && (IsBeforeKWoC(commit_date) == false) && (i == 0) {
+		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(commit_date)) && (i == 0) {
 			latest_commit_sha := commits[i]["sha"].(string)
 			fmt.Println("This is the latest SHA of the project ", latest_commit_sha)
 			// TODO: save the above in DB of the project above
@@ -179,7 +179,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 	}
 
 	// TODO: Update the last commit SHA of the project with commits[0]'s SHA in the FIRST PAGE
-	if link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"next\"") == false {
+	if link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"next\"") {
 		return true, ""
 	} else {
 		untrimmed_next_url := strings.Split(link_in_headers, ">")[0]
@@ -194,7 +194,7 @@ func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a pro
 	LAST_COMMIT_SHA := "" // TODO: need to be fetched from Project object
 	LATEST_COMMITS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/commits?sha=" + branch
-	for LATEST_COMMITS_FETCHED == false {
+	for !LATEST_COMMITS_FETCHED {
 		LATEST_COMMITS_FETCHED, API_URL = FilterAndSaveCommits(API_URL, LAST_COMMIT_SHA)
 		fmt.Println("API_URL IS -----------------", API_URL)
 		fmt.Println("LAST_COMMITS_FETCHED IS -----------------------", LATEST_COMMITS_FETCHED)
@@ -215,7 +215,7 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		pull_date := pulls[i]["created_at"].(string)
 
 		// For the first page Save the latest pull's created date
-		if (link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"prev\"") == false) && (IsBeforeKWoC(pull_date) == false) && (i == 0) {
+		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(pull_date)) && (i == 0) {
 			latest_pull_date := pulls[i]["created_at"].(string)
 			fmt.Println("This is the latest pull date of the project ", latest_pull_date)
 			// TODO: save the above in DB of the project above
@@ -249,7 +249,7 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 	// TODO: Update the last commit ID of the pulls with pulls[0]
 	// NEED TO UPDATE THE PULL ID, IF ITS THE FIRST PAGE
 
-	if link_in_headers == "" || strings.Contains(link_in_headers, "rel=\"next\"") == false {
+	if link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"next\"") {
 		return true, ""
 	} else {
 		untrimmed_next_url := strings.Split(link_in_headers, ">")[0]
@@ -264,7 +264,7 @@ func FetchLatestPulls(repo string, last_pull_date string) {
 	LAST_PULL_DATE := last_pull_date
 	LATEST_PULLS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/pulls?state=all"
-	for LATEST_PULLS_FETCHED == false {
+	for !LATEST_PULLS_FETCHED {
 		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE)
 		fmt.Println("API_URL IS ----- ", API_URL)
 		fmt.Println("LATEST_PULLS_FETCHED ", LATEST_PULLS_FETCHED)

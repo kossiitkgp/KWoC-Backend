@@ -52,16 +52,17 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	var projects []models.Project
-	type project_and_mentor struct {
-		ProjectName       string
-		ProjectDesc       string
-		ProjectTags       string
-		ProjectRepoLink   string
-		ProjectComChannel string
-		MentorName        []string
-		MentorUsername    []string
-		MentorEmail       []string
-	}
+	//Commenting Temporarily to remove Lint error as not used anywhere
+	// type project_and_mentor struct {
+	// 	ProjectName       string
+	// 	ProjectDesc       string
+	// 	ProjectTags       string
+	// 	ProjectRepoLink   string
+	// 	ProjectComChannel string
+	// 	MentorName        []string
+	// 	MentorUsername    []string
+	// 	MentorEmail       []string
+	// }
 
 	err := db.Find(&projects).Error
 	if err != nil {
@@ -118,7 +119,10 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(data_json)
+	_, error := w.Write(data_json)
+	if error != nil {
+		fmt.Print("ISSUE")
+	}
 }
 
 // Run stats of all projects
