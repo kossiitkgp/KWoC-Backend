@@ -128,28 +128,28 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	return "test", 200
 }
 
-//ProjectDetails fetch endpoint  
+//ProjectDetails fetch endpoint
 func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
-	
-		db := utils.GetDB()
-		defer db.Close()
-	
-		name := req["name"].(string)
-		fmt.Print(name)
-		projects := models.Project{}
-		err := db.Where(&models.Project{Name: name}).First(&projects).Error
-		if err!=nil{
-			return "Pass",http.StatusBadRequest
-		}
-		
-		type Response map[string]interface{}
-		res := Response{
-			"name":    projects.Name,
-			"desc": projects.Desc,
-			"tags":   projects.Tags,
-			"branch": projects.Branch,
-		}
-		fmt.Print(projects.Tags)
-		return res, http.StatusOK
-	
+
+	db := utils.GetDB()
+	defer db.Close()
+
+	name := req["name"].(string)
+	fmt.Print(name)
+	projects := models.Project{}
+	err := db.Where(&models.Project{Name: name}).First(&projects).Error
+	if err != nil {
+		return "Pass", http.StatusBadRequest
+	}
+
+	type Response map[string]interface{}
+	res := Response{
+		"name":   projects.Name,
+		"desc":   projects.Desc,
+		"tags":   projects.Tags,
+		"branch": projects.Branch,
+	}
+	fmt.Print(projects.Tags)
+	return res, http.StatusOK
+
 }
