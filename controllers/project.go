@@ -137,7 +137,19 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		name := req["name"].(string)
 		fmt.Print(name)
 		projects := models.Project{}
-		db.Where(&models.Project{Name: name}).First(&projects)
+		err := db.Where(&models.Project{Name: name}).First(&projects).Error
+		if err!=nil{
+			return "Pass",http.StatusBadRequest
+		}
 		
+		type Response map[string]interface{}
+		res := Response{
+			"name":    projects.Name,
+			"desc": projects.Desc,
+			"tags":   projects.Tags,
+			"branch": projects.Branch,
+		}
+		fmt.Print(projects.Tags)
+		return res, http.StatusOK
 	
 }
