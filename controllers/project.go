@@ -45,6 +45,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
+		README:     req["readme"].(string),
 		Mentor:     mentor,
 	}).Error
 	if err != nil {
@@ -165,6 +166,7 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 		Desc:   req["desc"].(string),
 		Tags:   req["tags"].(string),
 		Branch: req["branch"].(string),
+		README: req["readme"].(string),
 	}
 	fmt.Print(project)
 	projects := models.Project{}
@@ -221,6 +223,5 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"branch":    projects.Branch,
 		"repo_link": projects.RepoLink,
 	}
-	fmt.Print(projects.Tags)
 	return res, http.StatusOK
 }

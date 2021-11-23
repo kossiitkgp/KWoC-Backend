@@ -23,7 +23,7 @@ type Project struct {
 	RepoLink      string
 	ComChannel    string
 	Branch        string
-	README        string `gorm:"size:255000000"`
+	README        string `gorm:"size:2550000000"`
 	ProjectStatus bool
 
 	// for stats
