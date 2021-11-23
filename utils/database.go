@@ -44,8 +44,8 @@ func InitialMigration() {
 	defer db.Close()
 
 	db.AutoMigrate(&models.Mentor{})
-	db.AutoMigrate(&models.Project{})
 	db.AutoMigrate(&models.Student{})
+	db.AutoMigrate(&models.Project{})
 }
 
 // GetDB Get Database

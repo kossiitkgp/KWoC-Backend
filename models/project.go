@@ -4,20 +4,19 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//Mentor model
+// Mentor model
 type Mentor struct {
 	gorm.Model
 
-	ID       uint
 	Name     string
 	Email    string
 	Username string
 }
 
-//Project Model
+// Project Model
 type Project struct {
 	gorm.Model
-	ID            uint
+
 	Name          string
 	Desc          string `gorm:"size:2550"`
 	Tags          string
@@ -38,14 +37,16 @@ type Project struct {
 	RemovedLines uint
 
 	// foreign keys
-	Mentor          Mentor
-	SecondaryMentor Mentor
+	MentorUsername          string
+	Mentor                  Mentor `gorm:"foreignKey:MentorUsername"`
+	SecondaryMentorUsername string
+	SecondaryMentor         Mentor `gorm:"foreignKey:SecondaryMentorUsername"`
 }
 
 // Commits Model
 type Commits struct {
 	gorm.Model
-	ID           uint
+
 	URL          string
 	Message      string
 	LinesAdded   uint
@@ -59,12 +60,12 @@ type Commits struct {
 // PRs Model
 type PullRequest struct {
 	gorm.Model
-	ID        uint
+
 	URL       string
 	Title     string
 	CreatedAt string
 
-	Project Project //foreign key
+	Project Project // foreign key
 	Student Student // foreign key
 
 }

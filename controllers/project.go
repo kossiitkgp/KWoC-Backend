@@ -154,20 +154,26 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 	db := utils.GetDB()
 	defer db.Close()
 
-	name := req["name"].(string)
-	fmt.Print(name)
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	id := (uint)(req["id"].(float64))
 	projects := models.Project{}
-	err := db.Where(&models.Project{Name: name}).First(&projects).Error
+	err := db.First(&projects, id).Error
 	if err != nil {
 		return err, http.StatusBadRequest
 	}
 
+	if projects.MentorUsername != ctx_user {
+		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+		return "Session Hijacking", 403
+	}
+
 	type Response map[string]interface{}
 	res := Response{
-		"name":   projects.Name,
-		"desc":   projects.Desc,
-		"tags":   projects.Tags,
-		"branch": projects.Branch,
+		"name":      projects.Name,
+		"desc":      projects.Desc,
+		"tags":      projects.Tags,
+		"branch":    projects.Branch,
 		"repo_link": projects.RepoLink,
 	}
 	fmt.Print(projects.Tags)
