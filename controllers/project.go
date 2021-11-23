@@ -168,6 +168,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"desc":   projects.Desc,
 		"tags":   projects.Tags,
 		"branch": projects.Branch,
+		"repo_link": projects.RepoLink,
 	}
 	fmt.Print(projects.Tags)
 	return res, http.StatusOK
