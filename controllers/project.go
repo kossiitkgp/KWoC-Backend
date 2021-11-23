@@ -134,13 +134,29 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	db := utils.GetDB()
 	defer db.Close()
 
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	id := (uint)(req["id"].(float64))
 	project := &models.Project{
+		Name:   req["name"].(string),
 		Desc:   req["desc"].(string),
 		Tags:   req["tags"].(string),
 		Branch: req["branch"].(string),
 	}
 	fmt.Print(project)
-	err := db.Table("projects").Where("Name= ?", req["name"].(string)).Select("Desc", "Tags", "Branch").Updates(project).Error
+	projects := models.Project{}
+	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch").Updates(project).Error
+	if err != nil {
+		fmt.Print(err)
+		return "fail", http.StatusBadRequest
+	}
+
+	if projects.MentorUsername != ctx_user {
+		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+		return "Session Hijacking", 403
+	}
+
+	err = db.First(&projects, id).Select("Desc", "Tags", "Branch").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
