@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
 	"kwoc20-backend/models"
 	utils "kwoc20-backend/utils"
-	"fmt"
 )
 
 //ProjectReg endpoint to register project details
@@ -33,7 +33,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
-		Mentor:   mentor,
+		Mentor:     mentor,
 	}).Error
 
 	if err != nil {
@@ -52,16 +52,17 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	var projects []models.Project
-	type project_and_mentor struct {
-		ProjectName       string
-		ProjectDesc       string
-		ProjectTags       string
-		ProjectRepoLink   string
-		ProjectComChannel string
-		MentorName        []string
-		MentorUsername    []string
-		MentorEmail       []string
-	}
+	//Commenting Temporarily to remove Lint error as not used anywhere
+	// type project_and_mentor struct {
+	// 	ProjectName       string
+	// 	ProjectDesc       string
+	// 	ProjectTags       string
+	// 	ProjectRepoLink   string
+	// 	ProjectComChannel string
+	// 	MentorName        []string
+	// 	MentorUsername    []string
+	// 	MentorEmail       []string
+	// }
 
 	err := db.Find(&projects).Error
 	if err != nil {
@@ -118,12 +119,15 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(data_json)
+	_, error := w.Write(data_json)
+	if error != nil {
+		fmt.Print("ISSUE")
+	}
 }
 
 // Run stats of all projects
 func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
-	test := utils.Testing();
+	test := utils.Testing()
 	fmt.Println("test recieved is ", test)
-	return "test",200
+	return "test", 200
 }

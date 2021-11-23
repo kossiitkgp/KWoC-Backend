@@ -35,7 +35,6 @@ func InitialMigration() {
 	// }
 	// defer db.Close()
 
-	
 	// temporary SQLite for ease of development
 	db, err := gorm.Open("sqlite3", "kwoc.db")
 	if err != nil {
@@ -71,7 +70,6 @@ func GetDB() *gorm.DB {
 	// 	LOG.Println(err)
 	// 	panic(err)
 	// }
-	
 
 	// return db
 
@@ -81,9 +79,7 @@ func GetDB() *gorm.DB {
 		LOG.Println(err)
 		panic(err)
 	}
-	
 
 	return db
-
 
 }
