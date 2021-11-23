@@ -38,7 +38,6 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				if err != nil {
 					fmt.Print("ISSUE")
 				}
-
 				return
 			}
 		}()

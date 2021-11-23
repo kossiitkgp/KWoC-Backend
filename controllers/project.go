@@ -2,16 +2,29 @@ package controllers
 
 import (
 	"encoding/json"
-	"net/http"
-
 	"fmt"
 	"kwoc20-backend/models"
+	"net/http"
+
 	utils "kwoc20-backend/utils"
 )
 
-//ProjectReg endpoint to register project details
+// ProjectReg endpoint to register project details
 func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
-
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+				"name" : New Name of Project,
+				"desc" : New DEsciption of Project,
+				"tags" : Updated tags of project,
+				"branch" : updated branch,
+				"username" : Mentor Username,
+				"repoLink": RepoLink of Project,
+				"comChannel" : Link of communication channel of mentor and mentee,
+				"readme" : Project Readme
+			}
+	*/
 	db := utils.GetDB()
 	defer db.Close()
 
@@ -33,26 +46,25 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		Tags:       req["tags"].(string),
 		RepoLink:   req["repoLink"].(string),
 		ComChannel: req["comChannel"].(string),
+		README:     req["readme"].(string),
 		Mentor:     mentor,
 	}).Error
-
 	if err != nil {
 		utils.LOG.Println(err)
 		return err.Error(), http.StatusInternalServerError
 	}
 
 	return "success", http.StatusOK
-
 }
 
-//ProjectGet endpoint to fetch all projects
+// ProjectGet endpoint to fetch all projects
 // INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
 func AllProjects(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	defer db.Close()
 
 	var projects []models.Project
-	//Commenting Temporarily to remove Lint error as not used anywhere
+	// Commenting Temporarily to remove Lint error as not used anywhere
 	// type project_and_mentor struct {
 	// 	ProjectName       string
 	// 	ProjectDesc       string
@@ -130,4 +142,88 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	test := utils.Testing()
 	fmt.Println("test recieved is ", test)
 	return "test", 200
+}
+
+// UpdateDetails : to Update Project Details
+func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+				"name" : New Name of Project,
+				"desc" : New DEsciption of Project,
+				"tags" : Updated tags of project,
+				"branch" : updated branch,
+				"readme" :  Project Readme
+			}
+	*/
+	db := utils.GetDB()
+	defer db.Close()
+
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	id := (uint)(req["id"].(float64))
+	project := &models.Project{
+		Name:   req["name"].(string),
+		Desc:   req["desc"].(string),
+		Tags:   req["tags"].(string),
+		Branch: req["branch"].(string),
+		README: req["readme"].(string),
+	}
+	fmt.Print(project)
+	projects := models.Project{}
+	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch").Updates(project).Error
+	if err != nil {
+		fmt.Print(err)
+		return "fail", http.StatusBadRequest
+	}
+
+	if projects.MentorUsername != ctx_user {
+		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+		return "Session Hijacking", 403
+	}
+
+	err = db.First(&projects, id).Select("Desc", "Tags", "Branch").Updates(project).Error
+	if err != nil {
+		fmt.Print(err)
+		return "fail", http.StatusBadRequest
+	}
+
+	return "Success", http.StatusOK
+}
+
+// ProjectDetails fetch endpoint
+func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+			}
+	*/
+	db := utils.GetDB()
+	defer db.Close()
+
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	id := (uint)(req["id"].(float64))
+	projects := models.Project{}
+	err := db.First(&projects, id).Error
+	if err != nil {
+		return err, http.StatusBadRequest
+	}
+
+	if projects.MentorUsername != ctx_user {
+		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+		return "Session Hijacking", 403
+	}
+
+	type Response map[string]interface{}
+	res := Response{
+		"name":      projects.Name,
+		"desc":      projects.Desc,
+		"tags":      projects.Tags,
+		"branch":    projects.Branch,
+		"repo_link": projects.RepoLink,
+	}
+	return res, http.StatusOK
 }
