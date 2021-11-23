@@ -21,7 +21,8 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 				"branch" : updated branch,
 				"username" : Mentor Username,
 				"repoLink": RepoLink of Project,
-				"comChannel" : Link of communication channel of mentor and mentee
+				"comChannel" : Link of communication channel of mentor and mentee,
+				"readme" : Project Readme
 			}
 	*/
 	db := utils.GetDB()
@@ -152,7 +153,8 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 				"name" : New Name of Project,
 				"desc" : New DEsciption of Project,
 				"tags" : Updated tags of project,
-				"branch" : updated branch
+				"branch" : updated branch,
+				"readme" :  Project Readme
 			}
 	*/
 	db := utils.GetDB()
