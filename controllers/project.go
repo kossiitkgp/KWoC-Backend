@@ -11,6 +11,19 @@ import (
 
 // ProjectReg endpoint to register project details
 func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+				"name" : New Name of Project,
+				"desc" : New DEsciption of Project,
+				"tags" : Updated tags of project,
+				"branch" : updated branch,
+				"username" : Mentor Username,
+				"repoLink": RepoLink of Project,
+				"comChannel" : Link of communication channel of mentor and mentee
+			}
+	*/
 	db := utils.GetDB()
 	defer db.Close()
 
@@ -131,6 +144,16 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 
 // UpdateDetails : to Update Project Details
 func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+				"name" : New Name of Project,
+				"desc" : New DEsciption of Project,
+				"tags" : Updated tags of project,
+				"branch" : updated branch
+			}
+	*/
 	db := utils.GetDB()
 	defer db.Close()
 
@@ -167,6 +190,12 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 
 // ProjectDetails fetch endpoint
 func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	/*
+		 BODY PARAMS
+			{
+				"id" : Project Id,
+			}
+	*/
 	db := utils.GetDB()
 	defer db.Close()
 
