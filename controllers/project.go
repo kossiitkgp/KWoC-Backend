@@ -40,14 +40,19 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	mentor := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
 
+	secondaryMentor := models.Mentor{}
+	db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
+
 	err := db.Create(&models.Project{
-		Name:       req["name"].(string),
-		Desc:       req["desc"].(string),
-		Tags:       req["tags"].(string),
-		RepoLink:   req["repoLink"].(string),
-		ComChannel: req["comChannel"].(string),
-		README:     req["readme"].(string),
-		Mentor:     mentor,
+		Name:            req["name"].(string),
+		Desc:            req["desc"].(string),
+		Tags:            req["tags"].(string),
+		RepoLink:        req["repoLink"].(string),
+		ComChannel:      req["comChannel"].(string),
+		README:          req["readme"].(string),
+		Branch:          req["branch"].(string),
+		Mentor:          mentor,
+		SecondaryMentor: secondaryMentor,
 	}).Error
 	if err != nil {
 		utils.LOG.Println(err)
