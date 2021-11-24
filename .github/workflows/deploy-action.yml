@@ -1,0 +1,25 @@
+name: transfer build binary to ec2 instance
+on: 
+  workflow_dispatch:
+ 
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: "just-a-placeholder"
+      - name: Adding correct known_hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - uses: actions/checkout@v2
+      - name: Setup Go, install dependencies and build
+        uses:  actions/setup-go@v2
+        with: 
+          go-version: "1.17.0"
+        run: |
+          go get
+          go build
+      - name: Send binary to ec2 instance
+        run: rsync -avz ./kwoc20-backend ubuntu@${{ secrets.SSH_HOST }}:/home/ubuntu
