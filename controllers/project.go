@@ -20,6 +20,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
 				"username" : Mentor Username,
+				"secondaryMentor": Secodnary Mentor useraName
 				"repoLink": RepoLink of Project,
 				"comChannel" : Link of communication channel of mentor and mentee,
 				"readme" : Project Readme
@@ -167,17 +168,21 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 
 	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
+	secondaryMentor := models.Mentor{}
+	db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
+
 	id := (uint)(req["id"].(float64))
 	project := &models.Project{
-		Name:   req["name"].(string),
-		Desc:   req["desc"].(string),
-		Tags:   req["tags"].(string),
-		Branch: req["branch"].(string),
-		README: req["readme"].(string),
+		Name:            req["name"].(string),
+		Desc:            req["desc"].(string),
+		Tags:            req["tags"].(string),
+		Branch:          req["branch"].(string),
+		README:          req["readme"].(string),
+		SecondaryMentor: secondaryMentor,
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch").Updates(project).Error
+	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
@@ -186,12 +191,6 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	if projects.MentorUsername != ctx_user {
 		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
 		return "Session Hijacking", 403
-	}
-
-	err = db.First(&projects, id).Select("Desc", "Tags", "Branch").Updates(project).Error
-	if err != nil {
-		fmt.Print(err)
-		return "fail", http.StatusBadRequest
 	}
 
 	return "Success", http.StatusOK
@@ -211,7 +210,9 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
 	id := (uint)(req["id"].(float64))
+
 	projects := models.Project{}
+
 	err := db.First(&projects, id).Error
 	if err != nil {
 		return err, http.StatusBadRequest
@@ -224,11 +225,12 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 
 	type Response map[string]interface{}
 	res := Response{
-		"name":      projects.Name,
-		"desc":      projects.Desc,
-		"tags":      projects.Tags,
-		"branch":    projects.Branch,
-		"repo_link": projects.RepoLink,
+		"name":              projects.Name,
+		"desc":              projects.Desc,
+		"tags":              projects.Tags,
+		"branch":            projects.Branch,
+		"repo_link":         projects.RepoLink,
+		"secondaryMentor": projects.SecondaryMentorUsername,
 	}
 	return res, http.StatusOK
 }
