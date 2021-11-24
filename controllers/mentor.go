@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"net/http"
-
 	"kwoc20-backend/models"
 	"kwoc20-backend/utils"
+	"net/http"
 )
 
 // After Being checked by LoginRequired Middleware
@@ -17,7 +16,6 @@ func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 		Email:    req["email"].(string),
 		Username: req["username"].(string),
 	}).Error
-
 	if err != nil {
 		return "database issue", 500
 	}
@@ -56,4 +54,28 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 	}
 
 	return res, 200
+}
+
+func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	db := utils.GetDB()
+	defer db.Close()
+
+	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
+
+	mentor := req["mentor"].(string)
+
+	if ctx_user != mentor {
+		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", mentor, ctx_user)
+		return "Corrupt JWT", http.StatusForbidden
+	}
+
+	var mentors []models.Mentor
+
+	err := db.Select([]string{"Name", "Username"}).Not("Username", mentor).Find(&mentors).Error
+	if err != nil {
+		utils.LOG.Println(err)
+		return err.Error(), http.StatusInternalServerError
+	}
+
+	return mentors, 200
 }
