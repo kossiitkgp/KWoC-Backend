@@ -18,7 +18,7 @@ jobs:
         uses:  actions/setup-go@v2
         with: 
           go-version: "1.17.0"
-        run: |
+      - run: |
           go get
           go build
       - name: Send binary to ec2 instance
