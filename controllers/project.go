@@ -225,11 +225,11 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 
 	type Response map[string]interface{}
 	res := Response{
-		"name":              projects.Name,
-		"desc":              projects.Desc,
-		"tags":              projects.Tags,
-		"branch":            projects.Branch,
-		"repo_link":         projects.RepoLink,
+		"name":            projects.Name,
+		"desc":            projects.Desc,
+		"tags":            projects.Tags,
+		"branch":          projects.Branch,
+		"repo_link":       projects.RepoLink,
 		"secondaryMentor": projects.SecondaryMentorUsername,
 	}
 	return res, http.StatusOK
