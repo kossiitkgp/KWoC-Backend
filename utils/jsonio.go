@@ -55,6 +55,7 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 		}
 
 		response, statusCode := next(jsonData, r)
+		fmt.Print(statusCode)
 		// if statusCode is not in 200s, in case of error
 		if statusCode/100 > 2 {
 			LOG.Println(fmt.Sprintf("%+v", response))
