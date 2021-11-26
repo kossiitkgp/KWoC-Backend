@@ -24,7 +24,7 @@ type Project struct {
 	ComChannel    string
 	Branch        string
 	README        string `gorm:"size:2550000000"`
-	ProjectStatus bool
+	ProjectStatus bool   `gorm:":default:false"`
 
 	// for stats
 	LastCommitSHA string
