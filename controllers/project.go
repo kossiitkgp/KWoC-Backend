@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"kwoc20-backend/models"
 	"net/http"
@@ -65,7 +64,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 
 // ProjectGet endpoint to fetch all projects
 // INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
-func AllProjects(w http.ResponseWriter, r *http.Request) {
+func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
@@ -82,11 +81,13 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 	// 	MentorEmail       []string
 	// }
 
-	err := db.Find(&projects).Error
+	err := db.Not("project_status", false).Find(&projects).Error
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		fmt.Print(err)
+		return "fail", http.StatusInternalServerError
 	}
+
+	return projects, 200
 
 	// var data []project_and_mentor
 	// for _, project := range projects {
@@ -130,17 +131,7 @@ func AllProjects(w http.ResponseWriter, r *http.Request) {
 
 	// 	data = append(data, project_and_mentor_x)
 	// }
-	data_json, err := json.Marshal("TO BE WORKED ON")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	_, error := w.Write(data_json)
-	if error != nil {
-		fmt.Print("ISSUE")
-	}
+
 }
 
 // Run stats of all projects
@@ -182,13 +173,13 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
+	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor_id").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
 	}
 
-	if projects.MentorUsername != ctx_user {
+	if projects.SecondaryMentor.Username != ctx_user {
 		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
 		return "Session Hijacking", 403
 	}
@@ -218,7 +209,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		return err, http.StatusBadRequest
 	}
 
-	if projects.MentorUsername != ctx_user {
+	if projects.Mentor.Username != ctx_user {
 		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
 		return "Session Hijacking", 403
 	}
@@ -230,7 +221,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"tags":            projects.Tags,
 		"branch":          projects.Branch,
 		"repo_link":       projects.RepoLink,
-		"secondaryMentor": projects.SecondaryMentorUsername,
+		"secondaryMentor": projects.SecondaryMentor.Username,
 	}
 	return res, http.StatusOK
 }

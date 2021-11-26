@@ -37,10 +37,10 @@ type Project struct {
 	RemovedLines uint
 
 	// foreign keys
-	MentorUsername          string
-	Mentor                  Mentor `gorm:"foreignKey:MentorUsername"`
-	SecondaryMentorUsername string
-	SecondaryMentor         Mentor `gorm:"foreignKey:SecondaryMentorUsername"`
+	Mentor_id          int32
+	Mentor             Mentor
+	SecondaryMentor_id int32
+	SecondaryMentor    Mentor
 }
 
 // Commits Model
