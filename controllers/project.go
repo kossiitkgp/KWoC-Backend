@@ -36,12 +36,17 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
 		return "Corrupt JWT", http.StatusForbidden
 	}
+	// fmt.Print(gh_username)
+	// fmt.Print(req["secondaryMentor"].(string))
 
 	mentor := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
 
 	secondaryMentor := models.Mentor{}
-	db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
+	if len(req["secondaryMentor"].(string)) > 0 {
+		db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
+	}
+
 
 	err := db.Create(&models.Project{
 		Name:            req["name"].(string),
