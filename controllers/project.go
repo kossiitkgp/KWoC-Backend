@@ -78,10 +78,9 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 
 	fmt.Println(projects)
 
-
 	return projects, 200
 
-		// type project_details_struct struct {
+	// type project_details_struct struct {
 	// 	Name     string
 	// 	Desc     string
 	// 	Tags     string
@@ -110,7 +109,6 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 	// 	// projects = append(projects, res
 	// }
 
-	
 	// var data []project_and_mentor
 	// for _, project := range projects {
 
@@ -172,7 +170,9 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 				"desc" : New DEsciption of Project,
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
-				"readme" :  Project Readme
+				"readme" :  Project Readme,
+
+			
 			}
 	*/
 	db := utils.GetDB()
@@ -194,14 +194,14 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor_id").Updates(project).Error
+	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
 	}
 
-	if projects.SecondaryMentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+	if projects.Mentor.Username != ctx_user {
+		fmt.Println(projects.Mentor.Username,"+", ctx_user)
 		return "Session Hijacking", 403
 	}
 
@@ -225,11 +225,10 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 
 	projects := models.Project{}
 
-	err := db.First(&projects, id).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").First(&projects, id).Error
 	if err != nil {
 		return err, http.StatusBadRequest
 	}
-
 	if projects.Mentor.Username != ctx_user {
 		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
 		return "Session Hijacking", 403
