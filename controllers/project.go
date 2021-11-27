@@ -69,7 +69,7 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 
 	var projects []models.Project
 
-	err := db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").Not("project_status", "1").Find(&projects).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusInternalServerError
