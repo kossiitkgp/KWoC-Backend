@@ -24,7 +24,7 @@ type Project struct {
 	ComChannel    string
 	Branch        string
 	README        string `gorm:"size:2550000000"`
-	ProjectStatus bool
+	ProjectStatus bool   `gorm:":default:false"`
 
 	// for stats
 	LastCommitSHA string
@@ -37,10 +37,10 @@ type Project struct {
 	RemovedLines uint
 
 	// foreign keys
-	MentorUsername          string
-	Mentor                  Mentor `gorm:"foreignKey:MentorUsername"`
-	SecondaryMentorUsername string
-	SecondaryMentor         Mentor `gorm:"foreignKey:SecondaryMentorUsername"`
+	Mentor_id          int32
+	Mentor             Mentor `gorm:"ForeignKey:Mentor_id"`
+	SecondaryMentor_id int32
+	SecondaryMentor    Mentor `gorm:"ForeignKey:SecondaryMentor_id"`
 }
 
 // Commits Model

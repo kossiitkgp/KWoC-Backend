@@ -74,7 +74,7 @@ func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, in
 	err := db.Select([]string{"Name", "Username"}).Not("username", mentor).Find(&mentors).Error
 	if err != nil {
 		utils.LOG.Println(err)
-		return err.Error(), http.StatusInternalServerError
+		return err, http.StatusInternalServerError
 	}
 
 	return mentors, 200

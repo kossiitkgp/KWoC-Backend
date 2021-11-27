@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"kwoc20-backend/models"
 	"net/http"
@@ -64,83 +63,21 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 }
 
 // ProjectGet endpoint to fetch all projects
-// INCOMPLETE BECAUSE MENTOR STILL NEEDS TO BE ADDED
-func AllProjects(w http.ResponseWriter, r *http.Request) {
+func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
 	var projects []models.Project
-	// Commenting Temporarily to remove Lint error as not used anywhere
-	// type project_and_mentor struct {
-	// 	ProjectName       string
-	// 	ProjectDesc       string
-	// 	ProjectTags       string
-	// 	ProjectRepoLink   string
-	// 	ProjectComChannel string
-	// 	MentorName        []string
-	// 	MentorUsername    []string
-	// 	MentorEmail       []string
-	// }
 
-	err := db.Find(&projects).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects).Error
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		fmt.Print(err)
+		return "fail", http.StatusInternalServerError
 	}
 
-	// var data []project_and_mentor
-	// for _, project := range projects {
+	fmt.Println(projects)
 
-	// 	mentor_names := make([]string, 1)
-	// 	mentor_usernames := make([]string, 1)
-	// 	mentor_emails := make([]string, 1)
-
-	// 	var mentor models.Mentor
-	// 	var secondary_mentor models.Mentor
-
-	// 	var project_and_mentor_x project_and_mentor
-	// 	err := db.First(&mentor, project.MentorID).Error
-	// 	if err != nil {
-	// 		w.WriteHeader(http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// 	mentor_names[0] = mentor.Name
-	// 	mentor_usernames[0] = mentor.Username
-	// 	mentor_emails[0] = mentor.Email
-
-	// 	if project.SecondaryMentorID != 0 {
-	// 		err := db.First(&secondary_mentor, project.SecondaryMentorID).Error
-	// 		if err != nil {
-	// 			w.WriteHeader(http.StatusInternalServerError)
-	// 			return
-	// 		}
-	// 		mentor_names = append(mentor_names, secondary_mentor.Name)
-	// 		mentor_usernames = append(mentor_usernames, secondary_mentor.Username)
-	// 		mentor_emails = append(mentor_emails, secondary_mentor.Email)
-	// 	}
-
-	// 	project_and_mentor_x.ProjectName = project.Name
-	// 	project_and_mentor_x.ProjectDesc = project.Desc
-	// 	project_and_mentor_x.ProjectTags = project.Tags
-	// 	project_and_mentor_x.ProjectRepoLink = project.RepoLink
-	// 	project_and_mentor_x.ProjectComChannel = project.ComChannel
-	// 	project_and_mentor_x.MentorName = mentor_names
-	// 	project_and_mentor_x.MentorUsername = mentor_usernames
-	// 	project_and_mentor_x.MentorEmail = mentor_emails
-
-	// 	data = append(data, project_and_mentor_x)
-	// }
-	data_json, err := json.Marshal("TO BE WORKED ON")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	_, error := w.Write(data_json)
-	if error != nil {
-		fmt.Print("ISSUE")
-	}
+	return projects, 200
 }
 
 // Run stats of all projects
@@ -160,7 +97,8 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 				"desc" : New DEsciption of Project,
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
-				"readme" :  Project Readme
+				"readme" :  Project Readme,
+				"secondaryMentor":Secondary Mentor Username
 			}
 	*/
 	db := utils.GetDB()
@@ -182,14 +120,14 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
+	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
 	}
 
-	if projects.MentorUsername != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+	if projects.Mentor.Username != ctx_user {
+		fmt.Println(projects.Mentor.Username, "+", ctx_user)
 		return "Session Hijacking", 403
 	}
 
@@ -213,12 +151,11 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 
 	projects := models.Project{}
 
-	err := db.First(&projects, id).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").First(&projects, id).Error
 	if err != nil {
 		return err, http.StatusBadRequest
 	}
-
-	if projects.MentorUsername != ctx_user {
+	if projects.Mentor.Username != ctx_user {
 		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
 		return "Session Hijacking", 403
 	}
@@ -230,7 +167,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"tags":            projects.Tags,
 		"branch":          projects.Branch,
 		"repo_link":       projects.RepoLink,
-		"secondaryMentor": projects.SecondaryMentorUsername,
+		"secondaryMentor": projects.SecondaryMentor.Username,
 	}
 	return res, http.StatusOK
 }
