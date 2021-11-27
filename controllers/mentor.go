@@ -29,18 +29,20 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 	mentor := models.Mentor{}
 	db := utils.GetDB()
 	defer db.Close()
+
 	db.Where(&models.Mentor{Username: username}).First(&mentor)
+
 	if mentor.ID == 0 {
 		return "no user", 400
 	}
 
 	var projects []models.Project
-	db.Where("mentor_id = ?", mentor.ID).Find(&projects)
+	db.Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).Preload("Mentor").Preload("SecondaryMentor").Find(&projects)
 
-	var secondary_projects []models.Project
-	db.Where("secondary_mentor_id = ?", mentor.ID).Find(&secondary_projects)
+	// var secondary_projects []models.Project
+	// db.Where("secondary_mentor_id = ?", mentor.ID).Find(&secondary_projects)
 
-	all_projects := append(projects, secondary_projects...)
+	all_projects := projects
 	// projects_json, err := json.Marshal(projects)
 
 	// var projects []models.Project
