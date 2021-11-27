@@ -69,26 +69,48 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 	defer db.Close()
 
 	var projects []models.Project
-	// Commenting Temporarily to remove Lint error as not used anywhere
-	// type project_and_mentor struct {
-	// 	ProjectName       string
-	// 	ProjectDesc       string
-	// 	ProjectTags       string
-	// 	ProjectRepoLink   string
-	// 	ProjectComChannel string
-	// 	MentorName        []string
-	// 	MentorUsername    []string
-	// 	MentorEmail       []string
-	// }
 
-	err := db.Not("project_status", false).Find(&projects).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusInternalServerError
 	}
 
+	fmt.Println(projects)
+
+
 	return projects, 200
 
+		// type project_details_struct struct {
+	// 	Name     string
+	// 	Desc     string
+	// 	Tags     string
+	// 	RepoLink string
+	// 	// ComChannel              string
+	// 	Branch string
+	// 	// README                  string
+	// 	// MentorName              string
+	// 	// MentorUsername          string
+	// 	// MentorEmail             string
+	// 	// SecondaryMentorName     string
+	// 	// SecondaryMentorUsername string
+	// 	SecondaryMentorEmail string
+	// }
+
+	// for _, v := range projects {
+	// 	type Response map[string]interface{}
+	// 	fmt.Print(project_details_struct{
+	// 		v.Name,
+	// 		v.Desc,
+	// 		v.Tags,
+	// 		v.Branch,
+	// 		v.RepoLink,
+	// 		v.SecondaryMentor.Email,
+	// 	})
+	// 	// projects = append(projects, res
+	// }
+
+	
 	// var data []project_and_mentor
 	// for _, project := range projects {
 
@@ -131,7 +153,6 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 
 	// 	data = append(data, project_and_mentor_x)
 	// }
-
 }
 
 // Run stats of all projects
