@@ -102,7 +102,8 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
 				"readme" :  Project Readme,
-				"secondaryMentor":Secondary Mentor Username
+				"secondaryMentor":Secondary Mentor Username,
+				"comChannel": Communication Channel
 			}
 	*/
 	db := utils.GetDB()
@@ -121,10 +122,11 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 		Branch:          req["branch"].(string),
 		README:          req["readme"].(string),
 		SecondaryMentor: secondaryMentor,
+		ComChannel:      req["comChannel"].(string),
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
+	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor", "ComChannel").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
