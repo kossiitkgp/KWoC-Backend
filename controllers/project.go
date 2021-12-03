@@ -47,7 +47,6 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
 	}
 
-
 	err := db.Create(&models.Project{
 		Name:            req["name"].(string),
 		Desc:            req["desc"].(string),
@@ -103,7 +102,8 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
 				"readme" :  Project Readme,
-				"secondaryMentor":Secondary Mentor Username
+				"secondaryMentor":Secondary Mentor Username,
+				"comChannel": Communication Channel
 			}
 	*/
 	db := utils.GetDB()
@@ -122,10 +122,11 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 		Branch:          req["branch"].(string),
 		README:          req["readme"].(string),
 		SecondaryMentor: secondaryMentor,
+		ComChannel:      req["comChannel"].(string),
 	}
 	fmt.Print(project)
 	projects := models.Project{}
-	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor").Updates(project).Error
+	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor", "ComChannel").Updates(project).Error
 	if err != nil {
 		fmt.Print(err)
 		return "fail", http.StatusBadRequest
@@ -172,6 +173,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"tags":            projects.Tags,
 		"branch":          projects.Branch,
 		"repo_link":       projects.RepoLink,
+		"comChannel":      projects.ComChannel,
 		"secondaryMentor": projects.SecondaryMentor.Username,
 	}
 	return res, http.StatusOK
