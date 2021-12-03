@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"kwoc20-backend/models"
 	"net/http"
 	"os"
 	"strings"
-
-	"kwoc20-backend/models"
 )
 
 func Testing() string {
@@ -20,7 +19,7 @@ func Testing() string {
 
 	var projects []models.Project
 
-	err := db.Find(&projects).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects).Error
 	if err != nil {
 		fmt.Println("Error in Fetching projects - TODO - Log this")
 	}
@@ -33,7 +32,6 @@ func Testing() string {
 
 	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
 	return "testing for now"
-
 }
 
 func GetExtension(filename string) string {
@@ -150,7 +148,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		commit_message := commit_info_map["message"]
 		fmt.Println("needed info -> message ", commit_message)
 
-		//Fetches the tech on which student worked using file names
+		// Fetches the tech on which student worked using file names
 		files_arr, _ := commit_info["files"].([]interface{})
 		var file_names []string
 		for j := range files_arr {
@@ -160,7 +158,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		}
 		languages_worked := GetLanguagesFromFilenames(file_names)
 		fmt.Println("languages worked is ", languages_worked)
-		//TODO: Update the Languages Worked Field under Student row
+		// TODO: Update the Languages Worked Field under Student row
 
 		// TODO: Save the commit message in the the DB, the commit model contains
 		// URL  : commit_url
@@ -172,7 +170,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		// project: that will be parameter passed or from the repo name, u can get the object
 		// student : you can get the student object based on "student_username"
 
-		//Addding the summary stats - increase commit count in Project, and Student
+		// Addding the summary stats - increase commit count in Project, and Student
 		// TODO:
 		// Take the Student object and increase the commit_count by 1
 		// Take the Project object and increase the commit_count by 1
@@ -186,7 +184,6 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		next_url := strings.TrimLeft(untrimmed_next_url, "<")
 		return false, next_url
 	}
-
 }
 
 func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a project Object will be passed
@@ -228,7 +225,7 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 
 		pull_url := pulls[i]["html_url"].(string)
 		title := pulls[i]["title"].(string)
-		fmt.Println("pul_url is ", pull_url) //remove this print later
+		fmt.Println("pul_url is ", pull_url) // remove this print later
 		fmt.Println("Pull ttle is ", title)  // remove this later
 
 		user_info, _ := pulls[i]["user"].(map[string]interface{})
@@ -256,7 +253,6 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		next_url := strings.TrimLeft(untrimmed_next_url, "<")
 		return false, next_url
 	}
-
 }
 
 func FetchLatestPulls(repo string, last_pull_date string) {
@@ -269,5 +265,4 @@ func FetchLatestPulls(repo string, last_pull_date string) {
 		fmt.Println("API_URL IS ----- ", API_URL)
 		fmt.Println("LATEST_PULLS_FETCHED ", LATEST_PULLS_FETCHED)
 	}
-
 }
