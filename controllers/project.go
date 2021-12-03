@@ -47,7 +47,6 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		db.Where(&models.Mentor{Username: req["secondaryMentor"].(string)}).First(&secondaryMentor)
 	}
 
-
 	err := db.Create(&models.Project{
 		Name:            req["name"].(string),
 		Desc:            req["desc"].(string),
@@ -172,6 +171,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		"tags":            projects.Tags,
 		"branch":          projects.Branch,
 		"repo_link":       projects.RepoLink,
+		"comChannel":      projects.ComChannel,
 		"secondaryMentor": projects.SecondaryMentor.Username,
 	}
 	return res, http.StatusOK
