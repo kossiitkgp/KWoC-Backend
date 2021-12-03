@@ -27,7 +27,7 @@ func Testing() string {
 	fmt.Println("We are testing Pulls ---------------------")
 	for _, project := range projects {
 		trimmed_repo_link := strings.Replace(project.RepoLink, "https://github.com/", "", 1)
-		FetchLatestPulls(trimmed_repo_link, project.LastPullDate)
+		FetchLatestPulls(trimmed_repo_link, project.LastPullDate, project.ID)
 	}
 
 	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
@@ -94,6 +94,7 @@ func MakeRequest(URL string) (string, string) {
 }
 
 func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string) { // returns true if LATEST commit is found, else false
+
 	res, link_in_headers := MakeRequest(API_URL)
 	resBytes := []byte(res)
 
@@ -198,7 +199,10 @@ func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a pro
 	}
 }
 
-func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
+func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) (bool, string) {
+	db := GetDB()
+	defer db.Close()
+
 	res, link_in_headers := MakeRequest(API_URL)
 	resBytes := []byte(res)
 
@@ -214,12 +218,19 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		// For the first page Save the latest pull's created date
 		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(pull_date)) && (i == 0) {
 			latest_pull_date := pulls[i]["created_at"].(string)
+
+			projects := models.Project{}
+			project := &models.Project{
+				LastPullDate: latest_pull_date,
+			}
+			db.Preload("Mentor").First(&projects, project_id).Select("LastPullDate").Updates(project)
+
 			fmt.Println("This is the latest pull date of the project ", latest_pull_date)
-			// TODO: save the above in DB of the project above
+			// TODO: save the above in DB of the project above <-- DONE -->
 		}
 
 		if IsBeforeKWoC(pull_date) || pull_date == LAST_PULL_DATE {
-			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE
+			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE :explain:@rakaar
 			return true, ""
 		}
 
@@ -255,13 +266,13 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 	}
 }
 
-func FetchLatestPulls(repo string, last_pull_date string) {
+func FetchLatestPulls(repo string, last_pull_date string, project_id uint) {
 	fmt.Println("repo is ", repo)
 	LAST_PULL_DATE := last_pull_date
 	LATEST_PULLS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/pulls?state=all"
 	for !LATEST_PULLS_FETCHED {
-		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE)
+		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE, project_id)
 		fmt.Println("API_URL IS ----- ", API_URL)
 		fmt.Println("LATEST_PULLS_FETCHED ", LATEST_PULLS_FETCHED)
 	}
