@@ -70,7 +70,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 func IsBeforeKWoC(timestamp string) bool {
 	// returns true if the timestamp is before KWoC
 	fmt.Println("timestamp ", timestamp)
-	KWOC_STARTING_DATE := "2016-11T11:23:26Z"
+	KWOC_STARTING_DATE := "2021-12-06T00:00:01Z"
 	return timestamp < KWOC_STARTING_DATE
 }
 
