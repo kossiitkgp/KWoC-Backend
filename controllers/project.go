@@ -36,8 +36,6 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
 		return "Corrupt JWT", http.StatusForbidden
 	}
-	// fmt.Print(gh_username)
-	// fmt.Print(req["secondaryMentor"].(string))
 
 	mentor := models.Mentor{}
 	db.Where(&models.Mentor{Username: gh_username}).First(&mentor)
@@ -78,8 +76,6 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 		fmt.Print(err)
 		return "fail", http.StatusInternalServerError
 	}
-
-	fmt.Println(projects)
 
 	return projects, 200
 }
@@ -124,7 +120,6 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 		SecondaryMentor: secondaryMentor,
 		ComChannel:      req["comChannel"].(string),
 	}
-	fmt.Print(project)
 	projects := models.Project{}
 	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor", "ComChannel").Updates(project).Error
 	if err != nil {
@@ -162,7 +157,7 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		return err, http.StatusBadRequest
 	}
 	if projects.Mentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", "ctx_user")
+		fmt.Println(projects.Mentor.Username, "+", ctx_user)
 		return "Session Hijacking", 403
 	}
 
