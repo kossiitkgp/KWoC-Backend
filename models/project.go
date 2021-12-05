@@ -63,7 +63,6 @@ type PullRequest struct {
 
 	URL       string
 	Title     string
-	CreatedAt string
 
 	Project Project // foreign key
 	Student Student // foreign key

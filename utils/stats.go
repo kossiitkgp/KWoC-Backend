@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"kwoc20-backend/models"
 	"net/http"
 	"os"
 	"strings"
 
-	"kwoc20-backend/models"
+	"gorm.io/gorm"
 )
 
 func Testing() string {
@@ -20,7 +21,7 @@ func Testing() string {
 
 	var projects []models.Project
 
-	err := db.Find(&projects).Error
+	err := db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects).Error
 	if err != nil {
 		fmt.Println("Error in Fetching projects - TODO - Log this")
 	}
@@ -28,12 +29,11 @@ func Testing() string {
 	fmt.Println("We are testing Pulls ---------------------")
 	for _, project := range projects {
 		trimmed_repo_link := strings.Replace(project.RepoLink, "https://github.com/", "", 1)
-		FetchLatestPulls(trimmed_repo_link, project.LastPullDate)
+		FetchLatestPulls(trimmed_repo_link, project.LastPullDate, project.ID)
 	}
 
 	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
 	return "testing for now"
-
 }
 
 func GetExtension(filename string) string {
@@ -72,7 +72,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 func IsBeforeKWoC(timestamp string) bool {
 	// returns true if the timestamp is before KWoC
 	fmt.Println("timestamp ", timestamp)
-	KWOC_STARTING_DATE := "2016-11T11:23:26Z"
+	KWOC_STARTING_DATE := "2021-12-05T18:30:01Z"
 	return timestamp < KWOC_STARTING_DATE
 }
 
@@ -96,6 +96,7 @@ func MakeRequest(URL string) (string, string) {
 }
 
 func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string) { // returns true if LATEST commit is found, else false
+
 	res, link_in_headers := MakeRequest(API_URL)
 	resBytes := []byte(res)
 
@@ -150,7 +151,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		commit_message := commit_info_map["message"]
 		fmt.Println("needed info -> message ", commit_message)
 
-		//Fetches the tech on which student worked using file names
+		// Fetches the tech on which student worked using file names
 		files_arr, _ := commit_info["files"].([]interface{})
 		var file_names []string
 		for j := range files_arr {
@@ -160,7 +161,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		}
 		languages_worked := GetLanguagesFromFilenames(file_names)
 		fmt.Println("languages worked is ", languages_worked)
-		//TODO: Update the Languages Worked Field under Student row
+		// TODO: Update the Languages Worked Field under Student row
 
 		// TODO: Save the commit message in the the DB, the commit model contains
 		// URL  : commit_url
@@ -172,7 +173,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		// project: that will be parameter passed or from the repo name, u can get the object
 		// student : you can get the student object based on "student_username"
 
-		//Addding the summary stats - increase commit count in Project, and Student
+		// Addding the summary stats - increase commit count in Project, and Student
 		// TODO:
 		// Take the Student object and increase the commit_count by 1
 		// Take the Project object and increase the commit_count by 1
@@ -186,7 +187,6 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		next_url := strings.TrimLeft(untrimmed_next_url, "<")
 		return false, next_url
 	}
-
 }
 
 func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a project Object will be passed
@@ -201,7 +201,10 @@ func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a pro
 	}
 }
 
-func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
+func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) (bool, string) {
+	db := GetDB()
+	defer db.Close()
+
 	res, link_in_headers := MakeRequest(API_URL)
 	resBytes := []byte(res)
 
@@ -217,37 +220,50 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		// For the first page Save the latest pull's created date
 		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(pull_date)) && (i == 0) {
 			latest_pull_date := pulls[i]["created_at"].(string)
+
+			projects := models.Project{}
+			project := &models.Project{
+				LastPullDate: latest_pull_date,
+			}
+			db.Preload("Mentor").First(&projects, project_id).Select("LastPullDate").Updates(project)
 			fmt.Println("This is the latest pull date of the project ", latest_pull_date)
-			// TODO: save the above in DB of the project above
 		}
 
 		if IsBeforeKWoC(pull_date) || pull_date == LAST_PULL_DATE {
-			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE
 			return true, ""
 		}
 
 		pull_url := pulls[i]["html_url"].(string)
 		title := pulls[i]["title"].(string)
-		fmt.Println("pul_url is ", pull_url) //remove this print later
+		fmt.Println("pul_url is ", pull_url) // remove this print later
 		fmt.Println("Pull ttle is ", title)  // remove this later
 
 		user_info, _ := pulls[i]["user"].(map[string]interface{})
 		pr_author := user_info["login"]
 		fmt.Println("Author of PR is ", pr_author)
 
-		// TODO: Save in DB the pull request in pull request Table
-		// the fields are
-		// URL: pull_url
-		// Title: title
-		// PullID: pull_id
+		Project := models.Project{}
+		db.First(&Project, project_id)
 
-		// TODO: Update the stats summary
-		// Increase the PR count in Project row , and Student Row
-		// Foregin Key stuff - Guys halp!!!!
+		Student := models.Student{}
+		db.First(&Student, pr_author)
+
+		pull_request := &models.PullRequest{
+			URL:     pull_url,
+			Title:   title,
+			Project: Project,
+			Student: Student,
+		}
+
+		db.Create(&pull_request)
+
+		project := models.Project{}
+		db.Model(&project).Where("ID=?", project_id).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
+
+		student := models.Student{}
+		db.Model(&student).Where("username=?", pr_author).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
+
 	}
-
-	// TODO: Update the last commit ID of the pulls with pulls[0]
-	// NEED TO UPDATE THE PULL ID, IF ITS THE FIRST PAGE
 
 	if link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"next\"") {
 		return true, ""
@@ -256,18 +272,16 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string) (bool, string) {
 		next_url := strings.TrimLeft(untrimmed_next_url, "<")
 		return false, next_url
 	}
-
 }
 
-func FetchLatestPulls(repo string, last_pull_date string) {
+func FetchLatestPulls(repo string, last_pull_date string, project_id uint) {
 	fmt.Println("repo is ", repo)
 	LAST_PULL_DATE := last_pull_date
 	LATEST_PULLS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/pulls?state=all"
 	for !LATEST_PULLS_FETCHED {
-		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE)
+		LATEST_PULLS_FETCHED, API_URL = FilterAndSavePulls(API_URL, LAST_PULL_DATE, project_id)
 		fmt.Println("API_URL IS ----- ", API_URL)
 		fmt.Println("LATEST_PULLS_FETCHED ", LATEST_PULLS_FETCHED)
 	}
-
 }
