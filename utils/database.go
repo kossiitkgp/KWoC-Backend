@@ -36,6 +36,8 @@ func InitialMigration() {
 	db.AutoMigrate(&models.Mentor{})
 	db.AutoMigrate(&models.Student{})
 	db.AutoMigrate(&models.Project{})
+	db.AutoMigrate(&models.PullRequest{})
+	db.AutoMigrate(&models.Commits{})
 }
 
 // GetDB Get Database
@@ -52,7 +54,7 @@ func GetDB() *gorm.DB {
 		LOG.Println(err)
 		panic(err)
 	}
-	//TODO : DB close issue
+	// TODO : DB close issue
 
 	// // temporary SQLite for ease of development
 	// db, err := gorm.Open("sqlite3", "kwoc.db")
