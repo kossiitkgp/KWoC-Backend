@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 func Testing() string {
@@ -255,19 +257,13 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) 
 
 		db.Create(&pull_request)
 
-		// TODO: Save in DB the pull request in pull request Table
-		// the fields are
-		// URL: pull_url
-		// Title: title
-		// PullID: pull_id
+		project := models.Project{}
+		db.Model(&project).Where("ID=?", project_id).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
 
-		// TODO: Update the stats summary
-		// Increase the PR count in Project row , and Student Row
-		// Foregin Key stuff - Guys halp!!!!
+		student := models.Student{}
+		db.Model(&student).Where("username=?", pr_author).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
+
 	}
-
-	// TODO: Update the last commit ID of the pulls with pulls[0]
-	// NEED TO UPDATE THE PULL ID, IF ITS THE FIRST PAGE
 
 	if link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"next\"") {
 		return true, ""
