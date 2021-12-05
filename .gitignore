@@ -1,6 +1,7 @@
 tmp/
 *.db
 kwoc20-backend
+kwoc20-backend.exe
 .DS_Store
 .env
 *.db-journal
