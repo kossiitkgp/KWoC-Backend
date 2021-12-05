@@ -70,7 +70,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 func IsBeforeKWoC(timestamp string) bool {
 	// returns true if the timestamp is before KWoC
 	fmt.Println("timestamp ", timestamp)
-	KWOC_STARTING_DATE := "2021-12-06T00:00:01Z"
+	KWOC_STARTING_DATE := "2021-12-05T18:30:01Z"
 	return timestamp < KWOC_STARTING_DATE
 }
 
@@ -224,13 +224,10 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) 
 				LastPullDate: latest_pull_date,
 			}
 			db.Preload("Mentor").First(&projects, project_id).Select("LastPullDate").Updates(project)
-
 			fmt.Println("This is the latest pull date of the project ", latest_pull_date)
-			// TODO: save the above in DB of the project above <-- DONE -->
 		}
 
 		if IsBeforeKWoC(pull_date) || pull_date == LAST_PULL_DATE {
-			// TODO: update the last Pull ID of the repo, before returning IT SHOULD BE OF FIRST PAGE :explain:@rakaar
 			return true, ""
 		}
 
@@ -242,6 +239,21 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) 
 		user_info, _ := pulls[i]["user"].(map[string]interface{})
 		pr_author := user_info["login"]
 		fmt.Println("Author of PR is ", pr_author)
+
+		Project := models.Project{}
+		db.First(&Project, project_id)
+
+		Student := models.Student{}
+		db.First(&Student, pr_author)
+
+		pull_request := &models.PullRequest{
+			URL:     pull_url,
+			Title:   title,
+			Project: Project,
+			Student: Student,
+		}
+
+		db.Create(&pull_request)
 
 		// TODO: Save in DB the pull request in pull request Table
 		// the fields are
