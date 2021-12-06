@@ -25,6 +25,9 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		return "database issue", 500
 	}
 
+	
+
+
 	return "success", 200
 }
 

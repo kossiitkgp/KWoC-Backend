@@ -32,7 +32,7 @@ type Project struct {
 
 	// stats table
 	CommitCount  uint
-	PRCount      uint
+	PRCount      uint `gorm:":default:0"`
 	AddedLines   uint
 	RemovedLines uint
 

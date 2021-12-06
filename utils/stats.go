@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
-	"gorm.io/gorm"
 )
 
 func Testing() string {
@@ -72,7 +70,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 func IsBeforeKWoC(timestamp string) bool {
 	// returns true if the timestamp is before KWoC
 	fmt.Println("timestamp ", timestamp)
-	KWOC_STARTING_DATE := "2021-12-05T18:30:01Z"
+	KWOC_STARTING_DATE := "2021-09-05T18:30:01Z"
 	return timestamp < KWOC_STARTING_DATE
 }
 
@@ -245,8 +243,9 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) 
 		Project := models.Project{}
 		db.First(&Project, project_id)
 
+		fmt.Print(pr_author)
 		Student := models.Student{}
-		db.First(&Student, pr_author)
+		db.Where("username=?", pr_author).First(&Student)
 
 		pull_request := &models.PullRequest{
 			URL:     pull_url,
@@ -257,11 +256,11 @@ func FilterAndSavePulls(API_URL string, LAST_PULL_DATE string, project_id uint) 
 
 		db.Create(&pull_request)
 
-		project := models.Project{}
-		db.Model(&project).Where("ID=?", project_id).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
+		fmt.Print(project_id)
 
-		student := models.Student{}
-		db.Model(&student).Where("username=?", pr_author).UpdateColumn("PRCount", gorm.Expr("PRCount +  ?", 1))
+		db.Exec("UPDATE projects SET pr_count = pr_count + 1 WHERE id = ?", project_id)
+
+		db.Exec("UPDATE students SET pr_count = pr_count + 1 WHERE username = ?", pr_author)
 
 	}
 
