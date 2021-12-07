@@ -169,10 +169,15 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 				file_name := file_map["filename"].(string)
 				file_names = append(file_names, file_name)
 			}
+
 			languages_worked := GetLanguagesFromFilenames(file_names)
 			fmt.Println("languages worked is ", languages_worked)
 			// TODO: Update the Languages Worked Field under Student row
-			db.Exec("UPDATE students SET tech_worked = ?  ", languages_worked)
+			fmt.Print(student_username, "stuent username")
+
+			languages, _ := json.Marshal(languages_worked)
+			fmt.Print(languages, "Lnaguages worked on ")
+			db.Exec("UPDATE students SET tech_worked = ? WHERE username=?  ", languages, student_username)
 
 			// TODO: Save the commit message in the the DB, the commit model contains
 			// URL  : commit_url
@@ -195,6 +200,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 				Message:      commit_message,
 				LinesAdded:   lines_added,
 				LinesRemoved: lines_removed,
+				SHA:          commits[i]["sha"].(string),
 
 				Project: Project,
 				Student: Student,
@@ -203,9 +209,10 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 			db.Create(&commits)
 
 			// Addding the summary stats - increase commit count in Project, and Student
-
+			db.Exec("UPDATE projects SET added_lines=added_lines+? , removed_lines=removed_lines+? WHERE id = ?", lines_added, lines_removed, id)
 			db.Exec("UPDATE projects SET commit_count = commit_count + 1 WHERE id = ?", id)
 
+			db.Exec("UPDATE students SET added_lines=added_lines+? , removed_lines=removed_lines+? WHERE username = ?", lines_added, lines_removed, student_username)
 			db.Exec("UPDATE students SET commit_count = commit_count + 1 WHERE username = ?", student_username)
 			// TODO:
 			// Take the Student object and increase the commit_count by 1

@@ -2,10 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
-
 	"kwoc20-backend/models"
 	"kwoc20-backend/utils"
+	"net/http"
 )
 
 // After Being checked by LoginRequired Middleware
@@ -19,14 +18,10 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		College:  req["college"].(string),
 		Username: req["username"].(string),
 	}).Error
-
 	if err != nil {
 		fmt.Println("err is ", err)
 		return "database issue", 500
 	}
-
-	
-
 
 	return "success", 200
 }
@@ -51,11 +46,6 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 	}
 
 	return res, 200
-
-}
-
-func StudentStats(username string) interface{} {
-	return fmt.Sprintf("stats of %s", username)
 }
 
 func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -79,4 +69,18 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 	db.Save(&student)
 
 	return "success", http.StatusOK
+}
+
+func StudentStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	username := req["username"].(string)
+
+	student := models.Student{}
+	db := utils.GetDB()
+	defer db.Close()
+	db.Where(&models.Student{Username: username}).First(&student)
+	if student.ID == 0 {
+		return "no user", 400
+	}
+
+	return student, 200
 }
