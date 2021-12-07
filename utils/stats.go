@@ -172,8 +172,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 			languages_worked := GetLanguagesFromFilenames(file_names)
 			fmt.Println("languages worked is ", languages_worked)
 			// TODO: Update the Languages Worked Field under Student row
-			languages_worked=["abcd"]
-			db.Exec("UPDATE students SET tech_worked = ? WHERE username = ?", languages_worked, student_username)
+			db.Exec("UPDATE students SET tech_worked = ?  ", languages_worked)
 
 			// TODO: Save the commit message in the the DB, the commit model contains
 			// URL  : commit_url
