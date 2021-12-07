@@ -33,8 +33,8 @@ type Project struct {
 	// stats table
 	CommitCount  uint
 	PRCount      uint `gorm:":default:0"`
-	AddedLines   uint
-	RemovedLines uint
+	AddedLines   float64
+	RemovedLines float64
 
 	// foreign keys
 	Mentor_id          int32
@@ -49,8 +49,8 @@ type Commits struct {
 
 	URL          string
 	Message      string
-	LinesAdded   uint
-	LinesRemoved uint
+	LinesAdded   float64
+	LinesRemoved float64
 	SHA          string
 
 	Project Project // foreign key

@@ -27,10 +27,10 @@ func Testing() string {
 	fmt.Println("We are testing Pulls ---------------------")
 	for _, project := range projects {
 		trimmed_repo_link := strings.Replace(project.RepoLink, "https://github.com/", "", 1)
-		FetchLatestPulls(trimmed_repo_link, project.LastPullDate, project.ID)
+		// FetchLatestPulls(trimmed_repo_link, project.LastPullDate, project.ID)
+		FetchLatestCommits(trimmed_repo_link, project.Branch, project.LastCommitSHA, project.ID)
 	}
 
-	// FetchLatestCommits("lttkgp/metadata-extractor", "master")
 	return "testing for now"
 }
 
@@ -70,7 +70,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 func IsBeforeKWoC(timestamp string) bool {
 	// returns true if the timestamp is before KWoC
 	fmt.Println("timestamp ", timestamp)
-	KWOC_STARTING_DATE := "2021-09-05T18:30:01Z"
+	KWOC_STARTING_DATE := "2020-05-05T18:30:01Z"
 	return timestamp < KWOC_STARTING_DATE
 }
 
@@ -93,7 +93,9 @@ func MakeRequest(URL string) (string, string) {
 	return response, link_in_headers
 }
 
-func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string) { // returns true if LATEST commit is found, else false
+func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool, string) { // returns true if LATEST commit is found, else false
+	db := GetDB()
+	defer db.Close()
 
 	res, link_in_headers := MakeRequest(API_URL)
 	resBytes := []byte(res)
@@ -109,72 +111,107 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 		commit_info_map := commits[i]["commit"].(map[string]interface{})
 		commit_info_author_map := commit_info_map["author"].(map[string]interface{})
 		commit_date := commit_info_author_map["date"].(string)
+		fmt.Print(commit_date)
 
+		fmt.Print((!IsBeforeKWoC(commit_date)), "hello")
 		// For the first page Save the latest commit's SHA
 		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(commit_date)) && (i == 0) {
 			latest_commit_sha := commits[i]["sha"].(string)
+			projects := models.Project{}
+			project := &models.Project{
+				LastCommitSHA: latest_commit_sha,
+			}
+			db.First(&projects, id).Select("LastCommitSHA").Updates(project)
 			fmt.Println("This is the latest SHA of the project ", latest_commit_sha)
-			// TODO: save the above in DB of the project above
 		}
-
+		fmt.Print(LAST_COMMIT_SHA, "1234", commits[i]["sha"])
 		if IsBeforeKWoC(commit_date) || commits[i]["sha"] == LAST_COMMIT_SHA {
 			return true, ""
 		}
 
-		commit_url := commits[i]["html_url"]
+		commit_url := commits[i]["html_url"].(string)
 		fmt.Println("needed info -> commit URL ", commit_url) // remove this print later
 		fmt.Println("SHA is ", commits[i]["sha"])             // remove this print later
 
 		author_data_map, _ := commits[i]["author"].(map[string]interface{})
-		student_username := author_data_map["login"]
+		student_username := author_data_map["login"].(string)
 		fmt.Println("Student username ", student_username)
 		// Checking if commit_author is a registered student or not
-		// TODO: Need to check if student_username is in database or not
-		// If in DB, proceed to check more info about commit
-		// if NOT in DB,  "continue" the loop i.e check the next commit
 
-		// making another API request to get more info about the commit like stats
-		api_url, _ := commits[i]["url"].(string)
-		res, _ := MakeRequest(api_url)
-		resBytes := []byte(res)
-		var commit_info map[string]interface{}
-		_ = json.Unmarshal(resBytes, &commit_info)
+		student := &models.Student{}
+		// CAN BE WRONG
+		db.Where("username=?", student_username).First(&student)
+		fmt.Print(student)
+		if student.ID == 0 {
+			continue
+		} else {
+			// making another API request to get more info about the commit like stats
+			api_url, _ := commits[i]["url"].(string)
+			res, _ := MakeRequest(api_url)
+			resBytes := []byte(res)
+			var commit_info map[string]interface{}
+			_ = json.Unmarshal(resBytes, &commit_info)
 
-		commit_stats_map, _ := commit_info["stats"].(map[string]interface{})
-		lines_added := commit_stats_map["additions"]
-		lines_removed := commit_stats_map["deletions"]
-		fmt.Println("needed_info -> lines-added ", lines_added)     // remove this print later
-		fmt.Println("needed_info -> lines-removed ", lines_removed) // remove this print later
+			commit_stats_map, _ := commit_info["stats"].(map[string]interface{})
+			lines_added := commit_stats_map["additions"].(float64)
+			lines_removed := commit_stats_map["deletions"].(float64)
+			fmt.Println("needed_info -> lines-added ", lines_added)     // remove this print later
+			fmt.Println("needed_info -> lines-removed ", lines_removed) // remove this print later
 
-		commit_message := commit_info_map["message"]
-		fmt.Println("needed info -> message ", commit_message)
+			commit_message := commit_info_map["message"].(string)
+			fmt.Println("needed info -> message ", commit_message)
 
-		// Fetches the tech on which student worked using file names
-		files_arr, _ := commit_info["files"].([]interface{})
-		var file_names []string
-		for j := range files_arr {
-			file_map := files_arr[j].(map[string]interface{})
-			file_name := file_map["filename"].(string)
-			file_names = append(file_names, file_name)
+			// Fetches the tech on which student worked using file names
+			files_arr, _ := commit_info["files"].([]interface{})
+			var file_names []string
+			for j := range files_arr {
+				file_map := files_arr[j].(map[string]interface{})
+				file_name := file_map["filename"].(string)
+				file_names = append(file_names, file_name)
+			}
+			languages_worked := GetLanguagesFromFilenames(file_names)
+			fmt.Println("languages worked is ", languages_worked)
+			// TODO: Update the Languages Worked Field under Student row
+			languages_worked=["abcd"]
+			db.Exec("UPDATE students SET tech_worked = ? WHERE username = ?", languages_worked, student_username)
+
+			// TODO: Save the commit message in the the DB, the commit model contains
+			// URL  : commit_url
+			// Message : commit_message
+			// LinesAdded : lines_added
+			// LinesRemoved: lines_removed
+			// SHA : commits[i][sha]
+
+			// project: that will be parameter passed or from the repo name, u can get the object
+			// student : you can get the student object based on "student_username"
+
+			Project := models.Project{}
+			db.First(&Project, id)
+
+			Student := models.Student{}
+			db.Where("username=?", student_username).First(&Student)
+
+			commits := &models.Commits{
+				URL:          commit_url,
+				Message:      commit_message,
+				LinesAdded:   lines_added,
+				LinesRemoved: lines_removed,
+
+				Project: Project,
+				Student: Student,
+			}
+
+			db.Create(&commits)
+
+			// Addding the summary stats - increase commit count in Project, and Student
+
+			db.Exec("UPDATE projects SET commit_count = commit_count + 1 WHERE id = ?", id)
+
+			db.Exec("UPDATE students SET commit_count = commit_count + 1 WHERE username = ?", student_username)
+			// TODO:
+			// Take the Student object and increase the commit_count by 1
+			// Take the Project object and increase the commit_count by 1
 		}
-		languages_worked := GetLanguagesFromFilenames(file_names)
-		fmt.Println("languages worked is ", languages_worked)
-		// TODO: Update the Languages Worked Field under Student row
-
-		// TODO: Save the commit message in the the DB, the commit model contains
-		// URL  : commit_url
-		// Message : commit_message
-		// LinesAdded : lines_added
-		// LinesRemoved: lines_removed
-		// SHA : commits[i][sha]
-
-		// project: that will be parameter passed or from the repo name, u can get the object
-		// student : you can get the student object based on "student_username"
-
-		// Addding the summary stats - increase commit count in Project, and Student
-		// TODO:
-		// Take the Student object and increase the commit_count by 1
-		// Take the Project object and increase the commit_count by 1
 	}
 
 	// TODO: Update the last commit SHA of the project with commits[0]'s SHA in the FIRST PAGE
@@ -187,13 +224,15 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string) (bool, string)
 	}
 }
 
-func FetchLatestCommits(repo string, branch string) { // TODO: Here mostly a project Object will be passed
+func FetchLatestCommits(repo string, branch string, last_commit_sha string, id uint) { // TODO: Here mostly a project Object will be passed
 	fmt.Println("repo is ", repo)
-	LAST_COMMIT_SHA := "" // TODO: need to be fetched from Project object
+
+	LAST_COMMIT_SHA := last_commit_sha
+	fmt.Print(LAST_COMMIT_SHA) // TODO: need to be fetched from Project object
 	LATEST_COMMITS_FETCHED := false
 	API_URL := "https://api.github.com/repos/" + repo + "/commits?sha=" + branch
 	for !LATEST_COMMITS_FETCHED {
-		LATEST_COMMITS_FETCHED, API_URL = FilterAndSaveCommits(API_URL, LAST_COMMIT_SHA)
+		LATEST_COMMITS_FETCHED, API_URL = FilterAndSaveCommits(API_URL, LAST_COMMIT_SHA, id)
 		fmt.Println("API_URL IS -----------------", API_URL)
 		fmt.Println("LAST_COMMITS_FETCHED IS -----------------------", LATEST_COMMITS_FETCHED)
 	}
