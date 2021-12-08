@@ -173,3 +173,12 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 	}
 	return res, http.StatusOK
 }
+
+func ProjectStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	db := utils.GetDB()
+	defer db.Close()
+
+	var projects []models.Project
+	db.Find(&projects)
+	return projects, 200
+}

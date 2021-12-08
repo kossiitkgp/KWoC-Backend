@@ -74,25 +74,8 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 func StudentStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
-	username := req["username"].(string)
-	fmt.Print(username)
 
-	student := models.Student{}
-
-	db.Where("username=?", username).Find(&student)
-	if student.ID == 0 {
-		return "no user", 400
-	}
-
-	student_return := models.Student{
-		Name:         student.Name,
-		Username:     student.Username,
-		CommitCount:  student.CommitCount,
-		PRCount:      student.PRCount,
-		AddedLines:   student.AddedLines,
-		RemovedLines: student.RemovedLines,
-		TechWorked:   student.TechWorked,
-	}
-
-	return student_return, 200
+	var student []models.Student
+	db.Find(&student)
+	return student, 200
 }
