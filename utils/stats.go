@@ -40,8 +40,17 @@ func GetExtension(filename string) string {
 	return extension
 }
 
-func GetLanguagesFromFilenames(filenames []string) []string {
-	var languages []string
+func StringInSlice(list []string, a string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+func GetLanguagesFromFilenames(filenames []string, lang []string) []string {
+	// This requires changes, the same array gets overwritten, we need to first fetch the old array and append only those languages which arent there previously
 
 	json_file, err := os.Open("languages.json")
 	if err != nil {
@@ -58,13 +67,14 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 	for i := range filenames {
 		exts[GetExtension(filenames[i])] = true
 	}
-
 	// Get extension
 	for key := range exts {
-		languages = append(languages, ext2Lang[key])
+		if !StringInSlice(lang, ext2Lang[key]) {
+			lang = append(lang, ext2Lang[key])
+		}
 	}
 
-	return languages
+	return lang
 }
 
 func IsBeforeKWoC(timestamp string) bool {
@@ -111,9 +121,7 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 		commit_info_map := commits[i]["commit"].(map[string]interface{})
 		commit_info_author_map := commit_info_map["author"].(map[string]interface{})
 		commit_date := commit_info_author_map["date"].(string)
-		fmt.Print(commit_date)
 
-		fmt.Print((!IsBeforeKWoC(commit_date)), "hello")
 		// For the first page Save the latest commit's SHA
 		if (link_in_headers == "" || !strings.Contains(link_in_headers, "rel=\"prev\"")) && (!IsBeforeKWoC(commit_date)) && (i == 0) {
 			latest_commit_sha := commits[i]["sha"].(string)
@@ -122,26 +130,28 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 				LastCommitSHA: latest_commit_sha,
 			}
 			db.First(&projects, id).Select("LastCommitSHA").Updates(project)
-			fmt.Println("This is the latest SHA of the project ", latest_commit_sha)
 		}
-		fmt.Print(LAST_COMMIT_SHA, "1234", commits[i]["sha"])
+
 		if IsBeforeKWoC(commit_date) || commits[i]["sha"] == LAST_COMMIT_SHA {
 			return true, ""
 		}
 
 		commit_url := commits[i]["html_url"].(string)
-		fmt.Println("needed info -> commit URL ", commit_url) // remove this print later
-		fmt.Println("SHA is ", commits[i]["sha"])             // remove this print later
 
 		author_data_map, _ := commits[i]["author"].(map[string]interface{})
 		student_username := author_data_map["login"].(string)
-		fmt.Println("Student username ", student_username)
 		// Checking if commit_author is a registered student or not
 
 		student := &models.Student{}
-		// CAN BE WRONG
 		db.Where("username=?", student_username).First(&student)
-		fmt.Print(student)
+		var language_arr []string
+		fmt.Println(student.TechWorked)
+		err := json.Unmarshal([]byte(student.TechWorked), &language_arr)
+		fmt.Println(language_arr)
+		if err != nil {
+			fmt.Print("error")
+		}
+
 		if student.ID == 0 {
 			continue
 		} else {
@@ -155,11 +165,8 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 			commit_stats_map, _ := commit_info["stats"].(map[string]interface{})
 			lines_added := commit_stats_map["additions"].(float64)
 			lines_removed := commit_stats_map["deletions"].(float64)
-			fmt.Println("needed_info -> lines-added ", lines_added)     // remove this print later
-			fmt.Println("needed_info -> lines-removed ", lines_removed) // remove this print later
 
 			commit_message := commit_info_map["message"].(string)
-			fmt.Println("needed info -> message ", commit_message)
 
 			// Fetches the tech on which student worked using file names
 			files_arr, _ := commit_info["files"].([]interface{})
@@ -169,13 +176,17 @@ func FilterAndSaveCommits(API_URL string, LAST_COMMIT_SHA string, id uint) (bool
 				file_name := file_map["filename"].(string)
 				file_names = append(file_names, file_name)
 			}
+			fmt.Print("File name------>", file_names)
 
-			languages_worked := GetLanguagesFromFilenames(file_names)
+			fmt.Println(language_arr)
+			languages_worked := GetLanguagesFromFilenames(file_names, language_arr)
+
 			fmt.Println("languages worked is ", languages_worked)
 			// TODO: Update the Languages Worked Field under Student row
-			fmt.Print(student_username, "stuent username")
+			fmt.Print(student_username, "student username")
 
 			languages, _ := json.Marshal(languages_worked)
+
 			fmt.Print(languages, "Lnaguages worked on ")
 			db.Exec("UPDATE students SET tech_worked = ? WHERE username=?  ", languages, student_username)
 
