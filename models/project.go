@@ -54,17 +54,16 @@ type Commits struct {
 	SHA          string
 
 	Project Project // foreign key
-	Student Student // foreign key
+	Student Student
 }
 
 // PRs Model
 type PullRequest struct {
 	gorm.Model
 
-	URL       string
-	Title     string
+	URL   string
+	Title string
 
 	Project Project // foreign key
-	Student Student // foreign key
-
+	Student Student
 }

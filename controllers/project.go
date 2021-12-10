@@ -178,7 +178,18 @@ func ProjectStats(req map[string]interface{}, r *http.Request) (interface{}, int
 	db := utils.GetDB()
 	defer db.Close()
 
+	var projects []models.Commits
+	db.Preload("Student").Find(&projects)
+	return projects, 200
+}
+
+func DashboardStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	db := utils.GetDB()
+	defer db.Close()
+
+	// username := req["username"].(string)
+
 	var projects []models.Project
-	db.Find(&projects)
+	db.Preload("Mentor").Preload("SecondaryMentor").Find(&projects)
 	return projects, 200
 }

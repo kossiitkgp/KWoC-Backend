@@ -15,4 +15,6 @@ func RegisterProject(r *mux.Router) {
 	r.HandleFunc("/details", utils.PermissiveCORSMiddleware(utils.LoginRequired(utils.JsonIO(controllers.ProjectDetails)))).Methods("POST")
 	r.HandleFunc("/update", utils.PermissiveCORSMiddleware(utils.LoginRequired(utils.JsonIO(controllers.UpdateDetails)))).Methods("PUT")
 	r.HandleFunc("/project", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.ProjectStats))).Methods("GET")
+	r.HandleFunc("/dashboard", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.DashboardStats))).Methods("GET")
+
 }
