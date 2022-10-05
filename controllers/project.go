@@ -15,7 +15,7 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 			{
 				"id" : Project Id,
 				"name" : New Name of Project,
-				"desc" : New DEsciption of Project,
+				"desc" : New Desciption of Project,
 				"tags" : Updated tags of project,
 				"branch" : updated branch,
 				"username" : Mentor Username,

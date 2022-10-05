@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+
 	"kwoc20-backend/models"
 	"kwoc20-backend/utils"
-	"net/http"
 )
 
 // After Being checked by LoginRequired Middleware
@@ -20,10 +21,10 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	}).Error
 	if err != nil {
 		fmt.Println("err is ", err)
-		return "database issue", 500
+		return "Could not connect to Database", http.StatusInternalServerError
 	}
 
-	return "success", 200
+	return "Successfully Registered", http.StatusOK
 }
 
 func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -35,7 +36,7 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 	defer db.Close()
 	db.Where(&models.Student{Username: username}).First(&student)
 	if student.ID == 0 {
-		return "no user", 400
+		return "User does not exist", http.StatusBadRequest
 	}
 
 	type Response map[string]interface{}
@@ -45,7 +46,7 @@ func StudentDashboard(req map[string]interface{}, r *http.Request) (interface{},
 		"evals":   student.Evals,
 	}
 
-	return res, 200
+	return res, http.StatusOK
 }
 
 func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -68,7 +69,7 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 	student.Evals = 2
 	db.Save(&student)
 
-	return "success", http.StatusOK
+	return "Blog Submitted Successfully", http.StatusOK
 }
 
 func StudentStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
