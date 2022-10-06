@@ -25,7 +25,7 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
-				fmt.Println("Kuch to locha hai")
+				fmt.Println("Issue in json body #1")
 				fmt.Printf("%+v\n", recv)
 				debug.PrintStack()
 				response := &ErrorMessage{
@@ -36,7 +36,7 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				resBody, _ := json.Marshal(response)
 				_, err := w.Write(resBody)
 				if err != nil {
-					fmt.Print("ISSUE")
+					fmt.Print("Persisting Issue #2")
 				}
 				return
 			}
@@ -48,7 +48,7 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 		_ = json.Unmarshal(body, &jsonData1)
 		var jsonData map[string]interface{}
 		if jsonData1 == nil {
-			LOG.Println("Mil gya")
+			LOG.Println("Error while unmarshalling json")
 			jsonData = make(map[string]interface{})
 		} else {
 			jsonData = jsonData1.(map[string]interface{})
@@ -57,12 +57,12 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 		response, statusCode := next(jsonData, r)
 		// if statusCode is not in 200s, in case of error
 		if statusCode/100 > 2 {
-			LOG.Println(fmt.Sprintf("%+v", response))
+			LOG.Printf(fmt.Sprintf("%+v", response))
 			w.WriteHeader(statusCode)
 			w.Header().Set("Content-type", "application/json")
 			_, err := w.Write([]byte(`{"message": "Invalid Request"}`))
 			if err != nil {
-				fmt.Print("ISSUE")
+				fmt.Print("Error while writing error to response")
 			}
 			return
 		}

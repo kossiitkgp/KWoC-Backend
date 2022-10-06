@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-
 	utils.InitialMigration()
 
 	port := os.Getenv("PORT")
@@ -38,7 +37,7 @@ func main() {
 	projectSubRoute := router.PathPrefix("/project").Subrouter()
 	routes.RegisterProject(projectSubRoute)
 
-	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags|log.Lshortfile)
+	mainLogger := log.New(os.Stderr, "Message: ", log.LstdFlags|log.Lshortfile)
 	mainLogger.Println("Starting server on port " + port)
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
@@ -48,5 +47,4 @@ func main() {
 		mainLogger.Println("Error in Starting ", err)
 		os.Exit(1)
 	}
-
 }

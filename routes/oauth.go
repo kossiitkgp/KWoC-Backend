@@ -9,5 +9,4 @@ import (
 
 func RegisterOAuth(r *mux.Router) {
 	r.HandleFunc("", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.UserOAuth))).Methods("POST")
-
 }

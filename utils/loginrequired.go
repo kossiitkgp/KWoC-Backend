@@ -2,8 +2,10 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	// _ "github.com/jinzhu/gorm/dialects/mysql" // For MySQL Dialect
@@ -21,9 +23,27 @@ type Claims struct {
 // LoginRequired Middleware to protect endpoints
 func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenStr := r.Header.Get("Bearer")
+		// If development, bypass the bearer token with the developer's github username
+		if os.Getenv("MODE") == "dev" {
+			ctx := r.Context()
+			newctx := context.WithValue(ctx, CtxUserString("user"), os.Getenv("DEV_USERNAME"))
+			req := r.WithContext(newctx)
+
+			next(w, req)
+			return
+		}
+
+		bearer_token := r.Header.Get("Authorization")
+		tokenStrings := strings.Split(bearer_token, " ")
+		fmt.Print(tokenStrings)
+		if len(tokenStrings) != 2 {
+			http.Error(w, "Invalid Authorization Token", http.StatusUnauthorized)
+			return
+		}
+		tokenStr := tokenStrings[1]
+
 		if tokenStr == "" {
-			http.Error(w, "Empty GET request", 400)
+			http.Error(w, "Empty GET request", http.StatusUnauthorized)
 			LOG.Println("Empty Get request")
 			return
 		}
@@ -47,33 +67,8 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		}
 
 		ctx := r.Context()
-		// DatabaseUsername := os.Getenv("DATABASE_USERNAME")
-		// DatabasePassword := os.Getenv("DATABASE_PASSWORD")
-		// DatabaseName := os.Getenv("DATABASE_NAME")
-		// DatabaseHost := os.Getenv("DATABASE_HOST")
-		// DatabasePort := os.Getenv("DATABASE_PORT")
-
-		// DatabaseURI := fmt.Sprintf(
-		// 	"%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		// 	DatabaseUsername,
-		// 	DatabasePassword,
-		// 	DatabaseHost,
-		// 	DatabasePort,
-		// 	DatabaseName,
-		// )
-
-		// db, err := gorm.Open("mysql", DatabaseURI)
-		// if err != nil {
-		// 	http.Error(w, "Failed to connect to the Database!", 500)
-		// 	LOG.Println(err)
-		// 	os.Exit(1)
-		// }
-		// defer db.Close()
-
-		// var user interface{} //Instance of Mentor/Mentee model
 		newctx := context.WithValue(ctx, CtxUserString("user"), claims.Username)
 		req := r.WithContext(newctx)
-
 		next(w, req)
 	}
 }
