@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"net/http"
+
 	"kwoc20-backend/models"
 	"kwoc20-backend/utils"
-	"net/http"
 )
 
 // After Being checked by LoginRequired Middleware
@@ -17,10 +18,10 @@ func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 		Username: req["username"].(string),
 	}).Error
 	if err != nil {
-		return "database issue", 500
+		return "Couldn't Connect to Database, Try Later", http.StatusInternalServerError
 	}
 
-	return "success", 200
+	return "Successfully registered", http.StatusOK
 }
 
 func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -33,7 +34,7 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 	db.Where(&models.Mentor{Username: username}).First(&mentor)
 
 	if mentor.ID == 0 {
-		return "no user", 400
+		return "User does not exist", http.StatusBadRequest
 	}
 
 	var projects []models.Project
@@ -55,7 +56,7 @@ func MentorDashboard(req map[string]interface{}, r *http.Request) (interface{}, 
 		"projects": all_projects,
 	}
 
-	return res, 200
+	return res, http.StatusOK
 }
 
 func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -79,5 +80,5 @@ func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, in
 		return err, http.StatusInternalServerError
 	}
 
-	return mentors, 200
+	return mentors, http.StatusOK
 }

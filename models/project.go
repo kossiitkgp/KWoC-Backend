@@ -32,9 +32,9 @@ type Project struct {
 
 	// stats table
 	CommitCount  uint
-	PRCount      uint
-	AddedLines   uint
-	RemovedLines uint
+	PRCount      uint `gorm:":default:0"`
+	AddedLines   float64
+	RemovedLines float64
 
 	// foreign keys
 	Mentor_id          int32
@@ -49,22 +49,21 @@ type Commits struct {
 
 	URL          string
 	Message      string
-	LinesAdded   uint
-	LinesRemoved uint
+	LinesAdded   float64
+	LinesRemoved float64
 	SHA          string
 
 	Project Project // foreign key
-	Student Student // foreign key
+	Student Student
 }
 
 // PRs Model
 type PullRequest struct {
 	gorm.Model
 
-	URL       string
-	Title     string
+	URL   string
+	Title string
 
 	Project Project // foreign key
-	Student Student // foreign key
-
+	Student Student
 }

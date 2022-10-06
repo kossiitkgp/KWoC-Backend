@@ -142,5 +142,6 @@
 ".emacs": "Emacs Lisp",
 ".builder": "Ruby",
 ".kts": "Kotlin",
-".c": "C"
+".c": "C",
+".txt":"Text"
 }

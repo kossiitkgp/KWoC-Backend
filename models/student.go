@@ -4,7 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//Mentor model
+// Mentor model
 type Student struct {
 	gorm.Model
 
