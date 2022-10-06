@@ -16,6 +16,26 @@ MVC Strucutre is being followed.
 
 `docs`: Documentation
 
+## Routes
+
+- `/mentor/`
+    - `/form` POST - Register as a mentor.
+    - `/dashboard` GET - Get all the dashboard stats of the mentors.
+    - `/` GET - Get all the registered mentors
+- `/student`
+  - `/form` POST - Register a student for the event.
+  - `/dashboard` GET - Get dashboard stats of a particular student.
+  - `/blog` POST - Submit blog link for final submissions
+  - `/stats` GET - Get all stats of all the users.
+- `/project`
+  - `/register` POST - Register a Project
+  - `/` GET - Return all registered Porjects ! Open Route !
+  - `/details` POST - Return all details of a particular project.
+  - `/update` PUT - Update details of the project.
+  - `/project` GET - Get Stats of a particular project.
+  - `/dashboard` GET - Get dashbard stats of all the projects.
+- `/oauth` POST - Oauth using Github Token to get details for participants
+
 ## File Naming Convention
 
 - Separate file for each Model.
@@ -37,11 +57,13 @@ dgrijalva/jwt-go
 Also uses `golanglint-ci` for linting code.
 
 ## Set up
+
 - Clone the repo.
 
 - You can use the Makefile for automating the commands. Run `make help` for a list of commands.
 
-- Currently, only two(subject to change) commands are supported - 
+- Currently, only two(subject to change) commands are supported -
+
 * `make lint` - Run the lint checks
 * `make build` - For building the codebase
 
