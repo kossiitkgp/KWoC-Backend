@@ -3,10 +3,10 @@ module kwoc20-backend
 go 1.13
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/go-kit/kit v0.10.0
-	github.com/gorilla/handlers v1.4.2
-	github.com/gorilla/mux v1.7.4
-	github.com/jinzhu/gorm v1.9.14
-	gorm.io/gorm v1.22.4 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/gorilla/mux v1.8.0
+	github.com/jinzhu/gorm v1.9.16
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/lib/pq v1.10.7 // indirect
+	gorm.io/gorm v1.24.0
 )

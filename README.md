@@ -31,7 +31,7 @@ In short, don't keep any surprises. Use groupings as per your discretion.
 ```
 gorilla/mux
 jinzhu/gorm
-dgrijalva/jwt-go
+golang-jwt/jwt/v4
 ```
 
 Also uses `golanglint-ci` for linting code.
