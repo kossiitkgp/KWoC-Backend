@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	// _ "github.com/jinzhu/gorm/dialects/mysql" // For MySQL Dialect
 )
 
