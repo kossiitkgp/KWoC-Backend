@@ -25,9 +25,12 @@
     └── ...
 ```
 
-`cmd` : contains the entrypoint of the backend (main package) \\
-`controllers` : handler functions for the routes defined \\
-`server` : contains the router logic and routes \\
+`cmd` : contains the entrypoint of the backend (main package)
+
+`controllers` : handler functions for the routes defined
+
+`server` : contains the router logic and routes 
+
 `utils` : contains misc functions like logger
 
 > For new packages, a few suggestions
