@@ -6,11 +6,28 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
 )
 
 // Setup up mux routes and router
 func NewRouter() *mux.Router {
+
 	router := mux.NewRouter().StrictSlash(true)
+	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Warn().Msgf(
+			"%s %s Not Found",
+			r.Method,
+			r.RequestURI,
+		)
+	})
+
+	router.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Warn().Msgf(
+			"%s %s Method Not Allowed",
+			r.Method,
+			r.RequestURI,
+		)
+	})
 
 	// iterate over rall routes
 	for _, route := range routes {
