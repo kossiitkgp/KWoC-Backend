@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	"github.com/rs/zerolog/log"
+
 	// _ "github.com/jinzhu/gorm/dialects/mysql" // MySQL Dialect
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	// _ "github.com/jinzhu/gorm/dialects/sqlite" // sqlite for dev
@@ -21,14 +23,14 @@ func InitialMigration() {
 	newURI := "host=" + DatabaseHost + " port=" + DatabasePort + " user=" + DatabaseUsername + " dbname=" + DatabaseName + " sslmode=disable password=" + DatabasePassword
 	db, err := gorm.Open("postgres", newURI)
 	if err != nil {
-		LOG.Println(err)
+		log.Err(err).Msg("Database Error")
 		panic(err)
 	}
 
-	// temporary SQLite for ease of development
+	// // temporary SQLite for ease of development
 	// db, err := gorm.Open("sqlite3", "kwoc.db")
 	// if err != nil {
-	// 	fmt.Println(err.Error())
+	// 	log.Err(err).Msg("Database Error")
 	// 	panic("failed to connect database")
 	// }
 	// defer db.Close()
@@ -51,7 +53,7 @@ func GetDB() *gorm.DB {
 	newURI := "host=" + DatabaseHost + " port=" + DatabasePort + " user=" + DatabaseUsername + " dbname=" + DatabaseName + " sslmode=disable password=" + DatabasePassword
 	db, err := gorm.Open("postgres", newURI)
 	if err != nil {
-		LOG.Println(err)
+		log.Err(err).Msg("Database Error")
 		panic(err)
 	}
 	// TODO : DB close issue
@@ -59,7 +61,7 @@ func GetDB() *gorm.DB {
 	// // temporary SQLite for ease of development
 	// db, err := gorm.Open("sqlite3", "kwoc.db")
 	// if err != nil {
-	// 	LOG.Println(err)
+	// 	log.Err(err).Msg("Database Error")
 	// 	panic(err)
 	// }
 
