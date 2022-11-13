@@ -2,11 +2,39 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/rs/zerolog/log"
 )
+
+func LogErr(r *http.Request, err error, errMsg string) {
+	log.Err(err).Msgf(
+		"%s %s: %s",
+		r.Method,
+		r.RequestURI,
+		errMsg,
+	)
+}
+
+func LogInfo(r *http.Request, info string) {
+	log.Info().Msgf(
+		"%s %s: %s",
+		r.Method,
+		r.RequestURI,
+		info,
+	)
+}
+
+func LogWarn(r *http.Request, warning string) {
+	log.Warn().Msgf(
+		"%s %s: %s",
+		r.Method,
+		r.RequestURI,
+		warning,
+	)
+}
 
 // Logging middleware for incoming requests
 func Logger(inner http.Handler) http.Handler {
@@ -15,11 +43,9 @@ func Logger(inner http.Handler) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		log.Info().Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			time.Since(start),
+		LogInfo(
+			r,
+			fmt.Sprintf("Handled in %v", time.Since(start)),
 		)
 	})
 }
@@ -28,12 +54,9 @@ func getErrorHandler(errCode int, errMsg string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(errCode)
 
-		log.Warn().Msgf(
-			"Invalid Request: %s %s %d %s",
-			r.Method,
-			r.RequestURI,
-			errCode,
-			errMsg,
+		LogWarn(
+			r,
+			fmt.Sprintf("Invalid Request %d %s", errCode, errMsg),
 		)
 	})
 }
