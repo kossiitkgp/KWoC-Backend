@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	utils "kwoc20-backend/utils"
+
+	"github.com/rs/zerolog/log"
 )
 
 // ProjectReg endpoint to register project details
@@ -33,7 +35,13 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
 	if ctx_user != gh_username {
-		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		log.Warn().Msgf(
+			"%s %s: %v != %v Detected Session Hijacking",
+			r.Method,
+			r.RequestURI,
+			gh_username,
+			ctx_user,
+		)
 		return "Corrupt JWT", http.StatusForbidden
 	}
 
@@ -57,7 +65,11 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		SecondaryMentor: secondaryMentor,
 	}).Error
 	if err != nil {
-		utils.LOG.Println(err)
+		utils.LogErr(
+			r,
+			err,
+			"Database error.",
+		)
 		return err.Error(), http.StatusInternalServerError
 	}
 
