@@ -45,6 +45,7 @@ func main() {
 	log.Info().Msg("Starting server on port " + port)
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
+	router.Use(utils.Logger)
 
 	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
