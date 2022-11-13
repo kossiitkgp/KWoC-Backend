@@ -85,7 +85,11 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 
 	err := db.Preload("Mentor").Preload("SecondaryMentor").Not("project_status", "false").Find(&projects).Error
 	if err != nil {
-		fmt.Print(err)
+		utils.LogErr(
+			r,
+			err,
+			"Database Error",
+		)
 		return "fail", http.StatusInternalServerError
 	}
 
@@ -95,7 +99,10 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 // Run stats of all projects
 func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	test := utils.Testing()
-	fmt.Println("test recieved is ", test)
+	utils.LogInfo(
+		r,
+		fmt.Sprintf("test recieved is ", test),
+	)
 	return "test", 200
 }
 
@@ -135,12 +142,22 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	projects := models.Project{}
 	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor", "ComChannel").Updates(project).Error
 	if err != nil {
-		fmt.Print(err)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf("Bad Request %v", err),
+		)
 		return "fail", http.StatusBadRequest
 	}
 
 	if projects.Mentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking",
+				projects.Mentor.Username,
+				ctx_user,
+			),
+		)
 		return "Session Hijacking", 403
 	}
 
@@ -169,7 +186,14 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		return err, http.StatusBadRequest
 	}
 	if projects.Mentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking",
+				projects.Mentor.Username,
+				ctx_user,
+			),
+		)
 		return "Session Hijacking", 403
 	}
 

@@ -25,8 +25,10 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
-				fmt.Println("Kuch to locha hai")
-				fmt.Printf("%+v\n", recv)
+				LogWarn(
+					r,
+					fmt.Sprintf("Kuch to locha hai\n%+v", recv),
+				)
 				debug.PrintStack()
 				response := &ErrorMessage{
 					Message: "Internal Server Error",
@@ -36,7 +38,11 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				resBody, _ := json.Marshal(response)
 				_, err := w.Write(resBody)
 				if err != nil {
-					fmt.Print("ISSUE")
+					LogErr(
+						r,
+						err,
+						"ISSUE",
+					)
 				}
 				return
 			}
