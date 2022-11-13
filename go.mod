@@ -10,9 +10,6 @@ require (
 )
 
 require (
-
-	github.com/fzipp/gocyclo v0.6.0 // indirect
-	github.com/go-critic/go-critic v0.6.5 // indirect
 	github.com/golangci/golangci-lint v1.50.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
