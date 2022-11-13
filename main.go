@@ -30,6 +30,10 @@ func main() {
 	// 	routes.RegisterTest(testSubRoute)
 	// }
 
+	// register logger middleware
+	router.Use(utils.Logger)
+
+
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)
 
@@ -45,7 +49,9 @@ func main() {
 	log.Info().Msg("Starting server on port " + port)
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
-	router.Use(utils.Logger)
+
+	router.MethodNotAllowedHandler = utils.GetMethodNotAllowedHandler()
+	router.NotFoundHandler = utils.GetNotFoundHandler()
 
 	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
