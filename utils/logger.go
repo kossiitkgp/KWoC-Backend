@@ -24,28 +24,24 @@ func Logger(inner http.Handler) http.Handler {
 	})
 }
 
-func GetNotFoundHandler() http.Handler {
+func getErrorHandler(errCode int, errMsg string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(404)
+		w.WriteHeader(errCode)
 
 		log.Warn().Msgf(
-			"Invalid Request: %s %s %s",
+			"Invalid Request: %s %s %d %s",
 			r.Method,
 			r.RequestURI,
-			"404 Path Not Found",
+			errCode,
+			errMsg,
 		)
 	})
 }
 
-func GetMethodNotAllowedHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(405)
+func GetNotFoundHandler() http.Handler {
+	return getErrorHandler(404, "Path Not Found")
+}
 
-		log.Warn().Msgf(
-			"Invalid Request: %s %s %s",
-			r.Method,
-			r.RequestURI,
-			"405 Method Not Allowed",
-		)
-	})
+func GetMethodNotAllowedHandler() http.Handler {
+	return getErrorHandler(405, "Method Not Allowed")
 }
