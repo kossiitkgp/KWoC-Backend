@@ -1,5 +1,11 @@
 package tests
 
+import "fmt"
+
+func main() {
+	fmt.Println("Testing")
+}
+
 // import (
 //     "kwoc20-backend/utils"
 //     "net/http"
