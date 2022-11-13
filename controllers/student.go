@@ -64,7 +64,14 @@ func StudentBlogLink(req map[string]interface{}, r *http.Request) (interface{}, 
 	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
 	if ctx_user != gh_username {
-		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking\n",
+				gh_username,
+				ctx_user,
+			),
+		)
 		return "Corrupt JWT", http.StatusForbidden
 	}
 
