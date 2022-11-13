@@ -1,5 +1,9 @@
 build:
 	go build
+	go get golang.org/x/tools/cmd/goimports@latest
+	go get github.com/fzipp/gocyclo/cmd/gocyclo@latest
+	go get github.com/golangci/golangci-lint@latest
+	go get github.com/go-critic/go-critic@latest
 
 lint:
 	gofmt -s -w .
