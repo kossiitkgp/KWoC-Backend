@@ -41,13 +41,14 @@ Also uses `golanglint-ci` for linting code.
 - Clone the repo and `cd` into it's directory.
 - Run the following commands
   ```sh
-  docker-compose-v1 build
-  docker-compose-v1 up 
+  docker-compose build
+  docker-compose up 
   ```
-> **NOTE**: Do NOT use `docker-compose`. 
->
-> Using `docker-compose` instead of `docker-compose-v1` creates arbitrary container not in _docker-compose.yml_ and terminates the starting process with following error:
->> strconv.Atoi: parsing "": invalid syntax
+**NOTE**: If you face the following issue with `docker-compose`. 
+> strconv.Atoi: parsing "": invalid syntax
+
+This is because `docker-compose` is creating arbitrary container not in _docker-compose.yml_ and terminating the starting process.</br>
+**FIX**: Use `docker-compose-v1` instead of `docker-compose`.
 
 <!-- These are steps before the dockerfile was created, basically without it
 
