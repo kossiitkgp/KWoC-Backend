@@ -5,7 +5,7 @@ import (
 	"kwoc20-backend/controllers"
 )
 
-func HealthCheck(r *mux.Router) {
-	// Wrap the below Endpoint under LoginRequired Middleware after testing
+func RegisterHealthCheck(r *mux.Router) {
 	r.HandleFunc("/ping", controllers.Ping).Methods("GET")
+	r.HandleFunc("", controllers.HealthCheck).Methods("GET")
 }
