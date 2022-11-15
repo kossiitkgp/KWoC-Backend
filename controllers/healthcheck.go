@@ -22,5 +22,23 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 	}
 
-	//Alternatively, code from utils.GetDB() could be replicated to give a more exact error message without the system panicking
+	// Alternative code with better error reporting below, though this should probably be moved to utils
+
+	/*
+		DatabaseUsername := os.Getenv("DATABASE_USERNAME")
+		DatabasePassword := os.Getenv("DATABASE_PASSWORD")
+		DatabaseName := os.Getenv("DATABASE_NAME")
+		DatabaseHost := os.Getenv("DATABASE_HOST")
+		DatabasePort := os.Getenv("DATABASE_PORT")
+
+		newURI := "host=" + DatabaseHost + " port=" + DatabasePort + " user=" + DatabaseUsername + " dbname=" + DatabaseName + " sslmode=disable password=" + DatabasePassword
+		_, err := gorm.Open("postgres", newURI)
+		if err != nil {
+			fmt.Fprintf(w, "The database is ureachable with error: %s", err)
+			w.WriteHeader(200)
+		} else {
+			fmt.Fprintf(w, "The server is up and database is reachable")
+			w.WriteHeader(200)
+		}
+	*/
 }
