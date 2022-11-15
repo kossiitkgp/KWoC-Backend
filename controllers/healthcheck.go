@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"kwoc20-backend/utils"
 	"net/http"
 )
 
