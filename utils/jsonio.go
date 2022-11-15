@@ -25,8 +25,10 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recv := recover(); recv != nil {
-				fmt.Println("Kuch to locha hai")
-				fmt.Printf("%+v\n", recv)
+				LogWarn(
+					r,
+					fmt.Sprintf("Kuch to locha hai\n%+v", recv),
+				)
 				debug.PrintStack()
 				response := &ErrorMessage{
 					Message: "Internal Server Error",
@@ -36,7 +38,11 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				resBody, _ := json.Marshal(response)
 				_, err := w.Write(resBody)
 				if err != nil {
-					fmt.Print("ISSUE")
+					LogErr(
+						r,
+						err,
+						"ISSUE",
+					)
 				}
 				return
 			}
@@ -48,7 +54,6 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 		_ = json.Unmarshal(body, &jsonData1)
 		var jsonData map[string]interface{}
 		if jsonData1 == nil {
-			LOG.Println("Mil gya")
 			jsonData = make(map[string]interface{})
 		} else {
 			jsonData = jsonData1.(map[string]interface{})
@@ -57,12 +62,21 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 		response, statusCode := next(jsonData, r)
 		// if statusCode is not in 200s, in case of error
 		if statusCode/100 > 2 {
-			LOG.Println(fmt.Sprintf("%+v", response))
+			LogWarn(
+				r,
+				fmt.Sprintf("%+v", response),
+			)
+
 			w.WriteHeader(statusCode)
 			w.Header().Set("Content-type", "application/json")
+
 			_, err := w.Write([]byte(`{"message": "Invalid Request"}`))
 			if err != nil {
-				fmt.Print("ISSUE")
+				LogErr(
+					r,
+					err,
+					"ISSUE",
+				)
 			}
 			return
 		}

@@ -24,7 +24,11 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		tokenStr := r.Header.Get("Bearer")
 		if tokenStr == "" {
 			http.Error(w, "Empty GET request", 400)
-			LOG.Println("Empty Get request")
+
+			LogWarn(
+				r,
+				"Empty GET Request",
+			)
 			return
 		}
 
@@ -36,13 +40,21 @@ func LoginRequired(next func(http.ResponseWriter, *http.Request)) func(http.Resp
 		})
 		if err != nil {
 			http.Error(w, "Empty GET request", http.StatusUnauthorized)
-			LOG.Println(err)
+
+			LogWarn(
+				r,
+				"Empty GET Request",
+			)
 			return
 		}
 
 		if !token.Valid {
 			http.Error(w, "Invalid Token", http.StatusUnauthorized)
-			LOG.Println("Invalid Token")
+
+			LogWarn(
+				r,
+				"Invalid Token",
+			)
 			return
 		}
 

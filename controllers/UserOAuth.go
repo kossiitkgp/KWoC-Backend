@@ -70,7 +70,11 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	gh_name, ok2 := user["name"].(string)
 	gh_email, ok3 := user["email"].(string)
 
-	fmt.Printf("%+v %+v %+v\n", ok1, ok2, ok3)
+	utils.LogInfo(
+		r,
+		fmt.Sprintf("%+v %+v %+v\n", ok1, ok2, ok3),
+	)
+
 	if !ok1 {
 		return &utils.ErrorMessage{
 			Message: "GithubHandle not found",
@@ -127,7 +131,13 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 			"accessToken": accessToken,
 		}
 
-		utils.LOG.Println(fmt.Sprintf("New User: %+v", resNewUser))
+		utils.LogInfo(
+			r,
+			fmt.Sprintf(
+				"New User: %+v",
+				resNewUser,
+			),
+		)
 		return resNewUser, 200
 	}
 
@@ -140,8 +150,6 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		"jwt":         tokenStr,
 		"accessToken": accessToken,
 	}
-	// remove this now only
-	fmt.Println("delte ", resOldUser)
 	return resOldUser, 200
 
 }
