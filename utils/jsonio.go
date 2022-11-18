@@ -66,7 +66,6 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 				r,
 				fmt.Sprintf("%+v", response),
 			)
-
 			w.WriteHeader(statusCode)
 			w.Header().Set("Content-type", "application/json")
 
