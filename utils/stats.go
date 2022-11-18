@@ -3,11 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"kwoc20-backend/models"
+	"io"
 	"net/http"
 	"os"
 	"strings"
+
+	"kwoc20-backend/models"
 
 	"gorm.io/gorm"
 )
@@ -52,7 +53,7 @@ func GetLanguagesFromFilenames(filenames []string) []string {
 	defer json_file.Close()
 
 	var ext2Lang map[string]string
-	ext2Lang_bytes, _ := ioutil.ReadAll(json_file)
+	ext2Lang_bytes, _ := io.ReadAll(json_file)
 	_ = json.Unmarshal(ext2Lang_bytes, &ext2Lang)
 
 	// parse the file extensions
@@ -88,7 +89,7 @@ func MakeRequest(URL string) (string, string) {
 	}
 	defer res.Body.Close()
 
-	resBody, _ := ioutil.ReadAll(res.Body)
+	resBody, _ := io.ReadAll(res.Body)
 	response := string(resBody)
 
 	link_in_headers := res.Header.Get("Link")

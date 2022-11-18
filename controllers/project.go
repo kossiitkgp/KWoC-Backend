@@ -2,10 +2,13 @@ package controllers
 
 import (
 	"fmt"
-	"kwoc20-backend/models"
 	"net/http"
 
+	"kwoc20-backend/models"
+
 	utils "kwoc20-backend/utils"
+
+	"github.com/rs/zerolog/log"
 )
 
 // ProjectReg endpoint to register project details
@@ -33,7 +36,13 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	ctx_user := r.Context().Value(utils.CtxUserString("user")).(string)
 
 	if ctx_user != gh_username {
-		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", gh_username, ctx_user)
+		log.Warn().Msgf(
+			"%s %s: %v != %v Detected Session Hijacking",
+			r.Method,
+			r.RequestURI,
+			gh_username,
+			ctx_user,
+		)
 		return "Corrupt JWT", http.StatusForbidden
 	}
 
@@ -57,7 +66,11 @@ func ProjectReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 		SecondaryMentor: secondaryMentor,
 	}).Error
 	if err != nil {
-		utils.LOG.Println(err)
+		utils.LogErr(
+			r,
+			err,
+			"Database error.",
+		)
 		return err.Error(), http.StatusInternalServerError
 	}
 
@@ -73,7 +86,11 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 
 	err := db.Preload("Mentor").Preload("SecondaryMentor").Not("project_status", "false").Find(&projects).Error
 	if err != nil {
-		fmt.Print(err)
+		utils.LogErr(
+			r,
+			err,
+			"Database Error",
+		)
 		return "fail", http.StatusInternalServerError
 	}
 
@@ -83,7 +100,10 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 // Run stats of all projects
 func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	test := utils.Testing()
-	fmt.Println("test recieved is ", test)
+	utils.LogInfo(
+		r,
+		fmt.Sprintf("test recieved is %v", test),
+	)
 	return "test", 200
 }
 
@@ -123,12 +143,22 @@ func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, in
 	projects := models.Project{}
 	err := db.Preload("Mentor").First(&projects, id).Select("Name", "Desc", "Tags", "Branch", "README", "SecondaryMentor", "ComChannel").Updates(project).Error
 	if err != nil {
-		fmt.Print(err)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf("Bad Request %v", err),
+		)
 		return "fail", http.StatusBadRequest
 	}
 
 	if projects.Mentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking",
+				projects.Mentor.Username,
+				ctx_user,
+			),
+		)
 		return "Session Hijacking", 403
 	}
 
@@ -157,7 +187,14 @@ func ProjectDetails(req map[string]interface{}, r *http.Request) (interface{}, i
 		return err, http.StatusBadRequest
 	}
 	if projects.Mentor.Username != ctx_user {
-		fmt.Println(projects.Mentor.Username, "+", ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking",
+				projects.Mentor.Username,
+				ctx_user,
+			),
+		)
 		return "Session Hijacking", 403
 	}
 

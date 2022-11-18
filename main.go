@@ -1,17 +1,21 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"kwoc20-backend/routes"
 	"kwoc20-backend/utils"
 )
 
 func main() {
+	// Set up logger
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	utils.InitialMigration()
 
@@ -26,6 +30,9 @@ func main() {
 	// 	routes.RegisterTest(testSubRoute)
 	// }
 
+	// register logger middleware
+	router.Use(utils.Logger)
+
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)
 
@@ -38,15 +45,16 @@ func main() {
 	projectSubRoute := router.PathPrefix("/project").Subrouter()
 	routes.RegisterProject(projectSubRoute)
 
-	var mainLogger = log.New(os.Stderr, "Message: ", log.LstdFlags|log.Lshortfile)
-	mainLogger.Println("Starting server on port " + port)
+	log.Info().Msg("Starting server on port " + port)
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
 
+	router.MethodNotAllowedHandler = utils.GetMethodNotAllowedHandler()
+	router.NotFoundHandler = utils.GetNotFoundHandler()
+
 	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
-		mainLogger.Println("Error in Starting ", err)
+		log.Fatal().Err(err).Msg("Error in starting server")
 		os.Exit(1)
 	}
-
 }

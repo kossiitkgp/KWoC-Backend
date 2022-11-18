@@ -1,5 +1,8 @@
 build:
 	go build
+	go get golang.org/x/tools/cmd/goimports@latest
+	go get github.com/golangci/golangci-lint@latest
+	pre-commit install
 
 lint:
 	gofmt -s -w .

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -18,7 +18,6 @@ import (
 
 // Handler for UserOAuth
 func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
-
 	// return error if no state or no code
 	if js["code"] == "" || js["state"] == "" {
 		return "type mismatch", 400
@@ -36,7 +35,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		return fmt.Sprintf("Error occurred: %s", err), 500
 	}
 	defer res.Body.Close()
-	resBody, _ := ioutil.ReadAll(res.Body)
+	resBody, _ := io.ReadAll(res.Body)
 	resBodyString := string(resBody)
 	accessTokenPart := strings.Split(resBodyString, "&")[0]
 	accessToken := strings.Split(accessTokenPart, "=")[1]
@@ -54,7 +53,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	}
 	defer res1.Body.Close()
 
-	resBody1, _ := ioutil.ReadAll(res1.Body)
+	resBody1, _ := io.ReadAll(res1.Body)
 
 	var userdata interface{}
 	err = json.Unmarshal(resBody1, &userdata)
@@ -70,7 +69,11 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	gh_name, ok2 := user["name"].(string)
 	gh_email, ok3 := user["email"].(string)
 
-	fmt.Printf("%+v %+v %+v\n", ok1, ok2, ok3)
+	utils.LogInfo(
+		r,
+		fmt.Sprintf("%+v %+v %+v\n", ok1, ok2, ok3),
+	)
+
 	if !ok1 {
 		return &utils.ErrorMessage{
 			Message: "GithubHandle not found",
@@ -104,8 +107,8 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	expirationTime := time.Now().Add(50 * 24 * time.Hour)
 	claims := &utils.Claims{
 		Username: gh_username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: &jwt.NumericDate{Time: expirationTime},
 		},
 	}
 
@@ -127,7 +130,13 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 			"accessToken": accessToken,
 		}
 
-		utils.LOG.Printf("New User: %+v", resNewUser)
+		utils.LogInfo(
+			r,
+			fmt.Sprintf(
+				"New User: %+v",
+				resNewUser,
+			),
+		)
 		return resNewUser, 200
 	}
 
@@ -140,8 +149,5 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		"jwt":         tokenStr,
 		"accessToken": accessToken,
 	}
-	// remove this now only
-	fmt.Println("delte ", resOldUser)
 	return resOldUser, 200
-
 }

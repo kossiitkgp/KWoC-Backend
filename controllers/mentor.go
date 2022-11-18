@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"kwoc20-backend/models"
 	"kwoc20-backend/utils"
 	"net/http"
@@ -67,7 +68,14 @@ func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, in
 	mentor := req["mentor"].(string)
 
 	if ctx_user != mentor {
-		utils.LOG.Printf("%v != %v Detected Session Hijacking\n", mentor, ctx_user)
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"%v != %v Detected Session Hijacking",
+				mentor,
+				ctx_user,
+			),
+		)
 		return "Corrupt JWT", http.StatusForbidden
 	}
 
@@ -75,7 +83,11 @@ func GetAllMentors(req map[string]interface{}, r *http.Request) (interface{}, in
 
 	err := db.Select([]string{"Name", "Username"}).Not("username", mentor).Find(&mentors).Error
 	if err != nil {
-		utils.LOG.Println(err)
+		utils.LogErr(
+			r,
+			err,
+			"Database Error",
+		)
 		return err, http.StatusInternalServerError
 	}
 
