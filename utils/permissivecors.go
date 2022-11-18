@@ -2,7 +2,7 @@ package utils
 
 import "net/http"
 
-//PermissiveCORS May not be needed in production (with same domain name for the frontend and backend)
+// PermissiveCORS May not be needed in production (with same domain name for the frontend and backend)
 func PermissiveCORS(w http.ResponseWriter, r *http.Request) {
 	origin := r.Header.Get("Origin")
 	if origin != "" {

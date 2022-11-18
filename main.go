@@ -33,7 +33,6 @@ func main() {
 	// register logger middleware
 	router.Use(utils.Logger)
 
-
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)
 
@@ -58,5 +57,4 @@ func main() {
 		log.Fatal().Err(err).Msg("Error in starting server")
 		os.Exit(1)
 	}
-
 }
