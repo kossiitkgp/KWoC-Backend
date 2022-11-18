@@ -1,10 +1,8 @@
 package tests
 
-import "fmt"
-
-func main() {
-	fmt.Println("Testing")
-}
+// func tests() {
+// 	fmt.Println("Testing")
+// }
 
 // import (
 //     "kwoc20-backend/utils"
