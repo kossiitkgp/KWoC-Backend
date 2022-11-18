@@ -127,7 +127,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 			"accessToken": accessToken,
 		}
 
-		utils.LOG.Println(fmt.Sprintf("New User: %+v", resNewUser))
+		utils.LOG.Printf("New User: %+v", resNewUser)
 		return resNewUser, 200
 	}
 
