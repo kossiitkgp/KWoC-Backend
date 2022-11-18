@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -18,7 +18,6 @@ import (
 
 // Handler for UserOAuth
 func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
-
 	// return error if no state or no code
 	if js["code"] == "" || js["state"] == "" {
 		return "type mismatch", 400
@@ -36,7 +35,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		return fmt.Sprintf("Error occurred: %s", err), 500
 	}
 	defer res.Body.Close()
-	resBody, _ := ioutil.ReadAll(res.Body)
+	resBody, _ := io.ReadAll(res.Body)
 	resBodyString := string(resBody)
 	accessTokenPart := strings.Split(resBodyString, "&")[0]
 	accessToken := strings.Split(accessTokenPart, "=")[1]
@@ -54,7 +53,7 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	}
 	defer res1.Body.Close()
 
-	resBody1, _ := ioutil.ReadAll(res1.Body)
+	resBody1, _ := io.ReadAll(res1.Body)
 
 	var userdata interface{}
 	err = json.Unmarshal(resBody1, &userdata)
@@ -151,5 +150,4 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 		"accessToken": accessToken,
 	}
 	return resOldUser, 200
-
 }

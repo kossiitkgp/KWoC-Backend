@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime/debug"
 )
@@ -48,7 +48,7 @@ func JsonIO(next func(map[string]interface{}, *http.Request) (interface{}, int))
 			}
 		}()
 
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 
 		var jsonData1 interface{}
 		_ = json.Unmarshal(body, &jsonData1)
