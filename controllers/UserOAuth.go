@@ -107,8 +107,8 @@ func UserOAuth(js map[string]interface{}, r *http.Request) (interface{}, int) {
 	expirationTime := time.Now().Add(50 * 24 * time.Hour)
 	claims := &utils.Claims{
 		Username: gh_username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: &jwt.NumericDate{Time: expirationTime},
 		},
 	}
 

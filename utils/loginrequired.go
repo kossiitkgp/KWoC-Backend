@@ -15,7 +15,7 @@ type CtxUserString string
 // Claims jwt claim
 type Claims struct {
 	Username string `json:"username"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // LoginRequired Middleware to protect endpoints
