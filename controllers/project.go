@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"kwoc20-backend/models"
 	"net/http"
+
+	"kwoc20-backend/models"
 
 	utils "kwoc20-backend/utils"
 
@@ -101,7 +102,7 @@ func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	test := utils.Testing()
 	utils.LogInfo(
 		r,
-		fmt.Sprintf("test recieved is ", test),
+		fmt.Sprintf("test recieved is %v", test),
 	)
 	return "test", 200
 }
