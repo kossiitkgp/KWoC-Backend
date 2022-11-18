@@ -6,6 +6,7 @@ import (
 )
 
 func RegisterHealthCheck(r *mux.Router) {
+	//Ping can be removed
 	r.HandleFunc("/ping", controllers.Ping).Methods("GET")
 	r.HandleFunc("", controllers.HealthCheck).Methods("GET")
 }

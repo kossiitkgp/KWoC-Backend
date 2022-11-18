@@ -23,7 +23,6 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Alternative code with better error reporting below, though this should probably be moved to utils
-
 	/*
 		DatabaseUsername := os.Getenv("DATABASE_USERNAME")
 		DatabasePassword := os.Getenv("DATABASE_PASSWORD")

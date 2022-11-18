@@ -45,6 +45,9 @@ func main() {
 	projectSubRoute := router.PathPrefix("/project").Subrouter()
 	routes.RegisterProject(projectSubRoute)
 
+	healthSubRoute := router.PathPrefix("/healthcheck").Subrouter()
+	routes.RegisterHealthCheck(healthSubRoute)
+
 	log.Info().Msg("Starting server on port " + port)
 
 	router.PathPrefix("/").HandlerFunc(utils.PermissiveCORS).Methods("OPTIONS")
