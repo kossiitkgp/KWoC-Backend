@@ -36,8 +36,21 @@ golang-jwt/jwt/v4
 
 Also uses `golanglint-ci` for linting code.
 
-## Set up
-- Clone the repo.
+## Building
+
+- Clone the repo and `cd` into it's directory.
+- Run the following commands
+  ```sh
+  docker-compose build
+  docker-compose up 
+  ```
+**NOTE**: If you face the following issue with `docker-compose`. 
+> strconv.Atoi: parsing "": invalid syntax
+
+This is because `docker-compose` is creating arbitrary container not in _docker-compose.yml_ and terminating the starting process.</br>
+**FIX**: Use `docker-compose-v1` instead of `docker-compose`.
+
+<!-- These are steps before the dockerfile was created, basically without it
 
 - You can use the Makefile for automating the commands. Run `make help` for a list of commands.
 
@@ -52,3 +65,4 @@ Also uses `golanglint-ci` for linting code.
 - Run `go build` to build into a single binary.
 
 - Run `gofmt -s -w .` to lint all the files in one go.
+-->
