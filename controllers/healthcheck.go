@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"fmt"
-	"kwoc20-backend/utils"
 	"net/http"
+
+	"kwoc20-backend/utils"
 )
 
 func Ping(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Pong!")
+	w.Write([]byte("Pong!"))
 	w.WriteHeader(200)
 }
 
@@ -15,11 +15,12 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 
 	if db != nil {
-		fmt.Fprintf(w, "The server is up and database is reachable")
 		w.WriteHeader(200)
+		w.Write([]byte("The server is up and database is reachable"))
+
 	} else {
-		fmt.Fprintf(w, "The database is unreachable")
 		w.WriteHeader(200)
+		w.Write([]byte("Database is unreachable"))
 	}
 
 	// Alternative code with better error reporting below, though this should probably be moved to utils
