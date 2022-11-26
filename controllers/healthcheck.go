@@ -4,23 +4,31 @@ import (
 	"net/http"
 
 	"kwoc20-backend/utils"
+
+	"github.com/rs/zerolog/log"
 )
 
 func Ping(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Pong!"))
 	w.WriteHeader(200)
+	_, err := w.Write([]byte("Pong!"))
+	if err != nil {
+		log.Info().Msg("Could not respond to Ping")
+	}
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
-
+	w.WriteHeader(200)
 	if db != nil {
-		w.WriteHeader(200)
-		w.Write([]byte("The server is up and database is reachable"))
-
-	} else {
-		w.WriteHeader(200)
-		w.Write([]byte("Database is unreachable"))
+		_, err := w.Write([]byte("The server is up and database is reachable"))
+		if err != nil {
+			log.Info().Msg("Could not respond to Ping")
+		}
+		return
+	}
+	_, err := w.Write([]byte("Database is unreachable"))
+	if err != nil {
+		log.Info().Msg("Could not respond to Ping")
 	}
 
 	// Alternative code with better error reporting below, though this should probably be moved to utils
