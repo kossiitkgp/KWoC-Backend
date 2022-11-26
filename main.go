@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -16,6 +17,17 @@ func main() {
 	// Set up logger
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Info().Msg(os.Getenv("SENTRY_DSN"))
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: os.Getenv("SENTRY_DSN"),
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Info().Msg("Could not connect to sentry")
+	}
 
 	utils.InitialMigration()
 
@@ -55,7 +67,7 @@ func main() {
 	router.MethodNotAllowedHandler = utils.GetMethodNotAllowedHandler()
 	router.NotFoundHandler = utils.GetNotFoundHandler()
 
-	err := http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error in starting server")
 		os.Exit(1)
