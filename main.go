@@ -59,6 +59,9 @@ func main() {
 
 	healthSubRoute := router.PathPrefix("/healthcheck").Subrouter()
 	routes.RegisterHealthCheck(healthSubRoute)
+	
+	getstatsSubRoute := router.PathPrefix("/getstats").Subrouter()
+	routes.RegisterGetStats(getstatsSubRoute)
 
 	log.Info().Msg("Starting server on port " + port)
 
