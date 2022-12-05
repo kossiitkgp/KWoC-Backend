@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"net/http"
-
+	
+	"kwoc20-backend/models"
+	
 	"kwoc20-backend/utils"
 
 	"github.com/gorilla/mux"
