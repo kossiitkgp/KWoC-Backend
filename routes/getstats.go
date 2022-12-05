@@ -8,7 +8,9 @@ import (
 
 func RegisterGetStats(r *mux.Router) {
 
+	r.HandleFunc("/stats/student/{Username}", CheckStudent).Methods("GET")
 	r.HandleFunc("/stats/students", controllers.AllStudents).Methods("GET")
 	r.HandleFunc("/stats/student/{username}", controllers.OneStudent).Methods("GET")
 	r.HandleFunc("/stats/projects", controllers.AllProjects).Methods("GET")
+	r.HandleFunc("/stats/mentor/{Username}", OneMentor).Methods("GET")
 }
