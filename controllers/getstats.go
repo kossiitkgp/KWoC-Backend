@@ -42,7 +42,7 @@ func OneStudent(w http.ResponseWriter, r *http.Request) {
 	w.Write(student)
 }
 
-func AllProjects(w http.ResponseWriter, r *http.Request) {
+func GetAllProjects(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	w.WriteHeader(200)
 	var projects []Project
