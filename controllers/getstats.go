@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"kwoc20-backend/models"
@@ -15,7 +16,7 @@ func CheckStudent(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	var student models.Student
-	db.Find(&student, params["Username"])
+	db.Find(&student, params["username"])
 	if student.Username == " " {
 		w.WriteHeader(400)
 		w.Write([]byte("false"))
@@ -30,7 +31,8 @@ func AllStudents(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	var students []models.Student
 	db.Find(&students)
-	w.Write(students)
+	str := fmt.Sprintf("%+v", students)
+	w.Write([]byte(str))
 }
 
 func OneStudent(w http.ResponseWriter, r *http.Request) {
@@ -38,8 +40,9 @@ func OneStudent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	params := mux.Vars(r)
 	var student models.Student
-	db.Find(&student, params["Username"])
-	w.Write(student)
+	db.Find(&student, params["username"])
+	str := fmt.Sprintf("%+v", student)
+	w.Write([]byte(str))
 }
 
 func GetAllProjects(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +50,8 @@ func GetAllProjects(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	var projects []models.Project
 	db.Find(&projects)
-	w.Write(projects)
+	str := fmt.Sprintf("%+v", projects)
+	w.Write([]byte(str))
 }
 
 func OneMentor(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +59,7 @@ func OneMentor(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	params := mux.Vars(r)
 	var mentor []models.Project
-	db.Find(&mentor, params["Mentor.Username"])
-	w.Write(mentor)
+	db.Find(&mentor, params["Mentor.username"])
+	str := fmt.Sprintf("%+v", mentor)
+	w.Write([]byte(str))
 }
