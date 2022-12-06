@@ -1,7 +1,8 @@
-package controllers
+package routes
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"kwoc20-backend/models"
@@ -19,10 +20,18 @@ func CheckStudent(w http.ResponseWriter, r *http.Request) {
 	db.Find(&student, params["username"])
 	if student.Username == " " {
 		w.WriteHeader(400)
-		w.Write([]byte("false"))
+		_, err := w.Write([]byte("false"))
+		if err != nil {
+			log.Printf("Write failed: %v", err)
+		}
+		return
 	} else {
 		w.WriteHeader(200)
-		w.Write([]byte("true"))
+		_, err := w.Write([]byte("true"))
+		if err != nil {
+			log.Printf("Write failed: %v", err)
+		}
+		return
 	}
 }
 
@@ -32,7 +41,11 @@ func AllStudents(w http.ResponseWriter, r *http.Request) {
 	var students []models.Student
 	db.Find(&students)
 	str := fmt.Sprintf("%+v", students)
-	w.Write([]byte(str))
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		log.Printf("Write failed: %v", err)
+	}
+	return
 }
 
 func OneStudent(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +55,11 @@ func OneStudent(w http.ResponseWriter, r *http.Request) {
 	var student models.Student
 	db.Find(&student, params["username"])
 	str := fmt.Sprintf("%+v", student)
-	w.Write([]byte(str))
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		log.Printf("Write failed: %v", err)
+	}
+	return
 }
 
 func GetAllProjects(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +68,11 @@ func GetAllProjects(w http.ResponseWriter, r *http.Request) {
 	var projects []models.Project
 	db.Find(&projects)
 	str := fmt.Sprintf("%+v", projects)
-	w.Write([]byte(str))
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		log.Printf("Write failed: %v", err)
+	}
+	return
 }
 
 func OneMentor(w http.ResponseWriter, r *http.Request) {
@@ -61,5 +82,9 @@ func OneMentor(w http.ResponseWriter, r *http.Request) {
 	var mentor []models.Project
 	db.Find(&mentor, params["Mentor.username"])
 	str := fmt.Sprintf("%+v", mentor)
-	w.Write([]byte(str))
+	_, err := w.Write([]byte(str))
+	if err != nil {
+		log.Printf("Write failed: %v", err)
+	}
+	return
 }
