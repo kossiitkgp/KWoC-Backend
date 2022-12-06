@@ -1,4 +1,4 @@
-package controllers
+package routes
 
 import (
 	"kwoc20-backend/controllers"
