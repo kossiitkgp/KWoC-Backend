@@ -122,45 +122,50 @@ func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	}
 }
 
-type Project struct {
-	ID       uint
-	RepoLink string
-	Branch   string
-
-	LastPullDate string
-
-	CommitCount  uint
-	PRCount      uint
-	AddedLines   uint
-	RemovedLines uint
+type AllProjectsProject struct {
+	Title   string
+	Link    string
+	Contri  uint // Number of students who contributed
+	Commits uint
+	Lines   string
+}
+type AllProjectsRes struct {
+	Stats []AllProjectsProject
 }
 
-func GetAllProjects(w http.ResponseWriter, r *http.Request) {
+func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
-	w.WriteHeader(200)
-	var projects []Project
+	var projects []models.Project
+
 	db.
 		Table("projects").
-		Where("project_status = ?", "true").
-		Select(
-			"id", "repo_link", "branch",
-			"last_pull_date", "commit_count",
-			"pr_count", "added_lines", "removed_lines",
-		).
+		Where("project_status = ?", "1").
+		Select("*").
 		Find(&projects)
-	str := fmt.Sprintf("%+v", projects)
-	_, err := w.Write([]byte(str))
 
-	if err != nil {
-		utils.LogErr(r, err, "Write failed.")
+	response := make([]AllProjectsProject, 0)
+
+	for _, project := range projects {
+		response = append(
+			response,
+			AllProjectsProject{
+				Title:   project.Name,
+				Link:    project.RepoLink,
+				Contri:  0,
+				Commits: project.CommitCount,
+				Lines:   fmt.Sprintf("+%d/-%d", project.AddedLines, project.RemovedLines),
+			},
+		)
 	}
+
+	return AllProjectsRes{Stats: response}, 200
 }
 
 func OneMentor(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	w.WriteHeader(200)
 	params := mux.Vars(r)
-	var mentor []Project
+	var mentor []models.Project
 	db.
 		Table("projects").
 		Where("project_status = ?", "true").
