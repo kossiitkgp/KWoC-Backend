@@ -24,30 +24,27 @@ type Student struct {
 func CheckStudent(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	params := mux.Vars(r)
-	var student Student
+
+	student := Student{}
 	db.
 		Table("students").
-		Select(
-			"id", "username", "commit_count",
-			"pr_count", "added_lines", "removed_lines",
-			"tech_worked",
-		).
-		Find(&student, params["username"])
+		Where("username = ?", params["username"]).
+		First(&student)
 
-	if student.Username == " " {
-		w.WriteHeader(400)
-		_, err := w.Write([]byte("false"))
-		if err != nil {
-			utils.LogErr(r, err, "Write failed.")
-		}
-		return
+	student_exists := student.Username == params["username"]
+	var response string
+
+	if student_exists {
+		response = "true"
 	} else {
-		w.WriteHeader(200)
-		_, err := w.Write([]byte("true"))
-		if err != nil {
-			utils.LogErr(r, err, "Write failed.")
-		}
-		return
+		response = "false"
+	}
+
+	w.WriteHeader(200)
+	_, err := w.Write([]byte(response))
+
+	if err != nil {
+		utils.LogErr(r, err, "Write failed.")
 	}
 }
 
