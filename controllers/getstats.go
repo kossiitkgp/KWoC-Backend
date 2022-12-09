@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"kwoc20-backend/models"
 
@@ -30,7 +31,7 @@ func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int
 	}
 }
 
-type StudentStat struct {
+type AllStudentStat struct {
 	Name     string
 	Username string
 	Prs      string
@@ -38,7 +39,7 @@ type StudentStat struct {
 	Lines    string
 }
 type AllStudentsRes struct {
-	Stats []StudentStat
+	Stats []AllStudentStat
 }
 
 func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -50,12 +51,12 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 		Select("*").
 		Find(&students)
 
-	student_stats := make([]StudentStat, 0)
+	student_stats := make([]AllStudentStat, 0)
 
 	for _, student := range students {
 		student_stats = append(
 			student_stats,
-			StudentStat{
+			AllStudentStat{
 				Name:     student.Name,
 				Username: student.Username,
 				Prs:      fmt.Sprintf("%d", student.PRCount),
@@ -72,24 +73,52 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 	return response, 200
 }
 
-func OneStudent(w http.ResponseWriter, r *http.Request) {
+type OneStudentCommit struct {
+	Html_url string
+	Message  string
+}
+type OneStudentPull struct {
+	Html_url     string
+	Title        string
+	RepoOwner    string
+	LinesAdded   string
+	RepoName     string
+	LinesRemoved string
+}
+type OneStudentStat struct {
+	Name         string
+	Username     string
+	CommitCount  uint
+	Languages    []string
+	Pulls        []OneStudentPull
+	LinesAdded   uint
+	LinesRemoved uint
+}
+
+func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
-	w.WriteHeader(200)
 	params := mux.Vars(r)
-	var student models.Student
+
+	student := models.Student{}
 	db.
 		Table("students").
-		Select(
-			"id", "username", "commit_count",
-			"pr_count", "added_lines", "removed_lines",
-			"tech_worked",
-		).
-		Find(&student, params["username"])
-	str := fmt.Sprintf("%+v", student)
-	_, err := w.Write([]byte(str))
+		Where("username = ?", params["username"]).
+		First(&student)
 
-	if err != nil {
-		utils.LogErr(r, err, "Write failed.")
+	student_exists := student.Username == params["username"]
+
+	if student_exists {
+		return OneStudentStat{
+			Name:         student.Name,
+			Username:     student.Username,
+			CommitCount:  student.CommitCount,
+			Languages:    strings.Split(student.TechWorked, ","),
+			Pulls:        make([]OneStudentPull, 0),
+			LinesAdded:   student.AddedLines,
+			LinesRemoved: student.RemovedLines,
+		}, 200
+	} else {
+		return OneStudentStat{}, 200
 	}
 }
 
