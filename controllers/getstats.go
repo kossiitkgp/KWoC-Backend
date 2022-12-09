@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"kwoc20-backend/models"
+	_ "kwoc20-backend/models"
 
 	"kwoc20-backend/utils"
 
@@ -131,7 +131,7 @@ func OneMentor(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	w.WriteHeader(200)
 	params := mux.Vars(r)
-	var mentor []models.Project
+	var mentor []Project
 	db.
 		Table("projects").
 		Where("project_status = ?", "true").
@@ -140,7 +140,7 @@ func OneMentor(w http.ResponseWriter, r *http.Request) {
 			"last_pull_date", "commit_count",
 			"pr_count", "added_lines", "removed_lines",
 		).
-		Find(&mentor, params["Mentor.username"])
+		Find(&mentor, params["Mentor.Username"])
 	str := fmt.Sprintf("%+v", mentor)
 	_, err := w.Write([]byte(str))
 	if err != nil {
