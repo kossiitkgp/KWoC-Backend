@@ -21,7 +21,7 @@ type Student struct {
 	TechWorked   string
 }
 
-func CheckStudent(w http.ResponseWriter, r *http.Request) {
+func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	params := mux.Vars(r)
 
@@ -32,19 +32,11 @@ func CheckStudent(w http.ResponseWriter, r *http.Request) {
 		First(&student)
 
 	student_exists := student.Username == params["username"]
-	var response string
 
 	if student_exists {
-		response = "true"
+		return "true", 200
 	} else {
-		response = "false"
-	}
-
-	w.WriteHeader(200)
-	_, err := w.Write([]byte(response))
-
-	if err != nil {
-		utils.LogErr(r, err, "Write failed.")
+		return "false", 200
 	}
 }
 
