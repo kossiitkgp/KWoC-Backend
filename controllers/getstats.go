@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"kwoc20-backend/models"
-	_ "kwoc20-backend/models"
 
 	"kwoc20-backend/utils"
 
