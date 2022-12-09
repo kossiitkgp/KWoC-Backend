@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"kwoc20-backend/models"
 	_ "kwoc20-backend/models"
 
 	"kwoc20-backend/utils"
@@ -11,21 +12,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Student struct {
-	ID           uint
-	Username     string
-	CommitCount  uint
-	PRCount      uint
-	AddedLines   uint
-	RemovedLines uint
-	TechWorked   string
-}
-
 func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	params := mux.Vars(r)
 
-	student := Student{}
+	student := models.Student{}
 	db.
 		Table("students").
 		Where("username = ?", params["username"]).
@@ -40,31 +31,53 @@ func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int
 	}
 }
 
-func AllStudents(w http.ResponseWriter, r *http.Request) {
+type StudentStat struct {
+	Name     string
+	Username string
+	Prs      string
+	Commits  uint
+	Lines    string
+}
+type AllStudentsRes struct {
+	Stats []StudentStat
+}
+
+func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
-	w.WriteHeader(200)
-	var students []Student
+	var students []models.Student
+
 	db.
 		Table("students").
-		Select(
-			"id", "username", "commit_count",
-			"pr_count", "added_lines", "removed_lines",
-			"tech_worked",
-		).
+		Select("*").
 		Find(&students)
-	str := fmt.Sprintf("%+v", students)
-	_, err := w.Write([]byte(str))
 
-	if err != nil {
-		utils.LogErr(r, err, "Write failed.")
+	student_stats := make([]StudentStat, 0)
+
+	for _, student := range students {
+		student_stats = append(
+			student_stats,
+			StudentStat{
+				Name:     student.Name,
+				Username: student.Username,
+				Prs:      fmt.Sprintf("%d", student.PRCount),
+				Commits:  student.CommitCount,
+				Lines:    fmt.Sprintf("+%d/-%d", student.AddedLines, student.RemovedLines),
+			},
+		)
 	}
+
+	response := AllStudentsRes{
+		Stats: student_stats,
+	}
+
+	return response, 200
 }
 
 func OneStudent(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
 	w.WriteHeader(200)
 	params := mux.Vars(r)
-	var student Student
+	var student models.Student
 	db.
 		Table("students").
 		Select(
