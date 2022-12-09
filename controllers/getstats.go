@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	_ "kwoc20-backend/models"
@@ -27,26 +26,26 @@ func CheckStudent(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var student Student
 	db.
-	Table("students").
-	Select(
-		"id", "username", "commit_count",
-		"pr_count", "added_lines", "removed_lines",
-		"tech_worked",
-	).
-	Find(&student, params["username"])
+		Table("students").
+		Select(
+			"id", "username", "commit_count",
+			"pr_count", "added_lines", "removed_lines",
+			"tech_worked",
+		).
+		Find(&student, params["username"])
 
 	if student.Username == " " {
 		w.WriteHeader(400)
 		_, err := w.Write([]byte("false"))
 		if err != nil {
-			log.Printf("Write failed: %v", err)
+			utils.LogErr(r, err, "Write failed.")
 		}
 		return
 	} else {
 		w.WriteHeader(200)
 		_, err := w.Write([]byte("true"))
 		if err != nil {
-			log.Printf("Write failed: %v", err)
+			utils.LogErr(r, err, "Write failed.")
 		}
 		return
 	}
@@ -57,19 +56,19 @@ func AllStudents(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	var students []Student
 	db.
-	Table("students").
-	Select(
-		"id", "username", "commit_count",
-		"pr_count", "added_lines", "removed_lines",
-		"tech_worked",
-	).
-	Find(&students)
+		Table("students").
+		Select(
+			"id", "username", "commit_count",
+			"pr_count", "added_lines", "removed_lines",
+			"tech_worked",
+		).
+		Find(&students)
 	str := fmt.Sprintf("%+v", students)
 	_, err := w.Write([]byte(str))
+
 	if err != nil {
-		log.Printf("Write failed: %v", err)
+		utils.LogErr(r, err, "Write failed.")
 	}
-	return
 }
 
 func OneStudent(w http.ResponseWriter, r *http.Request) {
@@ -78,32 +77,32 @@ func OneStudent(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var student Student
 	db.
-	Table("students").
-	Select(
-		"id", "username", "commit_count",
-		"pr_count", "added_lines", "removed_lines",
-		"tech_worked",
-	).
-	Find(&student, params["username"])
+		Table("students").
+		Select(
+			"id", "username", "commit_count",
+			"pr_count", "added_lines", "removed_lines",
+			"tech_worked",
+		).
+		Find(&student, params["username"])
 	str := fmt.Sprintf("%+v", student)
 	_, err := w.Write([]byte(str))
+
 	if err != nil {
-		log.Printf("Write failed: %v", err)
+		utils.LogErr(r, err, "Write failed.")
 	}
-	return
 }
 
 type Project struct {
-	ID uint
-	RepoLink      string
-	Branch        string
+	ID       uint
+	RepoLink string
+	Branch   string
 
-	LastPullDate  string
+	LastPullDate string
 
-	CommitCount   uint
-	PRCount       uint
-	AddedLines    uint
-	RemovedLines  uint
+	CommitCount  uint
+	PRCount      uint
+	AddedLines   uint
+	RemovedLines uint
 }
 
 func GetAllProjects(w http.ResponseWriter, r *http.Request) {
@@ -121,10 +120,10 @@ func GetAllProjects(w http.ResponseWriter, r *http.Request) {
 		Find(&projects)
 	str := fmt.Sprintf("%+v", projects)
 	_, err := w.Write([]byte(str))
+
 	if err != nil {
-		log.Printf("Write failed: %v", err)
+		utils.LogErr(r, err, "Write failed.")
 	}
-	return
 }
 
 func OneMentor(w http.ResponseWriter, r *http.Request) {
@@ -143,8 +142,8 @@ func OneMentor(w http.ResponseWriter, r *http.Request) {
 		Find(&mentor, params["Mentor.Username"])
 	str := fmt.Sprintf("%+v", mentor)
 	_, err := w.Write([]byte(str))
+
 	if err != nil {
-		log.Printf("Write failed: %v", err)
+		utils.LogErr(r, err, "Write failed.")
 	}
-	return
 }
