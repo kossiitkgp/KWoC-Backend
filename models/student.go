@@ -20,5 +20,10 @@ type Student struct {
 	PRCount      uint
 	AddedLines   uint
 	RemovedLines uint
-	TechWorked   string
+
+	// TechWorked is a string of languages separated by comma(,)
+	TechWorked string
+
+	// ProjectsWorked is a string of project IDs separated by comma(,)
+	ProjectsWorked string
 }
