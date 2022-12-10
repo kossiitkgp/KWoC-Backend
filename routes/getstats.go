@@ -12,5 +12,5 @@ func RegisterGetStats(r *mux.Router) {
 	r.HandleFunc("/students", utils.JsonIO(controllers.AllStudents)).Methods("GET")
 	r.HandleFunc("/student/{username}", utils.JsonIO(controllers.OneStudent)).Methods("GET")
 	r.HandleFunc("/projects", utils.JsonIO(controllers.GetAllProjects)).Methods("GET")
-	r.HandleFunc("/projects/{Mentor.Username}", controllers.OneMentor).Methods("GET")
+	r.HandleFunc("/mentor/{Mentor.Username}", utils.JsonIO(controllers.OneMentor)).Methods("GET")
 }

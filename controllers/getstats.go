@@ -161,24 +161,57 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 	return AllProjectsRes{Stats: response}, 200
 }
 
-func OneMentor(w http.ResponseWriter, r *http.Request) {
-	db := utils.GetDB()
-	w.WriteHeader(200)
-	params := mux.Vars(r)
-	var mentor []models.Project
-	db.
-		Table("projects").
-		Where("project_status = ?", "true").
-		Select(
-			"id", "repo_link", "branch",
-			"last_pull_date", "commit_count",
-			"pr_count", "added_lines", "removed_lines",
-		).
-		Find(&mentor, params["Mentor.Username"])
-	str := fmt.Sprintf("%+v", mentor)
-	_, err := w.Write([]byte(str))
+type OneMentorProj struct {
+	RepoLink     string
+	Project_name string
+	Contributors []string // Array of usernames of students who contributed
+	Commits      uint
+	LinesAdded   uint
+	LinesRemoved uint
+}
+type OneMentorRes struct {
+	Projects []OneMentorProj
+}
 
-	if err != nil {
-		utils.LogErr(r, err, "Write failed.")
+func OneMentor(req map[string]interface{}, r *http.Request) (interface{}, int) {
+	db := utils.GetDB()
+	params := mux.Vars(r)
+	username := params["Mentor.Username"]
+
+	var mentor models.Mentor
+
+	db.
+		Table("mentors").
+		Where("username = ?", username).
+		Select("*").
+		First(&mentor)
+
+	if mentor.Username == username {
+		mentor_id := mentor.ID
+		var projects []models.Project
+
+		db.
+			Table("projects").
+			Where("mentor_id = ? OR secondary_mentor_id = ?", mentor_id, mentor_id).
+			Find(&projects)
+
+		mentor_stats := make([]OneMentorProj, 0)
+
+		for _, project := range projects {
+			mentor_stats = append(
+				mentor_stats,
+				OneMentorProj{
+					RepoLink:     project.RepoLink,
+					Project_name: project.Name,
+					Commits:      project.CommitCount,
+					LinesAdded:   project.AddedLines,
+					LinesRemoved: project.RemovedLines,
+				},
+			)
+		}
+
+		return OneMentorRes{Projects: mentor_stats}, 200
+	} else {
+		return OneMentorRes{}, 200
 	}
 }
