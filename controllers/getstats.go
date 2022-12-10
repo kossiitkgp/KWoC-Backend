@@ -85,14 +85,19 @@ type OneStudentPull struct {
 	RepoName     string
 	LinesRemoved string
 }
+type OneStudentRepo struct {
+	RepoLink string
+	Name     string
+}
 type OneStudentStat struct {
-	Name         string
-	Username     string
-	CommitCount  uint
-	Languages    []string
-	Pulls        []OneStudentPull
-	LinesAdded   uint
-	LinesRemoved uint
+	Name           string
+	Username       string
+	CommitCount    uint
+	Languages      []string
+	Pulls          []OneStudentPull
+	ProjectsWorked []OneStudentRepo
+	LinesAdded     uint
+	LinesRemoved   uint
 }
 
 func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -108,14 +113,33 @@ func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	student_exists := student.Username == params["username"]
 
 	if student_exists {
+		var projects_worked []OneStudentRepo = make([]OneStudentRepo, 0)
+
+		for _, proj_id := range strings.Split(student.ProjectsWorked, ",") {
+			proj := models.Project{}
+			db.
+				Table("projects").
+				Where("id = ?", proj_id).
+				First(&proj)
+
+			projects_worked = append(
+				projects_worked,
+				OneStudentRepo{
+					RepoLink: proj.RepoLink,
+					Name:     proj.Name,
+				},
+			)
+		}
+
 		return OneStudentStat{
-			Name:         student.Name,
-			Username:     student.Username,
-			CommitCount:  student.CommitCount,
-			Languages:    strings.Split(student.TechWorked, ","),
-			Pulls:        make([]OneStudentPull, 0),
-			LinesAdded:   student.AddedLines,
-			LinesRemoved: student.RemovedLines,
+			Name:           student.Name,
+			Username:       student.Username,
+			CommitCount:    student.CommitCount,
+			Languages:      strings.Split(student.TechWorked, ","),
+			Pulls:          make([]OneStudentPull, 0),
+			ProjectsWorked: projects_worked,
+			LinesAdded:     student.AddedLines,
+			LinesRemoved:   student.RemovedLines,
 		}, 200
 	} else {
 		return OneStudentStat{}, 200
@@ -151,7 +175,7 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 			AllProjectsProject{
 				Title:   project.Name,
 				Link:    project.RepoLink,
-				Contri:  0,
+				Contri:  uint(len(strings.Split(project.Contributors, ","))),
 				Commits: project.CommitCount,
 				Lines:   fmt.Sprintf("+%d/-%d", project.AddedLines, project.RemovedLines),
 			},
@@ -206,6 +230,7 @@ func OneMentor(req map[string]interface{}, r *http.Request) (interface{}, int) {
 					Commits:      project.CommitCount,
 					LinesAdded:   project.AddedLines,
 					LinesRemoved: project.RemovedLines,
+					Contributors: strings.Split(project.Contributors, ","),
 				},
 			)
 		}
