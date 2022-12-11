@@ -38,6 +38,9 @@ type Project struct {
 	// list of students who contributed to the project (a string of usernames separated by comma(,))
 	Contributors string
 
+	// list of URLs to PRs contributed to the project (a string of links separated by comma(,))
+	Pulls string
+
 	// foreign keys
 	Mentor_id          int32
 	Mentor             Mentor `gorm:"ForeignKey:Mentor_id"`

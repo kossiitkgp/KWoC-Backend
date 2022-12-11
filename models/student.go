@@ -26,4 +26,7 @@ type Student struct {
 
 	// ProjectsWorked is a string of project IDs separated by comma(,)
 	ProjectsWorked string
+
+	// list of URLs to PRs contributed by the student (a string of links separated by comma(,))
+	Pulls string
 }
