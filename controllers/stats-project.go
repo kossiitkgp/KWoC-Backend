@@ -17,8 +17,6 @@ type AllProjectsProject struct {
 	PrCount      uint
 	LinesAdded   uint
 	LinesRemoved uint
-
-	Contributors []string
 }
 type AllProjectsRes struct {
 	Stats []AllProjectsProject
@@ -47,8 +45,6 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 				PrCount:      project.PRCount,
 				LinesAdded:   project.AddedLines,
 				LinesRemoved: project.RemovedLines,
-
-				Contributors: strings.Split(project.Contributors, ","),
 			},
 		)
 	}
