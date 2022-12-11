@@ -31,13 +31,13 @@ func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int
 }
 
 type AllStudentsStats struct {
-	Name     string
-	Username string
+	Name     string `json:"name"`
+	Username string `json:"username"`
 
-	PrCount      uint
-	CommitCount  uint
-	LinesAdded   uint
-	LinesRemoved uint
+	PrCount      uint `json:"pr_count"`
+	CommitCount  uint `json:"commit_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
 }
 type AllStudentsRes struct {
 	Stats []AllStudentsStats
@@ -76,23 +76,23 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 }
 
 type OneStudentPull struct {
-	Url string
+	Url string `json:"url"`
 }
 type OneStudentRepo struct {
-	RepoLink string
-	Name     string
+	RepoLink string `json:"repo_link"`
+	Name     string `json:"name"`
 }
 type OneStudentStats struct {
-	Name     string
-	Username string
+	Name     string `json:"name"`
+	Username string `json:"username"`
 
-	CommitCount  uint
-	LinesAdded   uint
-	LinesRemoved uint
+	CommitCount  uint `json:"commit_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
 
-	Languages      []string
-	Pulls          []OneStudentPull
-	ProjectsWorked []OneStudentRepo
+	Languages      []string         `json:"languages"`
+	Pulls          []OneStudentPull `json:"pulls"`
+	ProjectsWorked []OneStudentRepo `json:"projects_worked"`
 }
 
 func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {

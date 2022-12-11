@@ -10,13 +10,13 @@ import (
 )
 
 type AllProjectsProject struct {
-	Name string
-	Link string
+	Name string `json:"name"`
+	Link string `json:"link"`
 
-	CommitCount  uint
-	PrCount      uint
-	LinesAdded   uint
-	LinesRemoved uint
+	CommitCount  uint `json:"commit_count"`
+	PrCount      uint `json:"pr_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
 }
 type AllProjectsRes struct {
 	Stats []AllProjectsProject
@@ -53,18 +53,18 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 }
 
 type OneMentorProjPull struct {
-	Url string
+	Url string `json:"url"`
 }
 type OneMentorProj struct {
-	Name     string
-	RepoLink string
+	Name     string `json:"name"`
+	RepoLink string `json:"repo_link"`
 
-	CommitCount  uint
-	LinesAdded   uint
-	LinesRemoved uint
+	CommitCount  uint `json:"commit_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
 
-	Contributors []string // Array of usernames of students who contributed
-	Pulls        []OneMentorProjPull
+	Contributors []string            `json:"contributors"` // Array of usernames of students who contributed
+	Pulls        []OneMentorProjPull `json:"pulls"`
 }
 type OneMentorRes struct {
 	Projects []OneMentorProj
