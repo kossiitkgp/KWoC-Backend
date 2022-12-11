@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -31,15 +30,17 @@ func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int
 	}
 }
 
-type AllStudentStat struct {
+type AllStudentsStats struct {
 	Name     string
 	Username string
-	Prs      string
-	Commits  uint
-	Lines    string
+
+	PrCount      uint
+	CommitCount  uint
+	LinesAdded   uint
+	LinesRemoved uint
 }
 type AllStudentsRes struct {
-	Stats []AllStudentStat
+	Stats []AllStudentsStats
 }
 
 func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -51,17 +52,18 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 		Select("*").
 		Find(&students)
 
-	student_stats := make([]AllStudentStat, 0)
+	student_stats := make([]AllStudentsStats, 0)
 
 	for _, student := range students {
 		student_stats = append(
 			student_stats,
-			AllStudentStat{
-				Name:     student.Name,
-				Username: student.Username,
-				Prs:      fmt.Sprintf("%d", student.PRCount),
-				Commits:  student.CommitCount,
-				Lines:    fmt.Sprintf("+%d/-%d", student.AddedLines, student.RemovedLines),
+			AllStudentsStats{
+				Name:         student.Name,
+				Username:     student.Username,
+				PrCount:      student.PRCount,
+				CommitCount:  student.CommitCount,
+				LinesAdded:   student.AddedLines,
+				LinesRemoved: student.RemovedLines,
 			},
 		)
 	}
@@ -73,31 +75,24 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 	return response, 200
 }
 
-type OneStudentCommit struct {
-	Html_url string
-	Message  string
-}
 type OneStudentPull struct {
-	Html_url     string
-	Title        string
-	RepoOwner    string
-	LinesAdded   string
-	RepoName     string
-	LinesRemoved string
+	Url string
 }
 type OneStudentRepo struct {
 	RepoLink string
 	Name     string
 }
-type OneStudentStat struct {
-	Name           string
-	Username       string
-	CommitCount    uint
+type OneStudentStats struct {
+	Name     string
+	Username string
+
+	CommitCount  uint
+	LinesAdded   uint
+	LinesRemoved uint
+
 	Languages      []string
 	Pulls          []OneStudentPull
 	ProjectsWorked []OneStudentRepo
-	LinesAdded     uint
-	LinesRemoved   uint
 }
 
 func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
@@ -131,27 +126,39 @@ func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) 
 			)
 		}
 
-		return OneStudentStat{
-			Name:           student.Name,
-			Username:       student.Username,
-			CommitCount:    student.CommitCount,
+		var pulls []OneStudentPull = make([]OneStudentPull, 0)
+
+		for _, pull_url := range strings.Split(student.Pulls, ",") {
+			pulls = append(pulls, OneStudentPull{Url: pull_url})
+		}
+
+		return OneStudentStats{
+			Name:     student.Name,
+			Username: student.Username,
+
+			CommitCount:  student.CommitCount,
+			LinesAdded:   student.AddedLines,
+			LinesRemoved: student.RemovedLines,
+
 			Languages:      strings.Split(student.TechWorked, ","),
-			Pulls:          make([]OneStudentPull, 0),
+			Pulls:          pulls,
 			ProjectsWorked: projects_worked,
-			LinesAdded:     student.AddedLines,
-			LinesRemoved:   student.RemovedLines,
 		}, 200
 	} else {
-		return OneStudentStat{}, 200
+		return OneStudentStats{}, 200
 	}
 }
 
 type AllProjectsProject struct {
-	Title   string
-	Link    string
-	Contri  uint // Number of students who contributed
-	Commits uint
-	Lines   string
+	Name string
+	Link string
+
+	CommitCount  uint
+	PrCount      uint
+	LinesAdded   uint
+	LinesRemoved uint
+
+	Contributors []string
 }
 type AllProjectsRes struct {
 	Stats []AllProjectsProject
@@ -173,11 +180,14 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 		response = append(
 			response,
 			AllProjectsProject{
-				Title:   project.Name,
-				Link:    project.RepoLink,
-				Contri:  uint(len(strings.Split(project.Contributors, ","))),
-				Commits: project.CommitCount,
-				Lines:   fmt.Sprintf("+%d/-%d", project.AddedLines, project.RemovedLines),
+				Name: project.Name,
+				Link: project.RepoLink,
+
+				CommitCount:  project.CommitCount,
+				LinesAdded:   project.AddedLines,
+				LinesRemoved: project.RemovedLines,
+
+				Contributors: strings.Split(project.Contributors, ","),
 			},
 		)
 	}
@@ -185,13 +195,19 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 	return AllProjectsRes{Stats: response}, 200
 }
 
+type OneMentorProjPull struct {
+	Url string
+}
 type OneMentorProj struct {
-	RepoLink     string
-	Project_name string
-	Contributors []string // Array of usernames of students who contributed
-	Commits      uint
+	Name     string
+	RepoLink string
+
+	CommitCount  uint
 	LinesAdded   uint
 	LinesRemoved uint
+
+	Contributors []string // Array of usernames of students who contributed
+	Pulls        []OneMentorProjPull
 }
 type OneMentorRes struct {
 	Projects []OneMentorProj
@@ -222,15 +238,24 @@ func OneMentor(req map[string]interface{}, r *http.Request) (interface{}, int) {
 		mentor_stats := make([]OneMentorProj, 0)
 
 		for _, project := range projects {
+			var proj_pulls []OneMentorProjPull = make([]OneMentorProjPull, 0)
+
+			for _, pull_url := range strings.Split(project.Pulls, ",") {
+				proj_pulls = append(proj_pulls, OneMentorProjPull{Url: pull_url})
+			}
+
 			mentor_stats = append(
 				mentor_stats,
 				OneMentorProj{
-					RepoLink:     project.RepoLink,
-					Project_name: project.Name,
-					Commits:      project.CommitCount,
+					Name:     project.Name,
+					RepoLink: project.RepoLink,
+
+					CommitCount:  project.CommitCount,
 					LinesAdded:   project.AddedLines,
 					LinesRemoved: project.RemovedLines,
+
 					Contributors: strings.Split(project.Contributors, ","),
+					Pulls:        proj_pulls,
 				},
 			)
 		}
