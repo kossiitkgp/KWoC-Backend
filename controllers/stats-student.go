@@ -145,6 +145,6 @@ func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) 
 			ProjectsWorked: projects_worked,
 		}, 200
 	} else {
-		return OneStudentStats{}, 200
+		return "Error: Student Does Not Exist", 410
 	}
 }

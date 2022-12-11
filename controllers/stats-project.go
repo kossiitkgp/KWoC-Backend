@@ -119,6 +119,6 @@ func OneMentor(req map[string]interface{}, r *http.Request) (interface{}, int) {
 
 		return OneMentorRes{Projects: mentor_stats}, 200
 	} else {
-		return OneMentorRes{}, 200
+		return "Error: Mentor Does Not Exist", 410
 	}
 }
