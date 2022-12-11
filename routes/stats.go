@@ -9,8 +9,10 @@ import (
 
 func RegisterGetStats(r *mux.Router) {
 	r.HandleFunc("/student/exists/{username}", utils.JsonIO(controllers.CheckStudent)).Methods("GET")
+
 	r.HandleFunc("/students", utils.JsonIO(controllers.AllStudents)).Methods("GET")
-	r.HandleFunc("/student/{username}", utils.JsonIO(controllers.OneStudent)).Methods("GET")
+	r.HandleFunc("/student/{username}", utils.LoginRequired(utils.JsonIO(controllers.OneStudent))).Methods("POST")
+
 	r.HandleFunc("/projects", utils.JsonIO(controllers.GetAllProjects)).Methods("GET")
-	r.HandleFunc("/mentor/{Mentor.Username}", utils.JsonIO(controllers.OneMentor)).Methods("GET")
+	r.HandleFunc("/mentor/{Mentor.Username}", utils.LoginRequired(utils.JsonIO(controllers.OneMentor))).Methods("POST")
 }
