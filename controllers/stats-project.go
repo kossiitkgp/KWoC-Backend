@@ -44,6 +44,7 @@ func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, i
 				Link: project.RepoLink,
 
 				CommitCount:  project.CommitCount,
+				PrCount:      project.PRCount,
 				LinesAdded:   project.AddedLines,
 				LinesRemoved: project.RemovedLines,
 
