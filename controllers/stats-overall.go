@@ -21,10 +21,11 @@ func OverallStats(req map[string]interface{}, r *http.Request) (interface{}, int
 
 	result := db.
 		Table("stats").
-		Order("id").
-		Last(&latest_stats)
+		Order("gen_time DESC").
+		Limit("1").
+		First(&latest_stats)
 
-	if result.Error != nil {
+	if result.Error != nil || result.RowsAffected < 1 {
 		return "Error: Database error", 500
 	}
 
