@@ -6,6 +6,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -14,6 +15,13 @@ import (
 )
 
 func main() {
+	// dotenv support
+	dotenv_err := godotenv.Load()
+
+	if dotenv_err != nil {
+		log.Err(dotenv_err).Msg("Failed to load .env file.")
+	}
+
 	// Set up logger
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
@@ -59,7 +67,7 @@ func main() {
 
 	healthSubRoute := router.PathPrefix("/healthcheck").Subrouter()
 	routes.RegisterHealthCheck(healthSubRoute)
-	
+
 	getstatsSubRoute := router.PathPrefix("/stats").Subrouter()
 	routes.RegisterGetStats(getstatsSubRoute)
 
