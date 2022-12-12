@@ -98,14 +98,14 @@ func AllProjects(req map[string]interface{}, r *http.Request) (interface{}, int)
 }
 
 // Run stats of all projects
-func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
-	test := utils.Testing()
-	utils.LogInfo(
-		r,
-		fmt.Sprintf("test recieved is %v", test),
-	)
-	return "test", 200
-}
+// func RunStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
+// 	test := utils.Testing()
+// 	utils.LogInfo(
+// 		r,
+// 		fmt.Sprintf("test recieved is %v", test),
+// 	)
+// 	return "test", 200
+// }
 
 // UpdateDetails : to Update Project Details
 func UpdateDetails(req map[string]interface{}, r *http.Request) (interface{}, int) {

@@ -27,14 +27,19 @@ type Project struct {
 	ProjectStatus bool   `gorm:":default:false"`
 
 	// for stats
-	LastCommitSHA string
-	LastPullDate  string
+	LastPullTime int64
 
 	// stats table
 	CommitCount  uint
 	PRCount      uint
 	AddedLines   uint
 	RemovedLines uint
+
+	// list of students who contributed to the project (a string of usernames separated by comma(,))
+	Contributors string
+
+	// list of URLs to PRs contributed to the project (a string of links separated by comma(,))
+	Pulls string
 
 	// foreign keys
 	Mentor_id          int32
