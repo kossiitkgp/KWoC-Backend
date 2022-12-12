@@ -44,6 +44,7 @@ func main() {
 
 	// register logger middleware
 	router.Use(utils.Logger)
+	router.Use(accessControlMiddleware)
 
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)
@@ -59,7 +60,7 @@ func main() {
 
 	healthSubRoute := router.PathPrefix("/healthcheck").Subrouter()
 	routes.RegisterHealthCheck(healthSubRoute)
-	
+
 	getstatsSubRoute := router.PathPrefix("/stats").Subrouter()
 	routes.RegisterGetStats(getstatsSubRoute)
 
@@ -75,4 +76,19 @@ func main() {
 		log.Fatal().Err(err).Msg("Error in starting server")
 		os.Exit(1)
 	}
+}
+
+// access control and  CORS middleware
+func accessControlMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS,PUT")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
