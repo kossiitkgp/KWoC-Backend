@@ -18,6 +18,8 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	w.WriteHeader(200)
 	if db != nil {
 		_, err := w.Write([]byte("The server is up and database is reachable"))

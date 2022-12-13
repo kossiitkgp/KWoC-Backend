@@ -13,6 +13,8 @@ import (
 
 func CheckStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	params := mux.Vars(r)
 
 	student := models.Student{}
@@ -45,6 +47,8 @@ type AllStudentsRes struct {
 
 func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	var students []models.Student
 
 	db.
@@ -97,6 +101,8 @@ type OneStudentStats struct {
 
 func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	params := mux.Vars(r)
 
 	student := models.Student{}
