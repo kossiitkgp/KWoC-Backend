@@ -8,13 +8,13 @@ import (
 )
 
 func RegisterGetStats(r *mux.Router) {
-	r.HandleFunc("/student/exists/{username}", utils.JsonIO(controllers.CheckStudent)).Methods("GET")
+	r.HandleFunc("/student/exists/{username}", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.CheckStudent))).Methods("GET")
 
-	r.HandleFunc("/students", utils.JsonIO(controllers.AllStudents)).Methods("GET")
-	r.HandleFunc("/student/{username}", utils.LoginRequired(utils.JsonIO(controllers.OneStudent))).Methods("POST")
+	r.HandleFunc("/students", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.AllStudents))).Methods("GET")
+	r.HandleFunc("/student/{username}", utils.PermissiveCORSMiddleware(utils.LoginRequired(utils.JsonIO(controllers.OneStudent)))).Methods("POST")
 
-	r.HandleFunc("/projects", utils.JsonIO(controllers.GetAllProjects)).Methods("GET")
-	r.HandleFunc("/mentor/{Mentor.Username}", utils.LoginRequired(utils.JsonIO(controllers.OneMentor))).Methods("POST")
+	r.HandleFunc("/projects", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.GetAllProjects))).Methods("GET")
+	r.HandleFunc("/mentor/{Mentor.Username}", utils.PermissiveCORSMiddleware(utils.LoginRequired(utils.JsonIO(controllers.OneMentor)))).Methods("POST")
 
-	r.HandleFunc("/overall", utils.JsonIO(controllers.OverallStats)).Methods("GET")
+	r.HandleFunc("/overall", utils.PermissiveCORSMiddleware(utils.JsonIO(controllers.OverallStats))).Methods("GET")
 }
