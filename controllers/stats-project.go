@@ -24,6 +24,8 @@ type AllProjectsRes struct {
 
 func GetAllProjects(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	var projects []models.Project
 
 	db.
@@ -72,6 +74,8 @@ type OneMentorRes struct {
 
 func OneMentor(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
+
 	params := mux.Vars(r)
 	username := params["Mentor.Username"]
 

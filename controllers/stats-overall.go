@@ -16,6 +16,7 @@ type OverallStatsRes struct {
 
 func OverallStats(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
+	defer db.Close()
 
 	var latest_stats OverallStatsRes
 
