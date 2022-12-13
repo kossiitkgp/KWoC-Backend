@@ -52,7 +52,7 @@ func main() {
 
 	// register logger middleware
 	router.Use(utils.Logger)
-	router.Use(accessControlMiddleware)
+	// router.Use(accessControlMiddleware)
 
 	oauthSubRoute := router.PathPrefix("/oauth").Subrouter()
 	routes.RegisterOAuth(oauthSubRoute)
@@ -87,16 +87,16 @@ func main() {
 }
 
 // access control and  CORS middleware
-func accessControlMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS,PUT")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+// func accessControlMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		w.Header().Set("Access-Control-Allow-Origin", "*")
+// 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS,PUT")
+// 		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
-		if r.Method == "OPTIONS" {
-			return
-		}
+// 		if r.Method == "OPTIONS" {
+// 			return
+// 		}
 
-		next.ServeHTTP(w, r)
-	})
-}
+// 		next.ServeHTTP(w, r)
+// 	})
+// }
