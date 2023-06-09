@@ -28,6 +28,9 @@ func InitialMigration() {
 func GetDB() *gorm.DB {
 	isDev := os.Getenv("DEV") == "true"
 
+	var dbDialect string
+	var dbURI string
+
 	if !isDev {
 		DatabaseUsername := os.Getenv("DATABASE_USERNAME")
 		DatabasePassword := os.Getenv("DATABASE_PASSWORD")
@@ -35,24 +38,21 @@ func GetDB() *gorm.DB {
 		DatabaseHost := os.Getenv("DATABASE_HOST")
 		DatabasePort := os.Getenv("DATABASE_PORT")
 
-		newURI := "host=" + DatabaseHost + " port=" + DatabasePort + " user=" + DatabaseUsername + " dbname=" + DatabaseName + " sslmode=disable password=" + DatabasePassword
-		db, err := gorm.Open("postgres", newURI)
+		dbDialect = "postgres"
+		dbURI = "host=" + DatabaseHost + " port=" + DatabasePort + " user=" + DatabaseUsername + " dbname=" + DatabaseName + " sslmode=disable password=" + DatabasePassword
 
-		if err != nil {
-			log.Err(err).Msg("Database Error")
-			panic(err)
-		}
-
-		return db
 	} else {
 		// SQLite database for local development
-
-		db, err := gorm.Open("sqlite3", "devDB.db")
-		if err != nil {
-			log.Err(err).Msg("Database Error")
-			panic(err)
-		}
-
-		return db
+		dbDialect = "sqlite3"
+		dbURI = "devDB.db"
 	}
+
+	db, err := gorm.Open(dbDialect, dbURI)
+
+	if err != nil {
+		log.Err(err).Msg("Database Error")
+		panic(err)
+	}
+
+	return db
 }
