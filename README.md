@@ -10,6 +10,7 @@ KWoC backend server written in Go.
   - [File Structure](#file-structure)
   - [Endpoints](#endpoints)
   - [Environment Variables](#environment-variables)
+  - [Github OAuth](#github-oauth)
 
 ## Development
 ### Setting Up Locally
@@ -18,8 +19,10 @@ KWoC backend server written in Go.
 - Run `go get` in the repository to download all the dependencies.
 - Create a `.env` file to store all the [environment variables](#environment-variables).
 - Set the `DEV` environment variable to `true`. This makes the server use a local sqlite3 database, `devDB.db`.
+- Optionally set up [Github OAuth](#github-oauth) to test the log in endpoints. (See also: [Endpoints](#endpoints))
 - Run `go run .` to start the server.
 - Optionally install [SQLiteStudio](https://sqlitestudio.pl/) or any similar tool to help manage the local sqlite3 database file `devDB.db`.
+- Optionally install a tool such as [Postman](https://www.postman.com) to test the REST API.
 
 ### File Naming Convention
 See also: [File Structure](#file-structure).
@@ -72,7 +75,7 @@ Files: `routes/mentor.go`, `controllers/mentor.go`.
 
 #### OAuth
 Files: `routes/oauth.go`, `controllers/UserOAuth.go`.
-- `/oauth`(POST): Logs in a user via Github OAuth.
+- `/oauth`(POST): Logs in a user via Github OAuth. (See [Github OAuth](#github-oauth))
 
 #### Project
 Files: `routes/project.go`, `controllers/project.go`.
@@ -112,9 +115,18 @@ Environment variables can be set using a .env file (see the `.env.template` file
 - `DATABASE_NAME`: The name of the database to log into. (Valid when `DEV` is not set to `true`)
 - `DATABASE_HOST`: The host/url used to log into the database. (Valid when `DEV` is not set to `true`)
 - `DATABASE_PORT`: The port used to log into the database. (Valid when `DEV` is not set to `true`)
-- `client_id`: The client id used for Github OAuth.
-- `client_secret`: The client secret used for Github OAuth.
-- `JWT_SECRET_KEY`: The secret key used to create a JWT token.
+- `client_id`: The client id used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `client_secret`: The client secret used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `JWT_SECRET_KEY`: The secret key used to create a JWT token. (It can be a randomly generated string)
+
+#### Github OAuth
+KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.
+
+To set up the KWoC server, a Github OAuth application has to be created and the client id and secret has to be set in the [environment variables](#environment-variables).
+
+- Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
+- Set the Homepage URL to `https://kwoc.kossiitkgp.org` and the authorization callback URL to `https://kwoc.kossiitkgp.org/oauth/` in the production application.
+- Copy the client ID and the client secret (this should NEVER be made public) and set the `client_id` and `client_secret` [environment variables](#environment-variables) to these values.
 
 ****
 > Please update this documentation if you make changes to the KWoC backend or any other part of KWoC which affects the backend. Future humans will praise you.
