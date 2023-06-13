@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -16,6 +17,16 @@ func main() {
 	// Logger options ( using zerrolog )
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	// Load environment variables via .env files
+	log.Info().Msg("Attempting to load .env file.")
+	dotenv_err := godotenv.Load()
+
+	if dotenv_err != nil {
+		log.Warn().Msg("Failed to load .env file.")
+	} else {
+		log.Info().Msg("Successfully loaded .env file.")
+	}
 
 	log.Info().Msg("Creating mux router")
 	router := server.NewRouter()
