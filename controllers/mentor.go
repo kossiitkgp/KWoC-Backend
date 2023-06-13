@@ -12,6 +12,23 @@ func MentorReg(req map[string]interface{}, r *http.Request) (interface{}, int) {
 	db := utils.GetDB()
 	defer db.Close()
 
+	mentor := models.Mentor{}
+	db.
+		Table("mentors").
+		Where("username = ?", req["username"].(string)).
+		First(&mentor)
+
+	mentor_exists := mentor.Username == req["username"].(string)
+
+	if mentor_exists {
+		utils.LogWarn(
+			r,
+			"Mentor already exists.",
+		)
+
+		return "Error: mentor already exists", 400
+	}
+
 	err := db.Create(&models.Mentor{
 		Name:     req["name"].(string),
 		Email:    req["email"].(string),
