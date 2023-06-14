@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"kwoc-backend/server"
+	"kwoc-backend/utils"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,6 +32,11 @@ func main() {
 		log.Warn().Msgf("Failed to load environment variables from %s.", *envFile)
 	} else {
 		log.Info().Msgf("Successfully loaded environment variables from %s.", *envFile)
+	}
+
+	mig_err := utils.MigrateModels()
+	if mig_err != nil {
+		log.Fatal().Err(mig_err).Msg("Database migration error.")
 	}
 
 	log.Info().Msg("Creating mux router")
