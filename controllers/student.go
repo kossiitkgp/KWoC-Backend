@@ -13,6 +13,23 @@ func StudentReg(req map[string]interface{}, r *http.Request) (interface{}, int) 
 	db := utils.GetDB()
 	defer db.Close()
 
+	student := models.Student{}
+	db.
+		Table("students").
+		Where("username = ?", req["username"].(string)).
+		First(&student)
+
+	student_exists := student.Username == req["username"].(string)
+
+	if student_exists {
+		utils.LogWarn(
+			r,
+			"Student already exists.",
+		)
+
+		return "Error: student already exists", 400
+	}
+
 	err := db.Create(&models.Student{
 		Name:     req["name"].(string),
 		Email:    req["email"].(string),
