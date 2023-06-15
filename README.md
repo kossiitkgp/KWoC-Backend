@@ -78,6 +78,15 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 - `DATABASE_NAME`: The name of the database to log into. (Valid when `DEV` is not set to `true`)
 - `DATABASE_HOST`: The host/url used to log into the database. (Valid when `DEV` is not set to `true`)
 - `DATABASE_PORT`: The port used to log into the database. (Valid when `DEV` is not set to `true`)
+- `GITHUB_OAUTH_CLIENT_ID`: The client id used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `GITHUB_OAUTH_CLIENT_SECRET`: The client secret used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `JWT_SECRET_KEY`: The secret key used to create a JWT token. (It can be a randomly generated string)
 
 ### Github OAuth
+KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.
 
+To set up the KWoC server, a Github OAuth application has to be created and the client id and secret has to be set in the [environment variables](#environment-variables).
+
+- Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
+- Set the Homepage URL to `https://kwoc.kossiitkgp.org` and the authorization callback URL to `https://kwoc.kossiitkgp.org/oauth/` in the production application.
+- Copy the client ID and the client secret (this should NEVER be made public) and set the `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` [environment variables](#environment-variables) to these values.
