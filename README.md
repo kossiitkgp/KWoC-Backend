@@ -66,5 +66,13 @@ The following command-line arguments are accepted by `cmd/backend.go`. `--argume
 - `envFile`: A file to load environment variables from. (Default: `.env`)
 
 ### Environment Variables
+Environment variables can be set using a `.env` (See [Command-Line Arguments](#command-line-arguments) to use a different file) file. The following variables are used. (See the `.env.template` file for an example)
+- `DEV`: When set to `true`, uses a local sqlite3 database from a file `devDB.db`.
+- `DATABASE_USERNAME`: The username used to log into the database. (Valid when `DEV` is not set to `true`)
+- `DATABASE_PASSWORD`: The password used to log into the database. (valid when `DEV` is not set to `true`)
+- `DATABASE_NAME`: The name of the database to log into. (Valid when `DEV` is not set to `true`)
+- `DATABASE_HOST`: The host/url used to log into the database. (Valid when `DEV` is not set to `true`)
+- `DATABASE_PORT`: The port used to log into the database. (Valid when `DEV` is not set to `true`)
+
 ### Github OAuth
 
