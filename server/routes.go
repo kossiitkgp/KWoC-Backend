@@ -2,6 +2,7 @@ package server
 
 import (
 	"kwoc-backend/controllers"
+	"kwoc-backend/utils"
 	"net/http"
 )
 
@@ -17,6 +18,6 @@ var routes []Route = []Route{
 		"Index",
 		"GET",
 		"/api/",
-		controllers.Index,
+		utils.WithLogin(controllers.Index),
 	},
 }
