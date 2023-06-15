@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"kwoc-backend/server"
 	"net/http"
 	"os"
@@ -8,14 +9,29 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	// Parse command-line arguments
+	envFile := flag.String("envFile", ".env", "A file to load environment variables from.")
+	flag.Parse()
+
 	// Logger options ( using zerrolog )
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	// Load environment variables via .env files
+	log.Info().Msgf("Attempting to load environment variables from %s.", *envFile)
+	dotenv_err := godotenv.Load(*envFile)
+
+	if dotenv_err != nil {
+		log.Warn().Msgf("Failed to load environment variables from %s.", *envFile)
+	} else {
+		log.Info().Msgf("Successfully loaded environment variables from %s.", *envFile)
+	}
 
 	log.Info().Msg("Creating mux router")
 	router := server.NewRouter()

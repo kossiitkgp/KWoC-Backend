@@ -10,6 +10,7 @@
   - [Libraries Used](#libraries-used)
   - [File Structure](#file-structure)
   - [Endpoints](#endpoints)
+  - [Command-Line Arguments](#command-line-arguments)
   - [Environment Variables](#environment-variables)
   - [Github OAuth](#github-oauth)
 
@@ -60,6 +61,10 @@
 - Do not keep many functions in utils, if they can be grouped in a package, then do so.
 
 ### Endpoints
+### Command-Line Arguments
+The following command-line arguments are accepted by `cmd/backend.go`. `--argument=value`, `--argument value`, `-argument=value`, and `-argument value` are all acceptable formats to pass a value to the command-line argument.
+- `envFile`: A file to load environment variables from. (Default: `.env`)
+
 ### Environment Variables
 ### Github OAuth
 
