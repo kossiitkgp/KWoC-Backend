@@ -1,9 +1,9 @@
-// Server utilities
-package utils
+package middleware
 
 import (
 	"context"
 	"fmt"
+	"kwoc-backend/utils"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -30,10 +30,10 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		_, claims, err := ParseLoginJwtString(tokenString)
+		_, claims, err := utils.ParseLoginJwtString(tokenString)
 
 		if err != nil {
-			if err == ErrJwtTokenInvalid {
+			if err == utils.ErrJwtTokenInvalid {
 				log.Warn().Msgf(
 					"%s %s %s",
 					r.Method,

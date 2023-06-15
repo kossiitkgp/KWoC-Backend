@@ -2,7 +2,7 @@
 package server
 
 import (
-	"kwoc-backend/utils"
+	"kwoc-backend/middleware"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -35,7 +35,7 @@ func NewRouter() *mux.Router {
 
 		// logger middleware to log incoming requests
 		handler = route.HandlerFunc
-		handler = utils.Logger(handler, route.Name)
+		handler = middleware.Logger(handler, route.Name)
 
 		// register route
 		router.

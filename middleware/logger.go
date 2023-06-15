@@ -1,5 +1,4 @@
-// Server utilities
-package utils
+package middleware
 
 import (
 	"net/http"
