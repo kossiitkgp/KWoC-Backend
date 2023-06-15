@@ -39,26 +39,29 @@
 ### File Structure
 ```
 ├── cmd
-│   └── backend.go
+│   ├── backend.go
 │   └── ...
 ├── controllers
-│   └── index.go
+│   ├── index.go
 │   └── ...
 ├── server
 │   ├── router.go
-│   └── routes.go
+│   ├── routes.go
 │   └── ...
-└── utils
-    └── logger.go
+├── utils
+│   ├── database.go
+│   └── ...
+└── middleware
+    ├── logger.go
     └── ...
 ```
 
 - `cmd` : Contains the entrypoint of the backend (main package).
 - `controllers` : Handler functions for the routes defined.
 - `server` : Contains the router logic and routes.
-- `utils` : Contains misc functions like logger.
+- `utils` : Contains misc functions like database utils.
+- `middleware/`: Contains all middleware.
 
-- For middlewares, please create and use `middleware` directory.
 - If there are any css,html or other static files, use `static` directory.
 - Do not keep many functions in utils, if they can be grouped in a package, then do so.
 
