@@ -79,9 +79,6 @@ func AllStudents(req map[string]interface{}, r *http.Request) (interface{}, int)
 	return response, 200
 }
 
-type OneStudentPull struct {
-	Url string `json:"url"`
-}
 type OneStudentRepo struct {
 	RepoLink string `json:"repo_link"`
 	Name     string `json:"name"`
@@ -95,7 +92,7 @@ type OneStudentStats struct {
 	LinesRemoved uint `json:"lines_removed"`
 
 	Languages      []string         `json:"languages"`
-	Pulls          []OneStudentPull `json:"pulls"`
+	Pulls          []string         `json:"pulls"`
 	ProjectsWorked []OneStudentRepo `json:"projects_worked"`
 }
 
@@ -132,11 +129,9 @@ func OneStudent(req map[string]interface{}, r *http.Request) (interface{}, int) 
 			)
 		}
 
-		var pulls []OneStudentPull = make([]OneStudentPull, 0)
+		var pulls []string = make([]string, 0)
 
-		for _, pull_url := range strings.Split(student.Pulls, ",") {
-			pulls = append(pulls, OneStudentPull{Url: pull_url})
-		}
+		pulls = append(pulls, strings.Split(student.Pulls, ",")...)
 
 		return OneStudentStats{
 			Name:     student.Name,
