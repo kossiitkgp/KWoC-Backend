@@ -31,8 +31,10 @@
 ## Project Structure
 [WIP]
 ### Libraries Used
-- gorilla/mux : [https://github.com/gorilla/mux](https://github.com/gorilla/mux). Used for routing
-- go-orm/gorm : [https://github.com/go-gorm/gorm](https://github.com/go-gorm/gorm). Used for database modelling
+- [gorilla/mux](https://github.com/gorilla/mux): Used for routing.
+- [gorm.io/gorm](https://gorm.io): Used for database modelling.
+- [joho/godotenv](https://github.com/joho/godotenv): Used for loading environment variables from a `.env` file.
+- [rs/zerolog](https://github.com/rs/zerolog): Used for logging information, errors, and warnings.
 
 ### File Structure
 ```
