@@ -79,6 +79,14 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userInfo.Username == "" {
+		log.Warn().Msg("Could not get username from the Github API.")
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "Could not get username from the Github API.")
+		return
+	}
+
 	db, err := utils.GetDB()
 	if err != nil {
 		log.Err(err).Msg("Error connecting to the database.")
