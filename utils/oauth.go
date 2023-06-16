@@ -12,6 +12,7 @@ import (
 
 var ErrClientIdNotFound = errors.New("ERROR: GITHUB OAUTH CLIENT ID NOT FOUND")
 var ErrClientSecretNotFound = errors.New("ERROR: GITHUB OAUTH CLIENT SECRET NOT FOUND")
+var ErrGithubAPIError = errors.New("ERROR: GITHUB API ERROR")
 
 // Body fields for the request
 type OAuthAccessReqFields struct {
@@ -23,6 +24,7 @@ type OAuthAccessReqFields struct {
 // Body fields for the response
 type OAuthAccessResFields struct {
 	AccessToken string `json:"access_token"`
+	Error       string `json:"error"`
 }
 
 func GetOauthAccessToken(code string) (string, error) {
@@ -61,6 +63,7 @@ func GetOauthAccessToken(code string) (string, error) {
 	}
 
 	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
 
 	res, err := httpClient.Do(req)
 	if err != nil {
@@ -73,6 +76,10 @@ func GetOauthAccessToken(code string) (string, error) {
 	res.Body.Close()
 	if err != nil {
 		return "", err
+	}
+
+	if resFields.Error != "" {
+		return "", errors.New(resFields.Error)
 	}
 
 	return resFields.AccessToken, nil
@@ -107,6 +114,10 @@ func GetOauthUserInfo(accessToken string) (*GHUserInfo, error) {
 	res, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, ErrGithubAPIError
 	}
 
 	var userInfo = GHUserInfo{}
