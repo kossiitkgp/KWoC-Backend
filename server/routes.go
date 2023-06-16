@@ -32,4 +32,10 @@ var routes []Route = []Route{
 		"/student/form/",
 		middleware.WithLogin(controllers.RegisterStudent),
 	},
+	{
+		"Mentor Registration",
+		"POST",
+		"/mentor/form/",
+		middleware.WithLogin(controllers.RegisterMentor),
+	},
 }
