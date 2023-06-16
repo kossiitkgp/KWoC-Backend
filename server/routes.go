@@ -19,4 +19,10 @@ var routes []Route = []Route{
 		"/api/",
 		controllers.Index,
 	},
+	{
+		"OAuth",
+		"POST",
+		"/oauth/",
+		controllers.OAuth,
+	},
 }
