@@ -74,7 +74,7 @@ func GenerateLoginJwtString(loginJwtFields LoginJwtFields) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(signingKey)
+	tokenString, err := token.SignedString([]byte(signingKey))
 
 	if err != nil {
 		return "", err
