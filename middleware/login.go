@@ -11,6 +11,8 @@ import (
 
 type LoginCtxKey string
 
+var LOGIN_CTX_USERNAME_KEY string = "login_username"
+
 // Session login middleware for incoming requests
 func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +58,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 		}
 
 		reqContext := r.Context()
-		newContext := context.WithValue(reqContext, LoginCtxKey("login_username"), claims.LoginJwtFields.Username)
+		newContext := context.WithValue(reqContext, LoginCtxKey(LOGIN_CTX_USERNAME_KEY), claims.LoginJwtFields.Username)
 
 		inner.ServeHTTP(w, r.WithContext(newContext))
 	})
