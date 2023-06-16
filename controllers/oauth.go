@@ -30,8 +30,8 @@ type OAuthResBodyFields struct {
 }
 
 func OAuth(w http.ResponseWriter, r *http.Request) {
-	var bodyFields = OAuthReqBodyFields{}
-	err := json.NewDecoder(r.Body).Decode(&bodyFields)
+	var reqFields = OAuthReqBodyFields{}
+	err := json.NewDecoder(r.Body).Decode(&reqFields)
 
 	if err != nil {
 		log.Err(err).Msgf(
@@ -46,7 +46,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if bodyFields.Code == "" || bodyFields.Type == "" {
+	if reqFields.Code == "" || reqFields.Type == "" {
 		log.Warn().Msgf(
 			"%s %s %s",
 			r.Method,
@@ -60,7 +60,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get a Github OAuth access token
-	accessToken, err := utils.GetOauthAccessToken(bodyFields.Code)
+	accessToken, err := utils.GetOauthAccessToken(reqFields.Code)
 	if err != nil {
 		log.Err(err).Msg("Error getting OAuth access token.")
 
@@ -91,7 +91,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Check if the user has already registered
 	var isNewUser bool = false
 
-	if bodyFields.Type == "student" {
+	if reqFields.Type == "student" {
 		student := models.Student{}
 		db.
 			Table("students").
@@ -99,7 +99,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 			First(&student)
 
 		isNewUser = student.Username != userInfo.Username
-	} else if bodyFields.Type == "mentor" {
+	} else if reqFields.Type == "mentor" {
 		mentor := models.Mentor{}
 		db.
 			Table("mentors").
@@ -121,16 +121,16 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := OAuthResBodyFields{
+	resFields := OAuthResBodyFields{
 		Username:  userInfo.Username,
 		Name:      userInfo.Name,
 		Email:     userInfo.Email,
-		Type:      bodyFields.Type,
+		Type:      reqFields.Type,
 		IsNewUser: isNewUser,
 		Jwt:       jwtString,
 	}
 
-	resJson, err := json.Marshal(response)
+	resJson, err := json.Marshal(resFields)
 	if err != nil {
 		log.Err(err).Msg("Error generating response JSON.")
 
