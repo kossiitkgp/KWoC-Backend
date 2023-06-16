@@ -2,6 +2,7 @@ package server
 
 import (
 	"kwoc-backend/controllers"
+	"kwoc-backend/middleware"
 	"net/http"
 )
 
@@ -24,5 +25,11 @@ var routes []Route = []Route{
 		"POST",
 		"/oauth/",
 		controllers.OAuth,
+	},
+	{
+		"Student Registration",
+		"POST",
+		"/student/form/",
+		middleware.WithLogin(controllers.RegisterStudent),
 	},
 }
