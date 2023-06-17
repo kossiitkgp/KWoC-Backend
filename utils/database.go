@@ -70,7 +70,12 @@ func GetDB() (db *gorm.DB, err error) {
 
 		dialector = postgres.Open(dsn)
 	} else {
-		dialector = sqlite.Open("devDB.db")
+		devDbPath := os.Getenv("DEV_DB_PATH")
+		if devDbPath == "" {
+			devDbPath = "devDB.db"
+		}
+
+		dialector = sqlite.Open(devDbPath)
 	}
 
 	db, err = gorm.Open(dialector, &gorm.Config{})
