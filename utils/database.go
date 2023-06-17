@@ -6,7 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/kossiitkgp/kwoc-db-models/models"
+	"kwoc-backend/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"

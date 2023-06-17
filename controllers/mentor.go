@@ -7,9 +7,9 @@ import (
 	"kwoc-backend/utils"
 	"net/http"
 
-	"github.com/kossiitkgp/kwoc-db-models/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
+	"kwoc-backend/models"
 )
 
 type RegisterMentorReqFields struct {

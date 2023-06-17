@@ -7,7 +7,8 @@ import (
 	"kwoc-backend/utils"
 	"net/http"
 
-	"github.com/kossiitkgp/kwoc-db-models/models"
+	"kwoc-backend/models"
+
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )

@@ -48,6 +48,9 @@
 │   ├── router.go
 │   ├── routes.go
 │   └── ...
+├── models
+│   ├── mentors.go
+│   └── ...
 ├── utils
 │   ├── database.go
 │   └── ...
@@ -59,8 +62,9 @@
 - `cmd` : Contains the entrypoint of the backend (main package).
 - `controllers` : Handler functions for the routes defined.
 - `server` : Contains the router logic and routes.
+- `models` : Contains KWoC database models.
 - `utils` : Contains misc functions like database utils.
-- `middleware/`: Contains all middleware.
+- `middleware`: Contains all middleware.
 
 - If there are any css,html or other static files, use `static` directory.
 - Do not keep many functions in utils, if they can be grouped in a package, then do so.
