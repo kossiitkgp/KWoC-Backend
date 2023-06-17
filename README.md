@@ -73,7 +73,7 @@ The following command-line arguments are accepted by `cmd/backend.go`. `--argume
 ### Environment Variables
 Environment variables can be set using a `.env` (See [Command-Line Arguments](#command-line-arguments) to use a different file) file. The following variables are used. (See the `.env.template` file for an example)
 - `DEV`: When set to `true`, uses a local sqlite3 database from a file `devDB.db` (or `DEV_DB_PATH` if set).
-- `DEV_DB_PATH`: The path to a local sqlite3 database file to be used in development. (Valid when `DEV` is set to `true`)
+- `DEV_DB_PATH`: The path to a local sqlite3 database file to be used in development. (Valid when `DEV` is set to `true`) (NOTE: `testDB.db` is used for testing)
 - `DATABASE_USERNAME`: The username used to log into the database. (Valid when `DEV` is not set to `true`)
 - `DATABASE_PASSWORD`: The password used to log into the database. (valid when `DEV` is not set to `true`)
 - `DATABASE_NAME`: The name of the database to log into. (Valid when `DEV` is not set to `true`)
