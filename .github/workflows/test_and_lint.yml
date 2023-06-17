@@ -1,10 +1,9 @@
-name: Testing
+name: Testing and Linting
 
 on: [pull_request]
 
 jobs:
-  build:
-
+  test_and_lint:
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -20,3 +19,6 @@ jobs:
 
       - name: Test
         run: go test -v ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
