@@ -56,7 +56,7 @@ func main() {
 
 	// Handling INTERRUPT signal for cleanup in a new goroutine.
 	// This is not necessary, but good for log keeping
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
@@ -65,7 +65,11 @@ func main() {
 	}()
 
 	log.Info().Msg("Starting server on port : " + port)
-	http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(":"+port, router)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error starting the server.")
+	}
 }
 
 func cleanup() {

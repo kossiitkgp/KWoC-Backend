@@ -11,6 +11,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Test unauthenticated request to /mentor/form/
@@ -82,7 +84,11 @@ func TestMentorOK(t *testing.T) {
 	// Set up a local test database path
 	os.Setenv("DEV", "true")
 	os.Setenv("DEV_DB_PATH", "testDB.db")
-	utils.MigrateModels()
+	err := utils.MigrateModels()
+
+	if err != nil {
+		log.Err(err).Msg("Error migrating database models.")
+	}
 
 	// Generate a jwt secret key for testing
 	rand.Seed(time.Now().UnixMilli())

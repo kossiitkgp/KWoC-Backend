@@ -148,5 +148,16 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(resJson)
+	_, err = w.Write(resJson)
+
+	if err != nil {
+		log.Err(err).Msgf(
+			"%s %s %s",
+			r.Method,
+			r.RequestURI,
+			"Error writing the response.",
+		)
+
+		return
+	}
 }

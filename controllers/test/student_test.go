@@ -83,7 +83,7 @@ func TestStudentOK(t *testing.T) {
 	// Set up a local test database path
 	os.Setenv("DEV", "true")
 	os.Setenv("DEV_DB_PATH", "testDB.db")
-	utils.MigrateModels()
+	_ = utils.MigrateModels()
 
 	// Generate a jwt secret key for testing
 	rand.Seed(time.Now().UnixMilli())
