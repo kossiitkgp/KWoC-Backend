@@ -51,7 +51,7 @@ func TestStudentSessionHijacking(t *testing.T) {
 	)
 	req.Header.Add("Bearer", someuserJwt)
 
-	res := executeRequest(req)
+	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
@@ -97,7 +97,7 @@ func TestStudentOK(t *testing.T) {
 	)
 	req.Header.Add("Bearer", testJwt)
 
-	res := executeRequest(req)
+	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseBodyToBe(t, res, "Success.")
@@ -111,7 +111,7 @@ func TestStudentOK(t *testing.T) {
 	)
 	req.Header.Add("Bearer", testJwt)
 
-	res = executeRequest(req)
+	res = executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseBodyToBe(t, res, "Error: Student already exists.")

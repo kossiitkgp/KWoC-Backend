@@ -7,7 +7,7 @@ import (
 
 func TestIndexController(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/", nil)
-	res := executeRequest(req)
+	res := executeRequest(req, nil)
 
 	if res.Code != http.StatusOK {
 		t.Errorf("Received response code %d. Expected %d.", res.Code, http.StatusOK)
