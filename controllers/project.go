@@ -116,10 +116,17 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	tx = db.Table("mentors").Where("username = ?", reqFields.MentorUsername).First(&mentor)
 
 	if tx.Error != nil {
-		log.Err(err).Msgf("Error fetching mentor `%s`.", reqFields.MentorUsername)
+		if tx.Error == gorm.ErrRecordNotFound {
+			log.Err(err).Msgf("Error: Mentor `%s` does not exist..", reqFields.MentorUsername)
 
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error fetching mentor.")
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, "Error: Mentor does not exist.")
+		} else {
+			log.Err(err).Msgf("Error fetching mentor `%s`.", reqFields.MentorUsername)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "Error fetching mentor.")
+		}
 		return
 	}
 
