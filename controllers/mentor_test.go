@@ -64,6 +64,9 @@ func TestMentorOK(t *testing.T) {
 	os.Setenv("DEV", "true")
 	os.Setenv("DEV_DB_PATH", "testDB.db")
 	err := utils.MigrateModels()
+	// Remove the test database once used
+	defer os.Unsetenv("DEV_DB_PATH")
+	defer os.Remove("testDB.db")
 
 	if err != nil {
 		log.Err(err).Msg("Error migrating database models.")
@@ -116,8 +119,4 @@ func TestMentorOK(t *testing.T) {
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseBodyToBe(t, res, "Error: Mentor already exists.")
 	// --- TEST EXISTING USER REQUEST ---
-
-	// Remove the test database
-	os.Unsetenv("DEV_DB_PATH")
-	os.Remove("testDB.db")
 }
