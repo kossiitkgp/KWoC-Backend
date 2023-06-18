@@ -18,9 +18,7 @@ func TestStudentNoAuth(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/student/form/", nil)
 	res := executeRequest(req)
 
-	if res.Code != http.StatusUnauthorized {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusUnauthorized, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 }
 
 // Test request to /student/form/ with invalid jwt
@@ -31,9 +29,7 @@ func TestStudentInvalidAuth(t *testing.T) {
 	res := executeRequest(req)
 
 	// Expect internal server error because token parsing throws an error
-	if res.Code != http.StatusInternalServerError {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusInternalServerError)
 }
 
 // Test request to /student/form/ with session hijacking attempt
@@ -66,9 +62,7 @@ func TestStudentSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req)
 
-	if res.Code != http.StatusUnauthorized {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 
 	resBody := res.Body.String()
 	expectedBody := "Login username and given username do not match."
@@ -116,9 +110,7 @@ func TestStudentOK(t *testing.T) {
 
 	res := executeRequest(req)
 
-	if res.Code != http.StatusOK {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusOK, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusOK)
 
 	resBody := res.Body.String()
 	expectedBody := "Success."
@@ -138,9 +130,7 @@ func TestStudentOK(t *testing.T) {
 
 	res = executeRequest(req)
 
-	if res.Code != http.StatusBadRequest {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusOK, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 
 	resBody = res.Body.String()
 	expectedBody = "Error: Student already exists."

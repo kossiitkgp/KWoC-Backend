@@ -20,9 +20,7 @@ func TestMentorNoAuth(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/mentor/form/", nil)
 	res := executeRequest(req)
 
-	if res.Code != http.StatusUnauthorized {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusUnauthorized, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 }
 
 // Test request to /mentor/form/ with invalid jwt
@@ -33,9 +31,7 @@ func TestMentorInvalidAuth(t *testing.T) {
 	res := executeRequest(req)
 
 	// Expect internal server error because token parsing throws an error
-	if res.Code != http.StatusInternalServerError {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusInternalServerError)
 }
 
 // Test request to /mentor/form/ with session hijacking attempt
@@ -67,9 +63,7 @@ func TestMentorSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req)
 
-	if res.Code != http.StatusUnauthorized {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 
 	resBody := res.Body.String()
 	expectedBody := "Login username and given username do not match."
@@ -120,9 +114,7 @@ func TestMentorOK(t *testing.T) {
 
 	res := executeRequest(req)
 
-	if res.Code != http.StatusOK {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusOK, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusOK)
 
 	resBody := res.Body.String()
 	expectedBody := "Success."
@@ -142,9 +134,7 @@ func TestMentorOK(t *testing.T) {
 
 	res = executeRequest(req)
 
-	if res.Code != http.StatusBadRequest {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusOK, res.Code)
-	}
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 
 	resBody = res.Body.String()
 	expectedBody = "Error: Mentor already exists."
