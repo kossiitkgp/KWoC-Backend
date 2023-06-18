@@ -34,7 +34,13 @@ func main() {
 		log.Info().Msgf("Successfully loaded environment variables from %s.", *envFile)
 	}
 
-	mig_err := utils.MigrateModels()
+	db, db_err := utils.GetDB()
+
+	if db_err != nil {
+		log.Fatal().Err(db_err).Msg("Error connecting to the database.")
+	}
+
+	mig_err := utils.MigrateModels(db)
 	if mig_err != nil {
 		log.Fatal().Err(mig_err).Msg("Database migration error.")
 	}

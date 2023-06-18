@@ -14,12 +14,7 @@ import (
 )
 
 // Initial database model migration
-func MigrateModels() error {
-	db, err := GetDB()
-	if err != nil {
-		return err
-	}
-
+func MigrateModels(db *gorm.DB) error {
 	student_mig_err := db.AutoMigrate(&models.Student{})
 	if student_mig_err != nil {
 		log.Err(student_mig_err).Msg("Students table automigrate error.")
