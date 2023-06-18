@@ -13,8 +13,8 @@ type Project struct {
 	Tags          string
 	RepoLink      string
 	ComChannel    string
-	README        string `gorm:"size:2550000000"`
-	ProjectStatus bool   `gorm:":default:false"`
+	README        string
+	ProjectStatus bool `gorm:":default:false"`
 
 	// for stats
 	LastPullTime int64
