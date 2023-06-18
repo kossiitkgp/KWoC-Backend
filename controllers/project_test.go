@@ -103,7 +103,7 @@ func TestProjectInvalidMentor(t *testing.T) {
 	projectRes := executeRequest(projectReq, db)
 
 	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
-	expectResponseBodyToBe(t, projectRes, "Error: Mentor does not exist.")
+	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Mentor `%s` does not exist.", testUsername))
 	// --- TEST PROJECT REGISTRATION WITH INVALID PRIMARY MENTOR ---
 }
 
@@ -183,6 +183,6 @@ func TestProjectOK(t *testing.T) {
 	projectRes = executeRequest(projectReq, db)
 
 	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
-	expectResponseBodyToBe(t, projectRes, "Error: Project already exists.")
+	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink))
 	// --- TEST EXISTING PROJECT REGISTRATION ---
 }

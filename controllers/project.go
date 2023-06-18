@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kwoc-backend/middleware"
 	"kwoc-backend/models"
+	"kwoc-backend/utils"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -37,15 +38,7 @@ func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Reque
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 
 	if err != nil {
-		log.Err(err).Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error decoding request JSON body.",
-		)
-
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error decoding request JSON body.")
+		utils.LogErrAndRespond(r, w, err, "Error decoding request JSON body.", http.StatusBadRequest)
 		return
 	}
 
@@ -75,30 +68,18 @@ func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Reque
 		First(&project)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		log.Err(err).Msgf(
-			"%s %s %s %v",
-			r.Method,
-			r.RequestURI,
-			"Database error.",
-			tx.Error,
-		)
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Database error.")
+		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
 	}
 
 	project_exists := project.RepoLink == reqFields.RepoLink
 	if project_exists {
-		log.Warn().Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
+		utils.LogWarnAndRespond(
+			r,
+			w,
 			fmt.Sprintf("Error: Project `%s` already exists.", reqFields.RepoLink),
+			http.StatusBadRequest,
 		)
-
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error: Project already exists.")
 		return
 	}
 
@@ -108,15 +89,21 @@ func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Reque
 
 	if tx.Error != nil {
 		if tx.Error == gorm.ErrRecordNotFound {
-			log.Err(err).Msgf("Error: Mentor `%s` does not exist..", reqFields.MentorUsername)
-
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Error: Mentor does not exist.")
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error: Mentor `%s` does not exist.", reqFields.MentorUsername),
+				http.StatusBadRequest,
+			)
 		} else {
-			log.Err(err).Msgf("Error fetching mentor `%s`.", reqFields.MentorUsername)
-
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "Error fetching mentor.")
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error fetching mentor `%s`.", reqFields.MentorUsername),
+				http.StatusInternalServerError,
+			)
 		}
 		return
 	}
@@ -127,10 +114,13 @@ func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Reque
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
 		if tx.Error != nil && err != gorm.ErrRecordNotFound {
-			log.Err(err).Msgf("Error fetching secondary mentor `%s`.", reqFields.SecondaryMentorUsername)
-
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "Error fetching secondary mentor.")
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error fetching secondary mentor `%s`.", reqFields.SecondaryMentorUsername),
+				http.StatusInternalServerError,
+			)
 			return
 		}
 	}
@@ -147,10 +137,7 @@ func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Reque
 	})
 
 	if tx.Error != nil {
-		log.Err(err).Msgf("Error creating project in the database.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error registering project.")
+		utils.LogErrAndRespond(r, w, err, "Error adding the project in the database.", http.StatusInternalServerError)
 		return
 	}
 
