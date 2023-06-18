@@ -24,10 +24,9 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		utils.LogErr(r, err, "Error decoding JSON body.")
 
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error decoding JSON body.")
 		return
 	}
 
@@ -57,20 +56,15 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 		First(&mentor)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		utils.LogErr(r, err, "Database error.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Database error.")
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
 
 	mentor_exists := mentor.Username == reqFields.Username
 
 	if mentor_exists {
-		utils.LogWarn(r, "Mentor already exists.")
+		utils.LogErrAndRespond(r, w, gorm.ErrRecordNotFound, "Error: Mentor already exists.", http.StatusBadRequest)
 
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error: Mentor already exists.")
 		return
 	}
 
@@ -82,10 +76,7 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 	})
 
 	if tx.Error != nil {
-		utils.LogErr(r, err, "Database create error.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Database error.")
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
 

@@ -25,10 +25,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error decoding JSON body.")
-
-		utils.LogErr(r, err, "Error decoding JSON body.")
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		return
 	}
 
@@ -58,20 +55,19 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 		First(&student)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		utils.LogErr(r, err, "Datbase error.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Database error.")
+		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
 	}
 
 	student_exists := student.Username == reqFields.Username
 
 	if student_exists {
-		utils.LogWarn(r, fmt.Sprintf("Student `%s` already exists.", student.Username))
-
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error: Student already exists.")
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Student `%s` already exists.", student.Username),
+			http.StatusBadRequest,
+		)
 		return
 	}
 
@@ -84,10 +80,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 	})
 
 	if tx.Error != nil {
-		utils.LogErr(r, err, "Database create error.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Database error.")
+		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
 	}
 

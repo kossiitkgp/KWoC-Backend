@@ -3,7 +3,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"kwoc-backend/utils"
 	"net/http"
 
@@ -35,46 +34,31 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 
 	if err != nil {
-		utils.LogErr(r, err, "Error parsing JSON body parameters.")
-
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Error parsing body parameters.")
+		utils.LogErrAndRespond(r, w, err, "Error parsing JSON body parameters.", http.StatusBadRequest)
 		return
 	}
 
 	if reqFields.Code == "" || reqFields.Type == "" {
-		utils.LogWarn(r, "Empty body parameters.")
-
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Empty body parameters.")
+		utils.LogWarnAndRespond(r, w, "Empty body parameters.", http.StatusBadRequest)
 		return
 	}
 
 	// Get a Github OAuth access token
 	accessToken, err := utils.GetOauthAccessToken(reqFields.Code)
 	if err != nil {
-		utils.LogErr(r, err, "Error getting OAuth access token.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error getting OAuth access token.")
+		utils.LogErrAndRespond(r, w, err, "Error getting OAuth access token.", http.StatusInternalServerError)
 		return
 	}
 
 	// Get the user's information from the Github API
 	userInfo, err := utils.GetOauthUserInfo(accessToken)
 	if err != nil {
-		utils.LogErr(r, err, "Error getting OAuth user info.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error getting OAuth user info.")
+		utils.LogErrAndRespond(r, w, err, "Error getting OAuth user info.", http.StatusInternalServerError)
 		return
 	}
 
 	if userInfo.Username == "" {
-		utils.LogWarn(r, "Could not get username from the Github API.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Could not get username from the Github API.")
+		utils.LogWarnAndRespond(r, w, "Could not get username from the Github API.", http.StatusInternalServerError)
 		return
 	}
 
@@ -104,10 +88,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 		Username: userInfo.Username,
 	})
 	if err != nil {
-		utils.LogErr(r, err, "Error generating a JWT string.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error generating a JWT string.")
+		utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
 		return
 	}
 
@@ -122,10 +103,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 
 	resJson, err := json.Marshal(resFields)
 	if err != nil {
-		utils.LogErr(r, err, "Error generating response JSON.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error generating response JSON.")
+		utils.LogErrAndRespond(r, w, err, "Error generating response JSON.", http.StatusInternalServerError)
 		return
 	}
 

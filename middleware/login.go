@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"kwoc-backend/utils"
 	"net/http"
 )
@@ -17,11 +16,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 		tokenString := r.Header.Get("Bearer")
 
 		if tokenString == "" {
-			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprint(w, "Error: No JWT session token found.")
-
-			utils.LogWarn(r, "Unauthenticated request.")
-
+			utils.LogWarnAndRespond(r, w, "Error: No JWT session token found.", http.StatusUnauthorized)
 			return
 		}
 
@@ -29,19 +24,11 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 
 		if err != nil {
 			if err == utils.ErrJwtTokenInvalid {
-				utils.LogWarn(r, "Invalid JWT Token Provided.")
-
-				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprint(w, "Error: JWT session token invalid.")
-
+				utils.LogErrAndRespond(r, w, err, "Error: JWT session token invalid.", http.StatusUnauthorized)
 				return
 			}
 
-			utils.LogErr(r, err, "Error parsing JWT string.")
-
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "Error parsing JWT string.")
-
+			utils.LogErrAndRespond(r, w, err, "Error parsing JWT string.", http.StatusInternalServerError)
 			return
 		}
 

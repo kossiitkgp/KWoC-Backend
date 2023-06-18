@@ -114,6 +114,6 @@ func TestStudentOK(t *testing.T) {
 	res = executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, "Error: Student already exists.")
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` already exists.", testUsername))
 	// --- TEST EXISTING USER REQUEST ---
 }

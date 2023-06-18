@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -13,6 +14,13 @@ func LogErr(r *http.Request, err error, errMsg string) {
 		r.RequestURI,
 		errMsg,
 	)
+}
+
+func LogErrAndRespond(r *http.Request, w http.ResponseWriter, err error, errMsg string, statusCode int) {
+	LogErr(r, err, errMsg)
+
+	w.WriteHeader(statusCode)
+	fmt.Fprint(w, errMsg)
 }
 
 func LogInfo(r *http.Request, info string) {
@@ -31,4 +39,11 @@ func LogWarn(r *http.Request, warning string) {
 		r.RequestURI,
 		warning,
 	)
+}
+
+func LogWarnAndRespond(r *http.Request, w http.ResponseWriter, warning string, statusCode int) {
+	LogWarn(r, warning)
+
+	w.WriteHeader(statusCode)
+	fmt.Fprint(w, warning)
 }
