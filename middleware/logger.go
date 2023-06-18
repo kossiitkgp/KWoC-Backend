@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"fmt"
+	"kwoc-backend/utils"
 	"net/http"
 	"time"
-
-	"github.com/rs/zerolog/log"
 )
 
 // Logging middleware for incoming requests
@@ -14,12 +14,9 @@ func Logger(inner http.Handler, name string) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		log.Info().Msgf(
-			"%s %s %s %s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
+		utils.LogInfo(
+			r,
+			fmt.Sprintf("%s %s", name, time.Since(start)),
 		)
 	})
 }

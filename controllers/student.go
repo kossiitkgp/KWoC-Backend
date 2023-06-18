@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"kwoc-backend/middleware"
+	"kwoc-backend/utils"
 	"net/http"
 
 	"kwoc-backend/models"
 
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -28,7 +28,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Error decoding JSON body.")
 
-		log.Err(err).Msg("Error decoding JSON body.")
+		utils.LogErr(r, err, "Error decoding JSON body.")
 		return
 	}
 
@@ -36,13 +36,13 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(string)
 
 	if reqFields.Username != login_username {
-		log.Warn().Msgf(
-			"%s %s %s\n%s %s",
-			r.Method,
-			r.RequestURI,
-			"POSSIBLE SESSION HIJACKING.",
-			fmt.Sprintf("JWT Username: %s", login_username),
-			fmt.Sprintf("Given Username: %s", reqFields.Username),
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
+				login_username,
+				reqFields.Username,
+			),
 		)
 
 		w.WriteHeader(http.StatusUnauthorized)
@@ -58,13 +58,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 		First(&student)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		log.Err(err).Msgf(
-			"%s %s %s %v",
-			r.Method,
-			r.RequestURI,
-			"Database error.",
-			tx.Error,
-		)
+		utils.LogErr(r, err, "Datbase error.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Database error.")
@@ -74,12 +68,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 	student_exists := student.Username == reqFields.Username
 
 	if student_exists {
-		log.Warn().Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error: Student already exists.",
-		)
+		utils.LogWarn(r, fmt.Sprintf("Student `%s` already exists.", student.Username))
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Error: Student already exists.")
@@ -95,13 +84,7 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 	})
 
 	if tx.Error != nil {
-		log.Err(err).Msgf(
-			"%s %s %s %v",
-			r.Method,
-			r.RequestURI,
-			"Database error.",
-			tx.Error,
-		)
+		utils.LogErr(r, err, "Database create error.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Database error.")

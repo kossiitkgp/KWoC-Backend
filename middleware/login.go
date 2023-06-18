@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"kwoc-backend/utils"
 	"net/http"
-
-	"github.com/rs/zerolog/log"
 )
 
 type LoginCtxKey string
@@ -22,12 +20,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprint(w, "Error: No JWT session token found.")
 
-			log.Warn().Msgf(
-				"%s %s %s",
-				r.Method,
-				r.RequestURI,
-				"Unauthenticated request.",
-			)
+			utils.LogWarn(r, "Unauthenticated request.")
 
 			return
 		}
@@ -36,12 +29,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 
 		if err != nil {
 			if err == utils.ErrJwtTokenInvalid {
-				log.Warn().Msgf(
-					"%s %s %s",
-					r.Method,
-					r.RequestURI,
-					"Invalid JWT Token Provided.",
-				)
+				utils.LogWarn(r, "Invalid JWT Token Provided.")
 
 				w.WriteHeader(http.StatusUnauthorized)
 				fmt.Fprint(w, "Error: JWT session token invalid.")
@@ -49,7 +37,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			log.Err(err).Msg("Error parsing JWT string.")
+			utils.LogErr(r, err, "Error parsing JWT string.")
 
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Error parsing JWT string.")

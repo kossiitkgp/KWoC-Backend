@@ -8,8 +8,6 @@ import (
 	"net/http"
 
 	"kwoc-backend/models"
-
-	"github.com/rs/zerolog/log"
 )
 
 type OAuthReqBodyFields struct {
@@ -37,12 +35,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 
 	if err != nil {
-		log.Err(err).Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error parsing body parameters.",
-		)
+		utils.LogErr(r, err, "Error parsing JSON body parameters.")
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Error parsing body parameters.")
@@ -50,12 +43,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reqFields.Code == "" || reqFields.Type == "" {
-		log.Warn().Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Empty body parameters.",
-		)
+		utils.LogWarn(r, "Empty body parameters.")
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Empty body parameters.")
@@ -65,7 +53,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	// Get a Github OAuth access token
 	accessToken, err := utils.GetOauthAccessToken(reqFields.Code)
 	if err != nil {
-		log.Err(err).Msg("Error getting OAuth access token.")
+		utils.LogErr(r, err, "Error getting OAuth access token.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Error getting OAuth access token.")
@@ -75,7 +63,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	// Get the user's information from the Github API
 	userInfo, err := utils.GetOauthUserInfo(accessToken)
 	if err != nil {
-		log.Err(err).Msg("Error getting OAuth user info.")
+		utils.LogErr(r, err, "Error getting OAuth user info.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Error getting OAuth user info.")
@@ -83,7 +71,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userInfo.Username == "" {
-		log.Warn().Msg("Could not get username from the Github API.")
+		utils.LogWarn(r, "Could not get username from the Github API.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Could not get username from the Github API.")
@@ -116,7 +104,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 		Username: userInfo.Username,
 	})
 	if err != nil {
-		log.Err(err).Msg("Error generating a JWT string.")
+		utils.LogErr(r, err, "Error generating a JWT string.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Error generating a JWT string.")
@@ -134,7 +122,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 
 	resJson, err := json.Marshal(resFields)
 	if err != nil {
-		log.Err(err).Msg("Error generating response JSON.")
+		utils.LogErr(r, err, "Error generating response JSON.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Error generating response JSON.")
@@ -145,12 +133,7 @@ func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(resJson)
 
 	if err != nil {
-		log.Err(err).Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error writing the response.",
-		)
+		utils.LogErr(r, err, "Error writing the response.")
 
 		return
 	}

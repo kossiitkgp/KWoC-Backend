@@ -4,10 +4,10 @@ package server
 import (
 	"kwoc-backend/controllers"
 	"kwoc-backend/middleware"
+	"kwoc-backend/utils"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -15,19 +15,11 @@ import (
 func NewRouter(db *gorm.DB) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Warn().Msgf(
-			"%s %s Not Found",
-			r.Method,
-			r.RequestURI,
-		)
+		utils.LogWarn(r, "404 Not Found.")
 	})
 
 	router.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Warn().Msgf(
-			"%s %s Method Not Allowed",
-			r.Method,
-			r.RequestURI,
-		)
+		utils.LogWarn(r, "405 Method Not Allowed.")
 	})
 
 	// iterate over all routes

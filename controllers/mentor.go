@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"kwoc-backend/middleware"
+	"kwoc-backend/utils"
 	"net/http"
 
 	"kwoc-backend/models"
 
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -24,10 +24,10 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 	if err != nil {
+		utils.LogErr(r, err, "Error decoding JSON body.")
+
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Error decoding JSON body.")
-
-		log.Err(err).Msg("Error decoding JSON body.")
 		return
 	}
 
@@ -35,13 +35,13 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(string)
 
 	if reqFields.Username != login_username {
-		log.Warn().Msgf(
-			"%s %s %s\n%s %s",
-			r.Method,
-			r.RequestURI,
-			"POSSIBLE SESSION HIJACKING.",
-			fmt.Sprintf("JWT Username: %s", login_username),
-			fmt.Sprintf("Given Username: %s", reqFields.Username),
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
+				login_username,
+				reqFields.Username,
+			),
 		)
 
 		w.WriteHeader(http.StatusUnauthorized)
@@ -57,13 +57,7 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 		First(&mentor)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		log.Err(err).Msgf(
-			"%s %s %s %v",
-			r.Method,
-			r.RequestURI,
-			"Database error.",
-			tx.Error,
-		)
+		utils.LogErr(r, err, "Database error.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Database error.")
@@ -73,12 +67,7 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 	mentor_exists := mentor.Username == reqFields.Username
 
 	if mentor_exists {
-		log.Warn().Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error: Mentor already exists.",
-		)
+		utils.LogWarn(r, "Mentor already exists.")
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Error: Mentor already exists.")
@@ -93,13 +82,7 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 	})
 
 	if tx.Error != nil {
-		log.Err(err).Msgf(
-			"%s %s %s %v",
-			r.Method,
-			r.RequestURI,
-			"Database error.",
-			tx.Error,
-		)
+		utils.LogErr(r, err, "Database create error.")
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Database error.")
