@@ -19,7 +19,7 @@ func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 
 func expectStatusCodeToBe(t *testing.T, res *httptest.ResponseRecorder, expectedCode int) {
 	if res.Code != expectedCode {
-		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
+		t.Errorf("Expected status code %d. Got %d.", expectedCode, res.Code)
 	}
 }
 
