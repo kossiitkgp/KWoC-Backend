@@ -29,3 +29,13 @@ func testRequestNoAuth(t *testing.T, method string, path string) {
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 }
+
+func testRequestInvalidAuth(t *testing.T, method string, path string) {
+	req, _ := http.NewRequest(method, path, nil)
+	req.Header.Add("Bearer", "Some invalid token")
+
+	res := executeRequest(req)
+
+	// Expect internal server error because token parsing throws an error
+	expectStatusCodeToBe(t, res, http.StatusInternalServerError)
+}

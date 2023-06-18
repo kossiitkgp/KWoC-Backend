@@ -22,13 +22,7 @@ func TestMentorNoAuth(t *testing.T) {
 
 // Test request to /mentor/form/ with invalid jwt
 func TestMentorInvalidAuth(t *testing.T) {
-	req, _ := http.NewRequest("POST", "/mentor/form/", nil)
-	req.Header.Add("Bearer", "Some invalid token")
-
-	res := executeRequest(req)
-
-	// Expect internal server error because token parsing throws an error
-	expectStatusCodeToBe(t, res, http.StatusInternalServerError)
+	testRequestInvalidAuth(t, "POST", "/mentor/form/")
 }
 
 // Test request to /mentor/form/ with session hijacking attempt
