@@ -75,9 +75,45 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if the project already exists
+	// Check if the student already exists in the db
+	project := models.Project{}
+	tx := db.
+		Table("projects").
+		Where("repo_link = ?", reqFields.RepoLink).
+		First(&project)
+
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		log.Err(err).Msgf(
+			"%s %s %s %v",
+			r.Method,
+			r.RequestURI,
+			"Database error.",
+			tx.Error,
+		)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "Database error.")
+		return
+	}
+
+	project_exists := project.RepoLink == reqFields.RepoLink
+	if project_exists {
+		log.Warn().Msgf(
+			"%s %s %s",
+			r.Method,
+			r.RequestURI,
+			fmt.Sprintf("Error: Project `%s` already exists.", reqFields.RepoLink),
+		)
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "Error: Project already exists.")
+		return
+	}
+
 	// Fetch primary mentor from the database
 	mentor := models.Mentor{}
-	tx := db.Table("mentors").Where("username = ?", reqFields.MentorUsername).First(&mentor)
+	tx = db.Table("mentors").Where("username = ?", reqFields.MentorUsername).First(&mentor)
 
 	if tx.Error != nil {
 		log.Err(err).Msgf("Error fetching mentor `%s`.", reqFields.MentorUsername)
@@ -101,7 +137,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tx = db.Create(models.Project{
+	tx = db.Create(&models.Project{
 		Name:            reqFields.Name,
 		Desc:            reqFields.Description,
 		Tags:            reqFields.Tags,
