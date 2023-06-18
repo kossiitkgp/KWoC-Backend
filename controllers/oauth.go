@@ -30,7 +30,9 @@ type OAuthResBodyFields struct {
 	Jwt       string `json:"jwt"`
 }
 
-func OAuth(w http.ResponseWriter, r *http.Request) {
+func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
+	db := dbHandler.db
+
 	var reqFields = OAuthReqBodyFields{}
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
 
@@ -85,15 +87,6 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Could not get username from the Github API.")
-		return
-	}
-
-	db, err := utils.GetDB()
-	if err != nil {
-		log.Err(err).Msg("Error connecting to the database.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error connecting to the database.")
 		return
 	}
 

@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"kwoc-backend/middleware"
-	"kwoc-backend/utils"
 	"net/http"
+
+	"kwoc-backend/models"
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
-	"kwoc-backend/models"
 )
 
 type RegisterMentorReqFields struct {
@@ -18,7 +18,8 @@ type RegisterMentorReqFields struct {
 	Email    string `json:"email"`
 }
 
-func RegisterMentor(w http.ResponseWriter, r *http.Request) {
+func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Request) {
+	db := dbHandler.db
 	var reqFields = RegisterMentorReqFields{}
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
@@ -45,20 +46,6 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "Login username and given username do not match.")
-		return
-	}
-
-	db, err := utils.GetDB()
-	if err != nil {
-		log.Err(err).Msgf(
-			"%s %s %s",
-			r.Method,
-			r.RequestURI,
-			"Error connecting to database.",
-		)
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error connecting to database.")
 		return
 	}
 

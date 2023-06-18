@@ -1,4 +1,4 @@
-package middleware
+package controllers
 
 import "gorm.io/gorm"
 

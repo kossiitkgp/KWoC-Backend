@@ -2,6 +2,7 @@
 package server
 
 import (
+	"kwoc-backend/controllers"
 	"kwoc-backend/middleware"
 	"net/http"
 
@@ -30,7 +31,7 @@ func NewRouter(db *gorm.DB) *mux.Router {
 	})
 
 	// iterate over all routes
-	dbHandler := middleware.NewDBHandler(db)
+	dbHandler := controllers.NewDBHandler(db)
 	routes := getRoutes(dbHandler)
 	for _, route := range routes {
 		var handler http.Handler
