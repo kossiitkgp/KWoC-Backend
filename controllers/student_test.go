@@ -100,7 +100,7 @@ func TestStudentOK(t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseBodyToBe(t, res, "Success.")
+	expectResponseBodyToBe(t, res, "Student registration successful.")
 	// --- TEST NEW USER REGISTRATION ---
 
 	// --- TEST EXISTING USER REQUEST ---

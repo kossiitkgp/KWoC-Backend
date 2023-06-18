@@ -98,7 +98,7 @@ func TestMentorOK(t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseBodyToBe(t, res, "Success.")
+	expectResponseBodyToBe(t, res, "Mentor registration successful.")
 	// --- TEST NEW USER REGISTRATION ---
 
 	// --- TEST EXISTING USER REQUEST ---

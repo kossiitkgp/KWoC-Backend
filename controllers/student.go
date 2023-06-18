@@ -109,5 +109,5 @@ func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Success.")
+	fmt.Fprint(w, "Student registration successful.")
 }

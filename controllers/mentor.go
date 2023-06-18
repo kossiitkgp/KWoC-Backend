@@ -107,5 +107,5 @@ func (dbHandler *DBHandler) RegisterMentor(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Success.")
+	fmt.Fprint(w, "Mentor registration successful.")
 }
