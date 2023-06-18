@@ -17,10 +17,7 @@ import (
 
 // Test unauthenticated request to /mentor/form/
 func TestMentorNoAuth(t *testing.T) {
-	req, _ := http.NewRequest("POST", "/mentor/form/", nil)
-	res := executeRequest(req)
-
-	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+	testRequestNoAuth(t, "POST", "/mentor/form/")
 }
 
 // Test request to /mentor/form/ with invalid jwt

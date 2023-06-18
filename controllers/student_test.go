@@ -15,10 +15,7 @@ import (
 
 // Test unauthenticated request to /student/form/
 func TestStudentNoAuth(t *testing.T) {
-	req, _ := http.NewRequest("POST", "/student/form/", nil)
-	res := executeRequest(req)
-
-	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+	testRequestNoAuth(t, "POST", "/student/form/")
 }
 
 // Test request to /student/form/ with invalid jwt

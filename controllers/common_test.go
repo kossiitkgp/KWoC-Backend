@@ -22,3 +22,10 @@ func expectStatusCodeToBe(t *testing.T, res *httptest.ResponseRecorder, expected
 		t.Errorf("Expected status code %d. Got %d.", http.StatusInternalServerError, res.Code)
 	}
 }
+
+func testRequestNoAuth(t *testing.T, method string, path string) {
+	req, _ := http.NewRequest(method, path, nil)
+	res := executeRequest(req)
+
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+}
