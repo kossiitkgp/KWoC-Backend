@@ -49,7 +49,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY)
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
 
 	if reqFields.MentorUsername != login_username {
 		log.Warn().Msgf(
