@@ -7,11 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 // Setup up mux routes and router
-func NewRouter() *mux.Router {
-
+func NewRouter(db *gorm.DB) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Warn().Msgf(
@@ -29,7 +29,9 @@ func NewRouter() *mux.Router {
 		)
 	})
 
-	// iterate over rall routes
+	// iterate over all routes
+	dbHandler := middleware.NewDBHandler(db)
+	routes := getRoutes(dbHandler)
 	for _, route := range routes {
 		var handler http.Handler
 

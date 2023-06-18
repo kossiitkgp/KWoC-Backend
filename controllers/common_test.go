@@ -10,7 +10,7 @@ import (
 // Ref: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql#h-writing-tests-for-the-api
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	router := server.NewRouter()
+	router := server.NewRouter(nil)
 
 	router.ServeHTTP(rr, req)
 

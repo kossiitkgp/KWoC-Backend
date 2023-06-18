@@ -13,29 +13,31 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-var routes []Route = []Route{
-	{
-		"Index",
-		"GET",
-		"/api/",
-		controllers.Index,
-	},
-	{
-		"OAuth",
-		"POST",
-		"/oauth/",
-		controllers.OAuth,
-	},
-	{
-		"Student Registration",
-		"POST",
-		"/student/form/",
-		middleware.WithLogin(controllers.RegisterStudent),
-	},
-	{
-		"Mentor Registration",
-		"POST",
-		"/mentor/form/",
-		middleware.WithLogin(controllers.RegisterMentor),
-	},
+func getRoutes(dbHandler *middleware.DBHandler) []Route {
+	return []Route{
+		{
+			"Index",
+			"GET",
+			"/api/",
+			controllers.Index,
+		},
+		{
+			"OAuth",
+			"POST",
+			"/oauth/",
+			controllers.OAuth,
+		},
+		{
+			"Student Registration",
+			"POST",
+			"/student/form/",
+			middleware.WithLogin(controllers.RegisterStudent),
+		},
+		{
+			"Mentor Registration",
+			"POST",
+			"/mentor/form/",
+			middleware.WithLogin(controllers.RegisterMentor),
+		},
+	}
 }
