@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"kwoc-backend/middleware"
 	"kwoc-backend/models"
-	"kwoc-backend/utils"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -31,7 +30,8 @@ type RegisterProjectReqFields struct {
 	ReadmeURL string `json:"readme"`
 }
 
-func RegisterProject(w http.ResponseWriter, r *http.Request) {
+func (dbHandler *DBHandler) RegisterProject(w http.ResponseWriter, r *http.Request) {
+	db := dbHandler.db
 	reqFields := RegisterProjectReqFields{}
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
@@ -63,15 +63,6 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "Login username and mentor username do not match.")
-		return
-	}
-
-	db, err := utils.GetDB()
-	if err != nil {
-		log.Err(err).Msg("Error connecting to the database.")
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error connecting to the database.")
 		return
 	}
 

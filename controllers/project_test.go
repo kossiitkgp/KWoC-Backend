@@ -11,8 +11,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/rs/zerolog/log"
 )
 
 // Test unauthenticated request to /project/add/
@@ -51,7 +49,7 @@ func TestProjectSessionHijacking(t *testing.T) {
 	)
 	req.Header.Add("Bearer", someuserJwt)
 
-	res := executeRequest(req)
+	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseBodyToBe(t, res, "Login username and mentor username do not match.")
@@ -62,14 +60,11 @@ func TestProjectInvalidMentor(t *testing.T) {
 	// Set up a local test database path
 	os.Setenv("DEV", "true")
 	os.Setenv("DEV_DB_PATH", "testDB.db")
-	err := utils.MigrateModels()
+	db, _ := utils.GetDB()
+	_ = utils.MigrateModels(db)
 	// Remove the test database once used
 	defer os.Unsetenv("DEV_DB_PATH")
 	defer os.Remove("testDB.db")
-
-	if err != nil {
-		log.Err(err).Msg("Error migrating database models.")
-	}
 
 	// Generate a jwt secret key for testing
 	rand.Seed(time.Now().UnixMilli())
@@ -105,7 +100,7 @@ func TestProjectInvalidMentor(t *testing.T) {
 	)
 	projectReq.Header.Add("Bearer", testJwt)
 
-	projectRes := executeRequest(projectReq)
+	projectRes := executeRequest(projectReq, db)
 
 	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
 	expectResponseBodyToBe(t, projectRes, "Error: Mentor does not exist.")
@@ -117,14 +112,11 @@ func TestProjectOK(t *testing.T) {
 	// Set up a local test database path
 	os.Setenv("DEV", "true")
 	os.Setenv("DEV_DB_PATH", "testDB.db")
-	err := utils.MigrateModels()
+	db, _ := utils.GetDB()
+	_ = utils.MigrateModels(db)
 	// Remove the test database once used
 	defer os.Unsetenv("DEV_DB_PATH")
 	defer os.Remove("testDB.db")
-
-	if err != nil {
-		log.Err(err).Msg("Error migrating database models.")
-	}
 
 	// Generate a jwt secret key for testing
 	rand.Seed(time.Now().UnixMilli())
@@ -151,7 +143,7 @@ func TestProjectOK(t *testing.T) {
 		bytes.NewReader(mentorReqBody),
 	)
 	mentorReq.Header.Add("Bearer", testJwt)
-	_ = executeRequest(mentorReq)
+	_ = executeRequest(mentorReq, db)
 
 	// --- TEST NEW PROJECT REGISTRATION ---
 	projectReqFields := controllers.RegisterProjectReqFields{
@@ -174,7 +166,7 @@ func TestProjectOK(t *testing.T) {
 	)
 	projectReq.Header.Add("Bearer", testJwt)
 
-	projectRes := executeRequest(projectReq)
+	projectRes := executeRequest(projectReq, db)
 
 	expectStatusCodeToBe(t, projectRes, http.StatusOK)
 	expectResponseBodyToBe(t, projectRes, "Success.")
@@ -188,7 +180,7 @@ func TestProjectOK(t *testing.T) {
 	)
 	projectReq.Header.Add("Bearer", testJwt)
 
-	projectRes = executeRequest(projectReq)
+	projectRes = executeRequest(projectReq, db)
 
 	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
 	expectResponseBodyToBe(t, projectRes, "Error: Project already exists.")

@@ -51,5 +51,11 @@ func getRoutes(app *middleware.App) []Route {
 			"/healthcheck/ping/",
 			controllers.Ping,
 		},
+		{
+			"Project Registration",
+			"POST",
+			"/project/add/",
+			middleware.WithLogin(dbHandler.RegisterProject),
+		},
 	}
 }
