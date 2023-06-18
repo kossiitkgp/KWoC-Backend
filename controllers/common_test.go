@@ -23,6 +23,14 @@ func expectStatusCodeToBe(t *testing.T, res *httptest.ResponseRecorder, expected
 	}
 }
 
+func expectResponseBodyToBe(t *testing.T, res *httptest.ResponseRecorder, expectedBody string) {
+	resBody := res.Body.String()
+
+	if resBody != expectedBody {
+		t.Errorf("Expected response `%s`. Got `%s`.", expectedBody, resBody)
+	}
+}
+
 func testRequestNoAuth(t *testing.T, method string, path string) {
 	req, _ := http.NewRequest(method, path, nil)
 	res := executeRequest(req)

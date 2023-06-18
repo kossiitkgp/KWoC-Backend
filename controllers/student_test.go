@@ -54,13 +54,7 @@ func TestStudentSessionHijacking(t *testing.T) {
 	res := executeRequest(req)
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-
-	resBody := res.Body.String()
-	expectedBody := "Login username and given username do not match."
-
-	if resBody != expectedBody {
-		t.Errorf("Expected response `%s`. Got `%s`.", expectedBody, resBody)
-	}
+	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
 }
 
 // Test a request to /student/form/ with proper authentication and input
@@ -102,13 +96,7 @@ func TestStudentOK(t *testing.T) {
 	res := executeRequest(req)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-
-	resBody := res.Body.String()
-	expectedBody := "Success."
-
-	if resBody != expectedBody {
-		t.Errorf("Expected response `%s`. Got `%s`.", expectedBody, resBody)
-	}
+	expectResponseBodyToBe(t, res, "Success.")
 	// --- TEST NEW USER REGISTRATION ---
 
 	// --- TEST EXISTING USER REQUEST ---
@@ -122,13 +110,7 @@ func TestStudentOK(t *testing.T) {
 	res = executeRequest(req)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-
-	resBody = res.Body.String()
-	expectedBody = "Error: Student already exists."
-
-	if resBody != expectedBody {
-		t.Errorf("Expected response `%s`. Got `%s`.", expectedBody, resBody)
-	}
+	expectResponseBodyToBe(t, res, "Error: Student already exists.")
 	// --- TEST EXISTING USER REQUEST ---
 
 	// Remove the test database
