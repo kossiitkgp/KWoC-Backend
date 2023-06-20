@@ -39,5 +39,17 @@ func getRoutes(app *middleware.App) []Route {
 			"/mentor/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
 		},
+		{
+			"HealthCheck",
+			"GET",
+			"/healthcheck/",
+			dbHandler.HealthCheck,
+		},
+		{
+			"Ping",
+			"GET",
+			"/healthcheck/ping/",
+			controllers.Ping,
+		},
 	}
 }

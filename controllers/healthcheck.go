@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"kwoc-backend/utils"
 	"net/http"
 	"time"
 
@@ -23,15 +22,10 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 // HealthCheck checks the server and database status.
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	db, err := utils.GetDB()
-	if err != nil {
-		log.Err(err).Msg("Could not connect to database")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+func (dbHandler *DBHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	db := dbHandler.db
 
-	err = db.Exec("SELECT 1").Error
+	err := db.Exec("SELECT 1").Error
 	if err != nil {
 		log.Err(err).Msg("Could not ping database")
 		w.WriteHeader(http.StatusInternalServerError)
