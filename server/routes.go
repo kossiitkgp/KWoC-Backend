@@ -13,7 +13,7 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-func getRoutes(dbHandler *controllers.DBHandler) []Route {
+func getRoutes(app *middleware.App) []Route {
 	return []Route{
 		{
 			"Index",
@@ -25,19 +25,19 @@ func getRoutes(dbHandler *controllers.DBHandler) []Route {
 			"OAuth",
 			"POST",
 			"/oauth/",
-			dbHandler.OAuth,
+			middleware.WrapApp(app, controllers.OAuth),
 		},
 		{
 			"Student Registration",
 			"POST",
 			"/student/form/",
-			middleware.WithLogin(dbHandler.RegisterStudent),
+			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
 		},
 		{
 			"Mentor Registration",
 			"POST",
 			"/mentor/form/",
-			middleware.WithLogin(dbHandler.RegisterMentor),
+			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
 		},
 	}
 }

@@ -19,8 +19,9 @@ type RegisterStudentReqFields struct {
 	College  string `json:"college"`
 }
 
-func (dbHandler *DBHandler) RegisterStudent(w http.ResponseWriter, r *http.Request) {
-	db := dbHandler.db
+func RegisterStudent(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
 	var reqFields = RegisterStudentReqFields{}
 
 	err := json.NewDecoder(r.Body).Decode(&reqFields)

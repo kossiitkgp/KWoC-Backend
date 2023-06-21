@@ -3,6 +3,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"kwoc-backend/middleware"
 	"kwoc-backend/utils"
 	"net/http"
 
@@ -27,8 +28,9 @@ type OAuthResBodyFields struct {
 	Jwt       string `json:"jwt"`
 }
 
-func (dbHandler *DBHandler) OAuth(w http.ResponseWriter, r *http.Request) {
-	db := dbHandler.db
+func OAuth(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
 
 	var reqFields = OAuthReqBodyFields{}
 	err := json.NewDecoder(r.Body).Decode(&reqFields)
