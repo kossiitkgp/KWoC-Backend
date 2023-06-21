@@ -86,6 +86,7 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 - `GITHUB_OAUTH_CLIENT_ID`: The client id used for Github OAuth. (See [Github OAuth](#github-oauth))
 - `GITHUB_OAUTH_CLIENT_SECRET`: The client secret used for Github OAuth. (See [Github OAuth](#github-oauth))
 - `JWT_SECRET_KEY`: The secret key used to create a JWT token. (It can be a randomly generated string)
+- `JWT_VALIDITY_TIME`: The amount of time (in hours) for which the generated JWT tokens should be valid.
 
 ### Github OAuth
 KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.

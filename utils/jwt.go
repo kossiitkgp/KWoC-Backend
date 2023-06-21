@@ -3,9 +3,11 @@ package utils
 import (
 	"errors"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/rs/zerolog/log"
 )
 
 var ErrJwtSecretKeyNotFound = errors.New("ERROR: JWT SECRET KEY NOT FOUND")
@@ -58,13 +60,24 @@ func ParseLoginJwtString(tokenString string) (*jwt.Token, *LoginJwtClaims, error
 func GenerateLoginJwtString(loginJwtFields LoginJwtFields) (string, error) {
 	issue_time := time.Now()
 
+	// Get the amount of time for which the generated JWT will be valid
+	jwtValidityTimeEnvVar := os.Getenv("JWT_VALIDITY_TIME")
+	jwtValidityTime, err := strconv.Atoi(jwtValidityTimeEnvVar)
+
+	if err != nil {
+		// Default of 30 days
+		jwtValidityTime = 30 * 24
+
+		log.Warn().Msgf("Could not parse JWT validity time from the environment. Set to default of %d hours.", jwtValidityTime)
+	}
+
 	claims := &LoginJwtClaims{
 		LoginJwtFields: loginJwtFields,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(issue_time),
 			NotBefore: jwt.NewNumericDate(issue_time),
 			// Valid for 30 days
-			ExpiresAt: jwt.NewNumericDate(issue_time.Add(30 * 24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(issue_time.Add(time.Duration(jwtValidityTime) * time.Hour)),
 		},
 	}
 
