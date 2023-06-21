@@ -3,6 +3,7 @@ package controllers_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"kwoc-backend/controllers"
 	"kwoc-backend/utils"
 	"net/http"
@@ -92,7 +93,7 @@ func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, "Error: Mentor already exists.")
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Mentor `%s` already exists.", testUsername))
 }
 
 // Test requests to /mentor/form/ with proper authentication and input

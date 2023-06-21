@@ -64,7 +64,12 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	mentor_exists := mentor.Username == reqFields.Username
 
 	if mentor_exists {
-		utils.LogErrAndRespond(r, w, gorm.ErrRecordNotFound, "Error: Mentor already exists.", http.StatusBadRequest)
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Mentor `%s` already exists.", mentor.Username),
+			http.StatusBadRequest,
+		)
 
 		return
 	}
