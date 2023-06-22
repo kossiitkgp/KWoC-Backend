@@ -31,7 +31,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the JWT login username is the same as the student's given username
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(string)
+	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
 	if reqFields.Username != login_username {
 		utils.LogWarn(
