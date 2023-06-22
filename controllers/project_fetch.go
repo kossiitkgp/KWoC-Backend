@@ -1,43 +1,47 @@
 package controllers
 
 import (
+	"fmt"
 	"kwoc-backend/middleware"
 	"kwoc-backend/models"
 	"kwoc-backend/utils"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-type FetchAllProjMentor struct {
+type FetchProjMentor struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 }
-type FetchAllProjProject struct {
-	Name            string             `json:"name"`
-	Desc            string             `json:"desc"`
-	Tags            string             `json:"tags"`
-	RepoLink        string             `json:"repo_link"`
-	ComChannel      string             `json:"com_channel"`
-	Mentor          FetchAllProjMentor `json:"mentor"`
-	SecondaryMentor FetchAllProjMentor `json:"secondary_mentor"`
+type FetchProjProject struct {
+	Name            string          `json:"name"`
+	Desc            string          `json:"desc"`
+	Tags            string          `json:"tags"`
+	RepoLink        string          `json:"repo_link"`
+	ComChannel      string          `json:"com_channel"`
+	Mentor          FetchProjMentor `json:"mentor"`
+	SecondaryMentor FetchProjMentor `json:"secondary_mentor"`
 }
 
-type FetchAllProjRes []FetchAllProjProject
+type FetchAllProjRes []FetchProjProject
 
-func newFetchAllProjMentor(mentor *models.Mentor) FetchAllProjMentor {
-	return FetchAllProjMentor{
+func newFetchProjMentor(mentor *models.Mentor) FetchProjMentor {
+	return FetchProjMentor{
 		Name:     mentor.Name,
 		Username: mentor.Username,
 	}
 }
-func newFetchAllProjProject(project *models.Project) FetchAllProjProject {
-	return FetchAllProjProject{
+func newFetchProjProject(project *models.Project) FetchProjProject {
+	return FetchProjProject{
 		Name:            project.Name,
 		Desc:            project.Desc,
 		Tags:            project.Tags,
 		RepoLink:        project.RepoLink,
 		ComChannel:      project.ComChannel,
-		Mentor:          newFetchAllProjMentor(&project.Mentor),
-		SecondaryMentor: newFetchAllProjMentor(&project.SecondaryMentor),
+		Mentor:          newFetchProjMentor(&project.Mentor),
+		SecondaryMentor: newFetchProjMentor(&project.SecondaryMentor),
 	}
 }
 
@@ -63,8 +67,54 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 	var response FetchAllProjRes = make(FetchAllProjRes, 0)
 
 	for _, project := range projects {
-		response = append(response, newFetchAllProjProject(&project))
+		response = append(response, newFetchProjProject(&project))
 	}
 
+	utils.RespondWithJson(r, w, response)
+}
+
+func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
+	reqParams := mux.Vars(r)
+
+	if reqParams["id"] == "" {
+		utils.LogWarnAndRespond(r, w, "Project id not found.", http.StatusBadRequest)
+		return
+	}
+
+	proj_id, err := strconv.Atoi(reqParams["id"])
+
+	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error parsing project id.", http.StatusBadRequest)
+		return
+	}
+
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	project := models.Project{}
+	tx := db.
+		Table("projects").
+		Preload("Mentor").
+		Preload("SecondaryMentor").
+		Where("project_status = ?", true).
+		Where("id = ?", proj_id).
+		Select("name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
+		First(&project)
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(r, w, err, "Error fetching project from the database.", http.StatusInternalServerError)
+	}
+
+	if int(project.ID) != proj_id {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Project with id `%d` does not exist.", proj_id),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	response := newFetchProjProject(&project)
 	utils.RespondWithJson(r, w, response)
 }
