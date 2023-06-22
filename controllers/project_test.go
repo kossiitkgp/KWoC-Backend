@@ -8,38 +8,12 @@ import (
 	"kwoc-backend/utils"
 	"math/rand"
 	"net/http"
-	"os"
 	"testing"
-	"time"
+
+	"gorm.io/gorm"
 )
 
-// Test unauthenticated request to /project/add/
-func TestProjectNoAuth(t *testing.T) {
-	testRequestNoAuth(t, "POST", "/project/add/")
-}
-
-// Test request to /project/add/ with invalid jwt
-func TestProjectInvalidAuth(t *testing.T) {
-	testRequestInvalidAuth(t, "POST", "/project/add/")
-}
-
-// Test request to /project/add/ with session hijacking attempt
-func TestProjectSessionHijacking(t *testing.T) {
-	// Generate a jwt secret key for testing
-	rand.Seed(time.Now().UnixMilli())
-
-	os.Setenv("JWT_SECRET_KEY", fmt.Sprintf("testkey%d", rand.Int()))
-
-	testLoginFields := utils.LoginJwtFields{
-		Username: "someuser",
-	}
-
-	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-
-	reqFields := controllers.RegisterProjectReqFields{
-		MentorUsername: "anotheruser",
-	}
-
+func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *http.Request {
 	reqBody, _ := json.Marshal(reqFields)
 
 	req, _ := http.NewRequest(
@@ -47,6 +21,46 @@ func TestProjectSessionHijacking(t *testing.T) {
 		"/project/add/",
 		bytes.NewReader(reqBody),
 	)
+
+	return req
+}
+
+func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername string) *controllers.RegisterProjectReqFields {
+	return &controllers.RegisterProjectReqFields{
+		Name:                    fmt.Sprintf("YANGJF-%d", rand.Int()),
+		Description:             "Yet another next-gen Javascript framework.",
+		Tags:                    "next-gen, javascript, framework",
+		MentorUsername:          mentorUsername,
+		SecondaryMentorUsername: secondaryMentorUsername,
+		RepoLink:                "https://xkcd.com/927/",
+		ComChannel:              "com-channel",
+		ReadmeURL:               "readme",
+	}
+}
+
+// Test unauthenticated request to /project/add/
+func TestProjectRegNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "POST", "/project/add/")
+}
+
+// Test request to /project/add/ with invalid jwt
+func TestProjectRegInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "POST", "/project/add/")
+}
+
+// Test request to /project/add/ with session hijacking attempt
+func TestProjectRegSessionHijacking(t *testing.T) {
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
+
+	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	reqFields := controllers.RegisterProjectReqFields{MentorUsername: "anotheruser"}
+
+	req := createProjctRegRequest(&reqFields)
 	req.Header.Add("Bearer", someuserJwt)
 
 	res := executeRequest(req, nil)
@@ -56,48 +70,25 @@ func TestProjectSessionHijacking(t *testing.T) {
 }
 
 // Test a request to /project/add/ with non-existent mentors
-func TestProjectInvalidMentor(t *testing.T) {
+func TestProjectRegInvalidMentor(t *testing.T) {
 	// Set up a local test database path
-	os.Setenv("DEV", "true")
-	os.Setenv("DEV_DB_PATH", "testDB.db")
-	db, _ := utils.GetDB()
-	_ = utils.MigrateModels(db)
-	// Remove the test database once used
-	defer os.Unsetenv("DEV_DB_PATH")
-	defer os.Remove("testDB.db")
+	db := setTestDB()
+	defer unsetTestDB()
 
 	// Generate a jwt secret key for testing
-	rand.Seed(time.Now().UnixMilli())
-
-	os.Setenv("JWT_SECRET_KEY", fmt.Sprintf("testkey%d", rand.Int()))
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
 
 	// Register a test mentor
-	testUsername := fmt.Sprintf("testuser%d", rand.Int())
-	testLoginFields := utils.LoginJwtFields{
-		Username: testUsername,
-	}
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	// --- TEST PROJECT REGISTRATION WITH INVALID PRIMARY MENTOR ---
-	projectReqFields := controllers.RegisterProjectReqFields{
-		Name:                    "YANGJF",
-		Description:             "Yet another next-gen Javascript framework.",
-		Tags:                    "next-gen, javascript, framework",
-		MentorUsername:          testUsername,
-		SecondaryMentorUsername: "",
-		RepoLink:                "https://xkcd.com/927/",
-		ComChannel:              "com-channel",
-		ReadmeURL:               "readme",
-	}
+	projectReqFields := createTestProjectRegFields(testUsername, "")
 
-	projectReqBody, _ := json.Marshal(projectReqFields)
-
-	projectReq, _ := http.NewRequest(
-		"POST",
-		"/project/add/",
-		bytes.NewReader(projectReqBody),
-	)
+	projectReq := createProjctRegRequest(projectReqFields)
 	projectReq.Header.Add("Bearer", testJwt)
 
 	projectRes := executeRequest(projectReq, db)
@@ -107,24 +98,50 @@ func TestProjectInvalidMentor(t *testing.T) {
 	// --- TEST PROJECT REGISTRATION WITH INVALID PRIMARY MENTOR ---
 }
 
-// Test a request to /project/add/ with proper authentication and input
-func TestProjectOK(t *testing.T) {
+// Test a new project registration request to /project/add/ with proper authentication and input
+func tProjectRegNew(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
+	projectReqFields := createTestProjectRegFields(testUsername, "")
+
+	projectReq := createProjctRegRequest(projectReqFields)
+	projectReq.Header.Add("Bearer", testJwt)
+
+	projectRes := executeRequest(projectReq, db)
+
+	expectStatusCodeToBe(t, projectRes, http.StatusOK)
+	expectResponseBodyToBe(t, projectRes, "Success.")
+}
+
+// Test an existing project registration request to /project/add/ with proper authentication and input
+func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
+	projectReqFields := createTestProjectRegFields(testUsername, "")
+
+	projectReq := createProjctRegRequest(projectReqFields)
+	projectReq.Header.Add("Bearer", testJwt)
+
+	_ = executeRequest(projectReq, db)
+
+	// Execute the same request again
+	projectReq = createProjctRegRequest(projectReqFields)
+	projectReq.Header.Add("Bearer", testJwt)
+
+	projectRes := executeRequest(projectReq, db)
+
+	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
+	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink))
+}
+
+// Test requests to /project/add/ with proper authentication and input
+func TestProjectRegOK(t *testing.T) {
 	// Set up a local test database path
-	os.Setenv("DEV", "true")
-	os.Setenv("DEV_DB_PATH", "testDB.db")
-	db, _ := utils.GetDB()
-	_ = utils.MigrateModels(db)
-	// Remove the test database once used
-	defer os.Unsetenv("DEV_DB_PATH")
-	defer os.Remove("testDB.db")
+	db := setTestDB()
+	defer unsetTestDB()
 
 	// Generate a jwt secret key for testing
-	rand.Seed(time.Now().UnixMilli())
-
-	os.Setenv("JWT_SECRET_KEY", fmt.Sprintf("testkey%d", rand.Int()))
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
 
 	// Register a test mentor
-	testUsername := fmt.Sprintf("testuser%d", rand.Int())
+	testUsername := getTestUsername()
 	testLoginFields := utils.LoginJwtFields{
 		Username: testUsername,
 	}
@@ -135,54 +152,24 @@ func TestProjectOK(t *testing.T) {
 		Username: testUsername,
 		Email:    "testuser@example.com",
 	}
-	mentorReqBody, _ := json.Marshal(mentorReqFields)
 
-	mentorReq, _ := http.NewRequest(
-		"POST",
-		"/mentor/form/",
-		bytes.NewReader(mentorReqBody),
-	)
+	mentorReq := createMentorRegRequest(&mentorReqFields)
 	mentorReq.Header.Add("Bearer", testJwt)
 	_ = executeRequest(mentorReq, db)
 
-	// --- TEST NEW PROJECT REGISTRATION ---
-	projectReqFields := controllers.RegisterProjectReqFields{
-		Name:                    "YANGJF",
-		Description:             "Yet another next-gen Javascript framework.",
-		Tags:                    "next-gen, javascript, framework",
-		MentorUsername:          testUsername,
-		SecondaryMentorUsername: "",
-		RepoLink:                "https://xkcd.com/927/",
-		ComChannel:              "com-channel",
-		ReadmeURL:               "readme",
-	}
-
-	projectReqBody, _ := json.Marshal(projectReqFields)
-
-	projectReq, _ := http.NewRequest(
-		"POST",
-		"/project/add/",
-		bytes.NewReader(projectReqBody),
+	// New project registration test
+	t.Run(
+		"Test: new project registration.",
+		func(t *testing.T) {
+			tProjectRegNew(db, testUsername, testJwt, t)
+		},
 	)
-	projectReq.Header.Add("Bearer", testJwt)
 
-	projectRes := executeRequest(projectReq, db)
-
-	expectStatusCodeToBe(t, projectRes, http.StatusOK)
-	expectResponseBodyToBe(t, projectRes, "Success.")
-	// --- TEST NEW PROJECT REGISTRATION ---
-
-	// --- TEST EXISTING PROJECT REGISTRATION ---
-	projectReq, _ = http.NewRequest(
-		"POST",
-		"/project/add/",
-		bytes.NewReader(projectReqBody),
+	// Existing project registration test
+	t.Run(
+		"Test: existing project registration.",
+		func(t *testing.T) {
+			tProjectRegExisting(db, testUsername, testJwt, t)
+		},
 	)
-	projectReq.Header.Add("Bearer", testJwt)
-
-	projectRes = executeRequest(projectReq, db)
-
-	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
-	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink))
-	// --- TEST EXISTING PROJECT REGISTRATION ---
 }
