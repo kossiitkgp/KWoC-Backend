@@ -22,6 +22,7 @@ type FetchProjProject struct {
 	Tags            string          `json:"tags"`
 	RepoLink        string          `json:"repo_link"`
 	ComChannel      string          `json:"com_channel"`
+	ReadmeURL       string          `json:"readme_url"`
 	Mentor          FetchProjMentor `json:"mentor"`
 	SecondaryMentor FetchProjMentor `json:"secondary_mentor"`
 }
@@ -42,6 +43,7 @@ func newFetchProjProject(project *models.Project) FetchProjProject {
 		Tags:            project.Tags,
 		RepoLink:        project.RepoLink,
 		ComChannel:      project.ComChannel,
+		ReadmeURL:       project.README,
 		Mentor:          newFetchProjMentor(&project.Mentor),
 		SecondaryMentor: newFetchProjMentor(&project.SecondaryMentor),
 	}
@@ -100,7 +102,7 @@ func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
 		Where("id = ?", proj_id).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id", "readme").
 		First(&project)
 
 	if tx.Error != nil {
