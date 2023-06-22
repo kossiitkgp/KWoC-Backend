@@ -16,6 +16,7 @@ type FetchProjMentor struct {
 	Username string `json:"username"`
 }
 type FetchProjProject struct {
+	Id              uint            `json:"id"`
 	Name            string          `json:"name"`
 	Desc            string          `json:"desc"`
 	Tags            string          `json:"tags"`
@@ -35,6 +36,7 @@ func newFetchProjMentor(mentor *models.Mentor) FetchProjMentor {
 }
 func newFetchProjProject(project *models.Project) FetchProjProject {
 	return FetchProjProject{
+		Id:              project.ID,
 		Name:            project.Name,
 		Desc:            project.Desc,
 		Tags:            project.Tags,
@@ -56,7 +58,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Select("name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {
@@ -98,7 +100,7 @@ func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
 		Where("id = ?", proj_id).
-		Select("name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
 		First(&project)
 
 	if tx.Error != nil {
