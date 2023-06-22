@@ -34,13 +34,19 @@ func main() {
 		log.Info().Msgf("Successfully loaded environment variables from %s.", *envFile)
 	}
 
-	mig_err := utils.MigrateModels()
+	db, db_err := utils.GetDB()
+
+	if db_err != nil {
+		log.Fatal().Err(db_err).Msg("Error connecting to the database.")
+	}
+
+	mig_err := utils.MigrateModels(db)
 	if mig_err != nil {
 		log.Fatal().Err(mig_err).Msg("Database migration error.")
 	}
 
 	log.Info().Msg("Creating mux router")
-	router := server.NewRouter()
+	router := server.NewRouter(db)
 
 	port := os.Getenv("BACKEND_PORT")
 	if port == "" {
@@ -56,7 +62,9 @@ func main() {
 
 	// Handling INTERRUPT signal for cleanup in a new goroutine.
 	// This is not necessary, but good for log keeping
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
+	defer close(c)
+
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
@@ -65,7 +73,11 @@ func main() {
 	}()
 
 	log.Info().Msg("Starting server on port : " + port)
-	http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(":"+port, router)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error starting the server.")
+	}
 }
 
 func cleanup() {

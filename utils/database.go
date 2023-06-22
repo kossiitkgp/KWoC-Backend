@@ -6,7 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/kossiitkgp/kwoc-db-models/models"
+	"kwoc-backend/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -14,12 +14,7 @@ import (
 )
 
 // Initial database model migration
-func MigrateModels() error {
-	db, err := GetDB()
-	if err != nil {
-		return err
-	}
-
+func MigrateModels(db *gorm.DB) error {
 	student_mig_err := db.AutoMigrate(&models.Student{})
 	if student_mig_err != nil {
 		log.Err(student_mig_err).Msg("Students table automigrate error.")
@@ -70,7 +65,12 @@ func GetDB() (db *gorm.DB, err error) {
 
 		dialector = postgres.Open(dsn)
 	} else {
-		dialector = sqlite.Open("devDB.db")
+		devDbPath := os.Getenv("DEV_DB_PATH")
+		if devDbPath == "" {
+			devDbPath = "devDB.db"
+		}
+
+		dialector = sqlite.Open(devDbPath)
 	}
 
 	db, err = gorm.Open(dialector, &gorm.Config{})

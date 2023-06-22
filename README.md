@@ -39,26 +39,33 @@
 ### File Structure
 ```
 ├── cmd
-│   └── backend.go
+│   ├── backend.go
 │   └── ...
 ├── controllers
-│   └── index.go
+│   ├── index.go
 │   └── ...
 ├── server
 │   ├── router.go
-│   └── routes.go
+│   ├── routes.go
 │   └── ...
-└── utils
-    └── logger.go
+├── models
+│   ├── mentors.go
+│   └── ...
+├── utils
+│   ├── database.go
+│   └── ...
+└── middleware
+    ├── logger.go
     └── ...
 ```
 
 - `cmd` : Contains the entrypoint of the backend (main package).
 - `controllers` : Handler functions for the routes defined.
 - `server` : Contains the router logic and routes.
-- `utils` : Contains misc functions like logger.
+- `models` : Contains KWoC database models.
+- `utils` : Contains misc functions like database utils.
+- `middleware`: Contains all middleware.
 
-- For middlewares, please create and use `middleware` directory.
 - If there are any css,html or other static files, use `static` directory.
 - Do not keep many functions in utils, if they can be grouped in a package, then do so.
 
@@ -69,12 +76,23 @@ The following command-line arguments are accepted by `cmd/backend.go`. `--argume
 
 ### Environment Variables
 Environment variables can be set using a `.env` (See [Command-Line Arguments](#command-line-arguments) to use a different file) file. The following variables are used. (See the `.env.template` file for an example)
-- `DEV`: When set to `true`, uses a local sqlite3 database from a file `devDB.db`.
+- `DEV`: When set to `true`, uses a local sqlite3 database from a file `devDB.db` (or `DEV_DB_PATH` if set).
+- `DEV_DB_PATH`: The path to a local sqlite3 database file to be used in development. (Valid when `DEV` is set to `true`) (NOTE: `testDB.db` is used for testing)
 - `DATABASE_USERNAME`: The username used to log into the database. (Valid when `DEV` is not set to `true`)
 - `DATABASE_PASSWORD`: The password used to log into the database. (valid when `DEV` is not set to `true`)
 - `DATABASE_NAME`: The name of the database to log into. (Valid when `DEV` is not set to `true`)
 - `DATABASE_HOST`: The host/url used to log into the database. (Valid when `DEV` is not set to `true`)
 - `DATABASE_PORT`: The port used to log into the database. (Valid when `DEV` is not set to `true`)
+- `GITHUB_OAUTH_CLIENT_ID`: The client id used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `GITHUB_OAUTH_CLIENT_SECRET`: The client secret used for Github OAuth. (See [Github OAuth](#github-oauth))
+- `JWT_SECRET_KEY`: The secret key used to create a JWT token. (It can be a randomly generated string)
+- `JWT_VALIDITY_TIME`: The amount of time (in hours) for which the generated JWT tokens should be valid.
 
 ### Github OAuth
+KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.
 
+To set up the KWoC server, a Github OAuth application has to be created and the client id and secret has to be set in the [environment variables](#environment-variables).
+
+- Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
+- Set the Homepage URL to `https://kwoc.kossiitkgp.org` and the authorization callback URL to `https://kwoc.kossiitkgp.org/oauth/` in the production application.
+- Copy the client ID and the client secret (this should NEVER be made public) and set the `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` [environment variables](#environment-variables) to these values.

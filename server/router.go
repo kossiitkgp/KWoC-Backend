@@ -2,40 +2,35 @@
 package server
 
 import (
+	"kwoc-backend/middleware"
 	"kwoc-backend/utils"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 // Setup up mux routes and router
-func NewRouter() *mux.Router {
-
+func NewRouter(db *gorm.DB) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Warn().Msgf(
-			"%s %s Not Found",
-			r.Method,
-			r.RequestURI,
-		)
+		utils.LogWarn(r, "404 Not Found.")
 	})
 
 	router.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Warn().Msgf(
-			"%s %s Method Not Allowed",
-			r.Method,
-			r.RequestURI,
-		)
+		utils.LogWarn(r, "405 Method Not Allowed.")
 	})
 
-	// iterate over rall routes
+	// iterate over all routes
+	app := &middleware.App{Db: db}
+	routes := getRoutes(app)
+
 	for _, route := range routes {
 		var handler http.Handler
 
 		// logger middleware to log incoming requests
 		handler = route.HandlerFunc
-		handler = utils.Logger(handler, route.Name)
+		handler = middleware.Logger(handler, route.Name)
 
 		// register route
 		router.
