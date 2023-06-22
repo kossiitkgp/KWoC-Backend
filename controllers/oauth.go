@@ -28,6 +28,9 @@ type OAuthResBodyFields struct {
 	Jwt       string `json:"jwt"`
 }
 
+var OAUTH_TYPE_STUDENT string = "student"
+var OAUTH_TYPE_MENTOR string = "mentor"
+
 func OAuth(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -67,7 +70,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Check if the user has already registered
 	var isNewUser bool = false
 
-	if reqFields.Type == "student" {
+	if reqFields.Type == OAUTH_TYPE_STUDENT {
 		student := models.Student{}
 		db.
 			Table("students").
@@ -75,7 +78,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 			First(&student)
 
 		isNewUser = student.Username != userInfo.Username
-	} else if reqFields.Type == "mentor" {
+	} else if reqFields.Type == OAUTH_TYPE_MENTOR {
 		mentor := models.Mentor{}
 		db.
 			Table("mentors").
