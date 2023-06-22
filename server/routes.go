@@ -55,7 +55,7 @@ func getRoutes(app *middleware.App) []Route {
 			"Project Registration",
 			"POST",
 			"/project/add/",
-			middleware.WithLogin(dbHandler.RegisterProject),
+			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
 		},
 	}
 }
