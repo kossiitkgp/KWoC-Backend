@@ -62,7 +62,6 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the project already exists
-	// Check if the student already exists in the db
 	project := models.Project{}
 	tx := db.
 		Table("projects").
