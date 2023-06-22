@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"kwoc-backend/middleware"
 	"net/http"
 	"time"
 
@@ -22,8 +23,9 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 // HealthCheck checks the server and database status.
-func (dbHandler *DBHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	db := dbHandler.db
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
 
 	err := db.Exec("SELECT 1").Error
 	if err != nil {

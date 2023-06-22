@@ -43,7 +43,7 @@ func getRoutes(app *middleware.App) []Route {
 			"HealthCheck",
 			"GET",
 			"/healthcheck/",
-			dbHandler.HealthCheck,
+			middleware.WrapApp(app, controllers.HealthCheck),
 		},
 		{
 			"Ping",
