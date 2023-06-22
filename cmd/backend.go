@@ -63,6 +63,8 @@ func main() {
 	// Handling INTERRUPT signal for cleanup in a new goroutine.
 	// This is not necessary, but good for log keeping
 	c := make(chan os.Signal, 1)
+	defer close(c)
+
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
