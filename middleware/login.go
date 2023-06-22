@@ -8,7 +8,7 @@ import (
 
 type LoginCtxKey string
 
-var LOGIN_CTX_USERNAME_KEY LoginCtxKey = "login_username"
+const LOGIN_CTX_USERNAME_KEY LoginCtxKey = "login_username"
 
 // Session login middleware for incoming requests
 func WithLogin(inner http.HandlerFunc) http.HandlerFunc {

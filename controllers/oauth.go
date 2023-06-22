@@ -28,8 +28,8 @@ type OAuthResBodyFields struct {
 	Jwt       string `json:"jwt"`
 }
 
-var OAUTH_TYPE_STUDENT string = "student"
-var OAUTH_TYPE_MENTOR string = "mentor"
+const OAUTH_TYPE_STUDENT string = "student"
+const OAUTH_TYPE_MENTOR string = "mentor"
 
 func OAuth(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)

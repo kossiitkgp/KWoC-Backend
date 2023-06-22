@@ -14,7 +14,7 @@ type App struct {
 
 type AppCtxKey string
 
-var APP_CTX_KEY AppCtxKey = "app"
+const APP_CTX_KEY AppCtxKey = "app"
 
 func WrapApp(app *App, handler http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
