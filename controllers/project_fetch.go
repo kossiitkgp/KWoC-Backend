@@ -61,7 +61,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {
@@ -103,7 +103,7 @@ func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
 		Where("id = ?", proj_id).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id", "readme").
+		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
 		First(&project)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
