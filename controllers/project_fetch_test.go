@@ -21,17 +21,17 @@ func createFetchAllProjRequest() *http.Request {
 	return req
 }
 
-func createFetchProjDetailsRequest(id uint) *http.Request {
+func createFetchProjDetailsRequest(id any) *http.Request {
 	req, _ := http.NewRequest(
 		"GET",
-		fmt.Sprintf("/project/%d", id),
+		fmt.Sprintf("/projects/%v", id),
 		nil,
 	)
 
 	return req
 }
 
-func generateTestProjects(numProjects int, randomizeProjectStatus bool) []models.Project {
+func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultProjectStatus bool) []models.Project {
 	rand.Seed(time.Now().Unix())
 
 	var projects []models.Project = make([]models.Project, 0)
@@ -42,7 +42,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool) []models
 		if randomizeProjectStatus {
 			projectStatus = rand.Intn(10) > 5
 		} else {
-			projectStatus = true
+			projectStatus = defaultProjectStatus
 		}
 
 		projects = append(
@@ -75,9 +75,9 @@ func TestFetchAllProjects(t *testing.T) {
 	db := setTestDB()
 	defer unsetTestDB()
 
-	testProjects := generateTestProjects(10, true)
+	testProjects := generateTestProjects(10, true, true)
 
-	db.Table("projects").Create(testProjects)
+	_ = db.Table("projects").Create(testProjects)
 
 	req := createFetchAllProjRequest()
 	res := executeRequest(req, db)
@@ -111,11 +111,73 @@ func TestFetchAllProjects(t *testing.T) {
 
 		if !areProjectsEquivalent(&proj, &testProj) {
 			areAllProjectsEquivalent = false
-			return
+			break
 		}
 	}
 
 	if !areAllProjectsEquivalent {
 		t.Fatalf("Projects returned by the /project/ endpoint are incorrect.")
+	}
+}
+
+// Try fetching a project with an invalid id
+func TestFetchProjDetailsInvalidID(t *testing.T) {
+	req := createFetchProjDetailsRequest("kekw")
+	res := executeRequest(req, nil)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, "Error parsing project id.")
+}
+
+// Try fetching a project that does not exist
+func TestFetchProjDetailsDNE(t *testing.T) {
+	db := setTestDB()
+	defer unsetTestDB()
+
+	testProjId := rand.Int()
+
+	req := createFetchProjDetailsRequest(testProjId)
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Project with id `%d` does not exist.", testProjId))
+}
+
+// Try to fetch an unapproved project
+func TestFetchProjDetailsUnapproved(t *testing.T) {
+	db := setTestDB()
+	defer unsetTestDB()
+
+	testProj := generateTestProjects(1, false, false)[0]
+
+	_ = db.Table("projects").Create(&testProj)
+
+	req := createFetchProjDetailsRequest(1)
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Project with id `%d` does not exist.", 1))
+}
+
+// Try to fetch a valid project
+func TestFetchProjDetailsOK(t *testing.T) {
+	db := setTestDB()
+	defer unsetTestDB()
+
+	testProjects := generateTestProjects(5, false, true)
+
+	_ = db.Table("projects").Create(testProjects)
+
+	for i, proj := range testProjects {
+		req := createFetchProjDetailsRequest(i + 1)
+		res := executeRequest(req, db)
+
+		var resProj controllers.FetchProjProject
+
+		json.NewDecoder(res.Body).Decode(&resProj)
+
+		if !areProjectsEquivalent(&resProj, &proj) {
+			t.Fatalf("/projects/%d returned incorrect information.", i+1)
+		}
 	}
 }
