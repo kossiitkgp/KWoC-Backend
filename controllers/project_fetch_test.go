@@ -174,7 +174,7 @@ func TestFetchProjDetailsOK(t *testing.T) {
 
 		var resProj controllers.FetchProjProject
 
-		json.NewDecoder(res.Body).Decode(&resProj)
+		_ = json.NewDecoder(res.Body).Decode(&resProj)
 
 		if !areProjectsEquivalent(&resProj, &proj) {
 			t.Fatalf("/projects/%d returned incorrect information.", i+1)
