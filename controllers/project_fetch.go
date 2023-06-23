@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 type FetchProjMentor struct {
@@ -105,8 +106,9 @@ func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
 		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "mentor_id", "secondary_mentor_id", "readme").
 		First(&project)
 
-	if tx.Error != nil {
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, err, "Error fetching project from the database.", http.StatusInternalServerError)
+		return
 	}
 
 	if int(project.ID) != proj_id {
