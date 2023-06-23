@@ -14,7 +14,7 @@ import (
 func createFetchAllProjRequest() *http.Request {
 	req, _ := http.NewRequest(
 		"GET",
-		"/projects/",
+		"/project/",
 		nil,
 	)
 
@@ -24,7 +24,7 @@ func createFetchAllProjRequest() *http.Request {
 func createFetchProjDetailsRequest(id any) *http.Request {
 	req, _ := http.NewRequest(
 		"GET",
-		fmt.Sprintf("/projects/%v", id),
+		fmt.Sprintf("/project/%v", id),
 		nil,
 	)
 
