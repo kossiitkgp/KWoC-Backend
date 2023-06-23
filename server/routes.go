@@ -75,5 +75,11 @@ func getRoutes(app *middleware.App) []Route {
 			"/project/{id}",
 			middleware.WrapApp(app, controllers.FetchProjectDetails),
 		},
+		{
+			"Update Project Details",
+			"PUT",
+			"/project/update/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.UpdateProject)),
+		},
 	}
 }
