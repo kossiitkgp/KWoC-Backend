@@ -16,6 +16,7 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("pong"))
 	if err != nil {
 		utils.LogErr(r, err, "Could not respond to Ping")
+		return
 	}
 
 	elapsed := fmt.Sprint(time.Since(start))
@@ -39,6 +40,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write([]byte("OK"))
 	if err != nil {
 		utils.LogErr(r, err, "Could not respond to HealthCheck")
+		return
 	}
 
 	utils.LogInfo(r, "Healthcheck request is OK")
