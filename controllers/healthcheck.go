@@ -4,8 +4,8 @@ import (
 	"kwoc-backend/middleware"
 	"net/http"
 	"time"
-
-	"github.com/rs/zerolog/log"
+	"kwoc-backend/utils"
+	// "github.com/rs/zerolog/log"
 )
 
 // Ping responds with "pong" and returns the latency.
@@ -15,11 +15,14 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("pong"))
 	if err != nil {
-		log.Err(err).Msg("Could not respond to Ping")
+		// log.Err(err).Msg("Could not respond to Ping")
+		utils.LogErr(r, err, "Could not respond to Ping")
 	}
 
 	elapsed := time.Since(start)
-	log.Info().Str("latency", elapsed.String()).Msg("Ping request processed")
+	// log.Info().Str("latency", elapsed.String()).Msg("Ping request processed")
+	Info := "latency: " + string(elapsed) + " Ping request processed"
+	utils.LogInfo(r, Info)
 }
 
 // HealthCheck checks the server and database status.
@@ -29,7 +32,8 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 	err := db.Exec("SELECT 1").Error
 	if err != nil {
-		log.Err(err).Msg("Could not ping database")
+		// log.Err(err).Msg("Could not ping database")
+		utils.LogErr(r, err, "Could not ping database")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -37,8 +41,10 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("OK"))
 	if err != nil {
-		log.Err(err).Msg("Could not respond to HealthCheck")
+		// log.Err(err).Msg("Could not respond to HealthCheck")
+		utils.LogErr(r, err, "Could not respond to HealthCheck")
 	}
 
-	log.Info().Msg("Healthcheck request is OK")
+	// log.Info().Msg("Healthcheck request is OK")
+	utils.LogInfo(r, "Healthcheck request is OK")
 }
