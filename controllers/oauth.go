@@ -106,18 +106,5 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		Jwt:       jwtString,
 	}
 
-	resJson, err := json.Marshal(resFields)
-	if err != nil {
-		utils.LogErrAndRespond(r, w, err, "Error generating response JSON.", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(resJson)
-
-	if err != nil {
-		utils.LogErr(r, err, "Error writing the response.")
-
-		return
-	}
+	utils.RespondWithJson(r, w, resFields)
 }
