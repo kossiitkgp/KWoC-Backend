@@ -18,7 +18,7 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	}
 
 	elapsed := time.Since(start)
-	Info := "latency: " + string(elapsed) + " Ping request processed"
+	const Info string = "latency: " + fmt.Sprint(elapsed) + " Ping request processed"
 	utils.LogInfo(r, Info)
 }
 
