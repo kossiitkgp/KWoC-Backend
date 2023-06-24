@@ -19,9 +19,8 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	elapsed := fmt.Sprint(time.Since(start))
-	var Info string = "latency: " + elapsed + " Ping request processed"
-	utils.LogInfo(r, Info)
+	elapsed := time.Since(start)
+	utils.LogInfo(r, fmt.Sprintf("latency: %dns Ping request processed", elapsed))
 }
 
 // HealthCheck checks the server and database status.
@@ -31,8 +30,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 	err := db.Exec("SELECT 1").Error
 	if err != nil {
-		utils.LogErr(r, err, "Could not ping database")
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.LogErrAndRespond(r, w, err, "Could not ping database", http.StatusInternalServerError)
 		return
 	}
 
