@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"kwoc-backend/middleware"
 	"kwoc-backend/utils"
@@ -24,9 +23,8 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	db := app.Db
 	var reqFields = RegisterStudentReqFields{}
 
-	err := json.NewDecoder(r.Body).Decode(&reqFields)
+	err := utils.DecodeJSONBody(r, w, &reqFields)
 	if err != nil {
-		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		return
 	}
 

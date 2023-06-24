@@ -36,10 +36,8 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	db := app.Db
 
 	var reqFields = OAuthReqBodyFields{}
-	err := json.NewDecoder(r.Body).Decode(&reqFields)
-
+	err := utils.DecodeJSONBody(r, w, &reqFields)
 	if err != nil {
-		utils.LogErrAndRespond(r, w, err, "Error parsing JSON body parameters.", http.StatusBadRequest)
 		return
 	}
 
