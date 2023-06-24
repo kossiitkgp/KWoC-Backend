@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	"kwoc-backend/middleware"
+	"kwoc-backend/utils"
 	"net/http"
 	"time"
-	"kwoc-backend/utils"
 )
 
 // Ping responds with "pong" and returns the latency.
@@ -17,8 +18,8 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 		utils.LogErr(r, err, "Could not respond to Ping")
 	}
 
-	elapsed := time.Since(start)
-	const Info string = "latency: " + fmt.Sprint(elapsed) + " Ping request processed"
+	elapsed := fmt.Sprint(time.Since(start))
+	var Info string = "latency: " + elapsed + " Ping request processed"
 	utils.LogInfo(r, Info)
 }
 
