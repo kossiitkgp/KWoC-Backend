@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+func DecodeJSONBody(r *http.Request, data any) error {
+	err := json.NewDecoder(r.Body).Decode(data)
+	defer r.Body.Close()
+	return err
+}
+
 func RespondWithJson(r *http.Request, w http.ResponseWriter, response any) {
 	resJson, err := json.Marshal(response)
 

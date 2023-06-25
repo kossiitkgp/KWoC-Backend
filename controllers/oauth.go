@@ -2,7 +2,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"kwoc-backend/middleware"
 	"kwoc-backend/utils"
 	"net/http"
@@ -36,10 +35,9 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	db := app.Db
 
 	var reqFields = OAuthReqBodyFields{}
-	err := json.NewDecoder(r.Body).Decode(&reqFields)
-
+	err := utils.DecodeJSONBody(r, &reqFields)
 	if err != nil {
-		utils.LogErrAndRespond(r, w, err, "Error parsing JSON body parameters.", http.StatusBadRequest)
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		return
 	}
 
