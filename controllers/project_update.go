@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"kwoc-backend/middleware"
 	"kwoc-backend/models"
@@ -39,7 +38,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	reqFields := UpdateProjectReqFields{}
 
-	err := json.NewDecoder(r.Body).Decode(&reqFields)
+	err := utils.DecodeJSONBody(r, &reqFields)
 	if err != nil {
 		utils.LogErrAndRespond(r, w, err, "Error decoding request JSON body.", http.StatusBadRequest)
 		return
