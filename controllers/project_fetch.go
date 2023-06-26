@@ -107,9 +107,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, err, "Error fetching project from the database.", http.StatusInternalServerError)
 		return
-	}
-
-	if int(project.ID) != project_id {
+	} else if tx.Error == gorm.ErrRecordNotFound {
 		utils.LogWarnAndRespond(
 			r,
 			w,
