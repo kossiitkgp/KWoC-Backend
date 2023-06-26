@@ -55,7 +55,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		)
 
 		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "Login username and given username do not match.")
+		fmt.Fprint(w, "Login username and mentor username do not match.")
 		return
 	}
 
