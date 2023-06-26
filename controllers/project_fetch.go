@@ -84,7 +84,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proj_id, err := strconv.Atoi(reqParams["id"])
+	project_id, err := strconv.Atoi(reqParams["id"])
 
 	if err != nil {
 		utils.LogErrAndRespond(r, w, err, "Error parsing project id.", http.StatusBadRequest)
@@ -100,7 +100,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Where("id = ?", proj_id).
+		Where("id = ?", project_id).
 		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
 		First(&project)
 
@@ -109,11 +109,11 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if int(project.ID) != proj_id {
+	if int(project.ID) != project_id {
 		utils.LogWarnAndRespond(
 			r,
 			w,
-			fmt.Sprintf("Project with id `%d` does not exist.", proj_id),
+			fmt.Sprintf("Project with id `%d` does not exist.", project_id),
 			http.StatusBadRequest,
 		)
 		return
