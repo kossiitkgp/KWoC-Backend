@@ -12,41 +12,39 @@ import (
 	"gorm.io/gorm"
 )
 
-type FetchProjMentor struct {
+type Mentor struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 }
-type FetchProjProject struct {
-	Id              uint            `json:"id"`
-	Name            string          `json:"name"`
-	Desc            string          `json:"desc"`
-	Tags            string          `json:"tags"`
-	RepoLink        string          `json:"repo_link"`
-	ComChannel      string          `json:"com_channel"`
-	ReadmeURL       string          `json:"readme_url"`
-	Mentor          FetchProjMentor `json:"mentor"`
-	SecondaryMentor FetchProjMentor `json:"secondary_mentor"`
+type Project struct {
+	Id              uint   `json:"id"`
+	Name            string `json:"name"`
+	Desc            string `json:"desc"`
+	Tags            string `json:"tags"`
+	RepoLink        string `json:"repo_link"`
+	ComChannel      string `json:"com_channel"`
+	ReadmeURL       string `json:"readme_url"`
+	Mentor          Mentor `json:"mentor"`
+	SecondaryMentor Mentor `json:"secondary_mentor"`
 }
 
-type FetchAllProjRes []FetchProjProject
-
-func newFetchProjMentor(mentor *models.Mentor) FetchProjMentor {
-	return FetchProjMentor{
-		Name:     mentor.Name,
-		Username: mentor.Username,
+func newMentor(dbMentor *models.Mentor) Mentor {
+	return Mentor{
+		Name:     dbMentor.Name,
+		Username: dbMentor.Username,
 	}
 }
-func newFetchProjProject(project *models.Project) FetchProjProject {
-	return FetchProjProject{
-		Id:              project.ID,
-		Name:            project.Name,
-		Desc:            project.Desc,
-		Tags:            project.Tags,
-		RepoLink:        project.RepoLink,
-		ComChannel:      project.ComChannel,
-		ReadmeURL:       project.README,
-		Mentor:          newFetchProjMentor(&project.Mentor),
-		SecondaryMentor: newFetchProjMentor(&project.SecondaryMentor),
+func newProject(dbProject *models.Project) Project {
+	return Project{
+		Id:              dbProject.ID,
+		Name:            dbProject.Name,
+		Desc:            dbProject.Desc,
+		Tags:            dbProject.Tags,
+		RepoLink:        dbProject.RepoLink,
+		ComChannel:      dbProject.ComChannel,
+		ReadmeURL:       dbProject.README,
+		Mentor:          newMentor(&dbProject.Mentor),
+		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
 	}
 }
 
@@ -69,16 +67,16 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response FetchAllProjRes = make(FetchAllProjRes, 0)
+	var response []Project = make([]Project, 0)
 
 	for _, project := range projects {
-		response = append(response, newFetchProjProject(&project))
+		response = append(response, newProject(&project))
 	}
 
 	utils.RespondWithJson(r, w, response)
 }
 
-func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
+func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := mux.Vars(r)
 
 	if reqParams["id"] == "" {
@@ -121,6 +119,6 @@ func FetchProjDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := newFetchProjProject(&project)
+	response := newProject(&project)
 	utils.RespondWithJson(r, w, response)
 }

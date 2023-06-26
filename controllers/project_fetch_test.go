@@ -62,7 +62,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 	return projects
 }
 
-func areProjectsEquivalent(proj1 *controllers.FetchProjProject, proj2 *models.Project) bool {
+func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bool {
 	return proj1.Name == proj2.Name &&
 		proj1.Desc == proj2.Desc &&
 		proj1.Tags == proj2.Tags &&
@@ -82,7 +82,7 @@ func TestFetchAllProjects(t *testing.T) {
 	req := createFetchAllProjRequest()
 	res := executeRequest(req, db)
 
-	var resProjects []controllers.FetchProjProject
+	var resProjects []controllers.Project
 	_ = json.NewDecoder(res.Body).Decode(&resProjects)
 
 	// Check if any projects with status false (not approved) are returned in the request
@@ -172,7 +172,7 @@ func TestFetchProjDetailsOK(t *testing.T) {
 		req := createFetchProjDetailsRequest(i + 1)
 		res := executeRequest(req, db)
 
-		var resProj controllers.FetchProjProject
+		var resProj controllers.Project
 
 		_ = json.NewDecoder(res.Body).Decode(&resProj)
 
