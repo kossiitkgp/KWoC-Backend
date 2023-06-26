@@ -18,7 +18,7 @@ func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *ht
 
 	req, _ := http.NewRequest(
 		"POST",
-		"/project/add/",
+		"/project/",
 		bytes.NewReader(reqBody),
 	)
 
@@ -38,17 +38,17 @@ func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername s
 	}
 }
 
-// Test unauthenticated request to /project/add/
+// Test unauthenticated request to /project/
 func TestProjectRegNoAuth(t *testing.T) {
-	testRequestNoAuth(t, "POST", "/project/add/")
+	testRequestNoAuth(t, "POST", "/project/")
 }
 
-// Test request to /project/add/ with invalid jwt
+// Test request to /project/ with invalid jwt
 func TestProjectRegInvalidAuth(t *testing.T) {
-	testRequestInvalidAuth(t, "POST", "/project/add/")
+	testRequestInvalidAuth(t, "POST", "/project/")
 }
 
-// Test request to /project/add/ with session hijacking attempt
+// Test request to /project/ with session hijacking attempt
 func TestProjectRegSessionHijacking(t *testing.T) {
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -69,7 +69,7 @@ func TestProjectRegSessionHijacking(t *testing.T) {
 	expectResponseBodyToBe(t, res, "Login username and mentor username do not match.")
 }
 
-// Test a request to /project/add/ with non-existent mentors
+// Test a request to /project/ with non-existent mentors
 func TestProjectRegInvalidMentor(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
@@ -98,7 +98,7 @@ func TestProjectRegInvalidMentor(t *testing.T) {
 	// --- TEST PROJECT REGISTRATION WITH INVALID PRIMARY MENTOR ---
 }
 
-// Test a new project registration request to /project/add/ with proper authentication and input
+// Test a new project registration request to /project/ with proper authentication and input
 func tProjectRegNew(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
 	projectReqFields := createTestProjectRegFields(testUsername, "")
 
@@ -111,7 +111,7 @@ func tProjectRegNew(db *gorm.DB, testUsername string, testJwt string, t *testing
 	expectResponseBodyToBe(t, projectRes, "Success.")
 }
 
-// Test an existing project registration request to /project/add/ with proper authentication and input
+// Test an existing project registration request to /project/ with proper authentication and input
 func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
 	projectReqFields := createTestProjectRegFields(testUsername, "")
 
@@ -130,7 +130,7 @@ func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *te
 	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink))
 }
 
-// Test requests to /project/add/ with proper authentication and input
+// Test requests to /project/ with proper authentication and input
 func TestProjectRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
