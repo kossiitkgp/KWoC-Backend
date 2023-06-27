@@ -140,7 +140,7 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 		utils.LogWarnAndRespond(
 			r,
 			w,
-			fmt.Sprintf("Student `%s` does not exists.", student.Username),
+			fmt.Sprintf("Student `%s` does not exists.", reqFields.Username),
 			http.StatusBadRequest,
 		)
 		return
