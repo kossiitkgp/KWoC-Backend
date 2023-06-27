@@ -34,6 +34,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
 		},
 		{
+			"Student Registration",
+			"POST",
+			"/student/bloglink/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.StudentBlogLink)),
+		},
+		{
 			"Mentor Registration",
 			"POST",
 			"/mentor/form/",
