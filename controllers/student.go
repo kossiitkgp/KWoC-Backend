@@ -18,9 +18,9 @@ type RegisterStudentReqFields struct {
 	College  string `json:"college"`
 }
 
-type StudentBlogLinkFields struct {
+type StudentBlogLinkReqFields struct {
 	Username string `json:"username"`
-	BlogLink string `json:"bloglink"`
+	BlogLink string `json:"blog_link"`
 }
 
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +96,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
-	var reqFields = StudentBlogLinkFields{}
+	var reqFields = StudentBlogLinkReqFields{}
 
 	err := utils.DecodeJSONBody(r, &reqFields)
 	if err != nil {

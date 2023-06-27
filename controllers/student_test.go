@@ -123,7 +123,7 @@ func TestStudentRegOK(t *testing.T) {
 	)
 }
 
-func createStudentBlogLinkRequest(reqFields *controllers.StudentBlogLinkFields) *http.Request {
+func createStudentBlogLinkRequest(reqFields *controllers.StudentBlogLinkReqFields) *http.Request {
 	reqBody, _ := json.Marshal(reqFields)
 
 	req, _ := http.NewRequest(
@@ -154,7 +154,7 @@ func TestStudentBloglinkSessionHijacking(t *testing.T) {
 
 	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
-	reqFields := controllers.StudentBlogLinkFields{Username: "anotheruser", BlogLink: "https://grugbrain.dev"}
+	reqFields := controllers.StudentBlogLinkReqFields{Username: "anotheruser", BlogLink: "https://grugbrain.dev"}
 
 	req := createStudentBlogLinkRequest(&reqFields)
 	req.Header.Add("Bearer", someuserJwt)
@@ -180,7 +180,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	_ = executeRequest(req, db)
 
 	// Execute the bloglink request
-	reqFields := controllers.StudentBlogLinkFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
+	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
 	req = createStudentBlogLinkRequest(&reqFields)
 	req.Header.Add("Bearer", testJwt)
 
@@ -198,7 +198,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	// Execute the bloglink request
-	reqFields := controllers.StudentBlogLinkFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
+	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
 	req := createStudentBlogLinkRequest(&reqFields)
 	req.Header.Add("Bearer", testJwt)
 
