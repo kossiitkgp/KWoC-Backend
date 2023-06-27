@@ -135,6 +135,36 @@ func createStudentBlogLinkRequest(reqFields *controllers.StudentBlogLinkFields) 
 	return req
 }
 
+// Test unauthenticated request to /student/bloglink/
+func TestStudentBloglinkNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "POST", "/student/bloglink/")
+}
+
+// Test request to /student/bloglink/ with invalid jwt
+func TestStudentBloglinkInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "POST", "/student/bloglink/")
+}
+
+// Test request to /student/bloglink/ with session hijacking attempt
+func TestStudentBloglinkSessionHijacking(t *testing.T) {
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+
+	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
+
+	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	reqFields := controllers.StudentBlogLinkFields{Username: "anotheruser", BlogLink: "https://grugbrain.dev"}
+
+	req := createStudentBlogLinkRequest(&reqFields)
+	req.Header.Add("Bearer", someuserJwt)
+
+	res := executeRequest(req, nil)
+
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
+}
+
 // Test an existing user request to /student/bloglink/ with proper authentication and input
 func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	// Test login fields
