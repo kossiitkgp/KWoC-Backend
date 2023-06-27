@@ -159,7 +159,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	expectStatusCodeToBe(t, res, http.StatusOK)
 }
 
-// Test an existing user registration request to /student/form/ with proper authentication and input
+// Test a non existing/registered user's request to /student/bloglink/ with proper authentication and input
 func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 	// Test login fields
 	testUsername := getTestUsername()

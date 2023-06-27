@@ -134,9 +134,7 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	student_exists := student.Username == reqFields.Username
-
-	if !student_exists {
+	if tx.Error == gorm.ErrRecordNotFound {
 		utils.LogWarnAndRespond(
 			r,
 			w,
