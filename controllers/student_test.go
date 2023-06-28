@@ -149,6 +149,7 @@ func TestStudentBloglinkInvalidAuth(t *testing.T) {
 func TestStudentBloglinkSessionHijacking(t *testing.T) {
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
 
 	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
 
@@ -187,6 +188,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
+	expectResponseBodyToBe(t, res, "BlogLink successfully updated.")
 }
 
 // Test a non existing/registered user's request to /student/bloglink/ with proper authentication and input
