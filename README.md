@@ -25,6 +25,10 @@
 - Run `./build.sh`. If it doesn't run, make sure it is executable.
 > To view the program as doc, run : `godoc -http=:6060` and checkout at `http://localhost:6060/pkg/kwoc-backend/`
 
+### Setting up pre-commit hook (optional)
+- Check if `golangci-lint` is installed, if not, install using `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3`
+- Run `./setup_hook.sh` (make sure it is executable using `chmod +x setup_hook.sh`)
+
 ### File Naming Convention
 [WIP]
 
