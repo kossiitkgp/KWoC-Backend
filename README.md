@@ -27,11 +27,8 @@
 - Optionally install [Postman](https://www.postman.com/) or a similar tool to test the API endpoints.
 
 ### Building
-[WIP]
-- Please use go 1.19 or check `go.mod` for the required version.
-- Default port is 8080. To change it, set environment variable `BACKEND_PORT` to desired port number.
-- Run `./build.sh`. If it doesn't run, make sure it is executable.
-> To view the program as doc, run : `godoc -http=:6060` and checkout at `http://localhost:6060/pkg/kwoc-backend/`
+- Install all the dependencies using `go mod tidy` or `go mod download`.
+- Run `go build cmd/backend.go` to build the server executable. The executable file will be named `backend`.
 
 ### Setting up pre-commit hook (optional)
 - Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/)
