@@ -14,8 +14,22 @@ import (
 type UpdateProjectReqFields struct {
 	// Id of the project in the database (required)
 	Id uint `json:"id"`
-	// The other fields are common with the registration endpoint
-	RegisterProjectReqFields
+	// Name of the project
+	Name string `json:"name"`
+	// Description for the project
+	Description string `json:"desc"`
+	// List of tags for the project
+	Tags string `json:"tags"`
+	// Mentor's username
+	MentorUsername string `json:"username"`
+	// Secondary mentor's username (if updated)
+	SecondaryMentorUsername string `json:"secondaryMentor"`
+	// Link to the repository of the project
+	RepoLink string `json:"repoLink"`
+	// Link to a communication channel/platform
+	ComChannel string `json:"comChannel"`
+	// Link to the project's README file
+	ReadmeURL string `json:"readme"`
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
