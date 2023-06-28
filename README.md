@@ -30,7 +30,10 @@
 - Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath)
 
 ### File Naming Convention
-[WIP]
+See also [File Structure](#file-structure).
+
+1. Test Files: Tests for a particular `file.go` are placed in a file named `file_test.go` and are placed in the same directory.
+2. Model Files: Database models are placed in the `models` directory. Each file corresponds to one table in the database and the name of the file corresponds with the name of the database table.
 
 ## Project Structure
 [WIP]
