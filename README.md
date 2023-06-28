@@ -74,15 +74,12 @@ See also [File Structure](#file-structure).
     └── ...
 ```
 
-- `cmd` : Contains the entrypoint of the backend (main package).
-- `controllers` : Handler functions for the routes defined.
+- `cmd` : Contains executable files including the entrypoing of the server (`backend.go`).
+- `controllers` : Contains controllers for the endpoints. (See also [Endpoints](#endpoints))
 - `server` : Contains the router logic and routes.
 - `models` : Contains KWoC database models.
 - `utils` : Contains misc functions like database utils.
 - `middleware`: Contains all middleware.
-
-- If there are any css,html or other static files, use `static` directory.
-- Do not keep many functions in utils, if they can be grouped in a package, then do so.
 
 ### Endpoints
 ### Command-Line Arguments
