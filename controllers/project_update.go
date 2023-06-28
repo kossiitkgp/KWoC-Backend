@@ -107,13 +107,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedProj := &models.Project{
-		Name:            reqFields.Name,
-		Desc:            reqFields.Description,
-		Tags:            reqFields.Tags,
-		RepoLink:        reqFields.RepoLink,
-		ComChannel:      reqFields.ComChannel,
-		README:          reqFields.ReadmeURL,
-		SecondaryMentor: secondaryMentor,
+		Name:               reqFields.Name,
+		Desc:               reqFields.Description,
+		Tags:               reqFields.Tags,
+		RepoLink:           reqFields.RepoLink,
+		ComChannel:         reqFields.ComChannel,
+		README:             reqFields.ReadmeURL,
+		SecondaryMentor_id: int32(secondaryMentor.ID),
 	}
 
 	tx = db.
