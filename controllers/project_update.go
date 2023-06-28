@@ -71,10 +71,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
-	}
-
-	project_exists := project.ID == reqFields.Id
-	if !project_exists {
+	} else if tx.Error == gorm.ErrRecordNotFound {
 		utils.LogWarnAndRespond(
 			r,
 			w,
@@ -89,13 +86,21 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	if reqFields.SecondaryMentorUsername != "" {
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
-		if tx.Error != nil && err != gorm.ErrRecordNotFound {
+		if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 			utils.LogErrAndRespond(
 				r,
 				w,
 				err,
 				fmt.Sprintf("Error fetching secondary mentor `%s`.", reqFields.SecondaryMentorUsername),
 				http.StatusInternalServerError,
+			)
+			return
+		} else if tx.Error == gorm.ErrRecordNotFound {
+			utils.LogWarnAndRespond(
+				r,
+				w,
+				fmt.Sprintf("Secondary mentor `%s` does not exist.", reqFields.SecondaryMentorUsername),
+				http.StatusBadRequest,
 			)
 			return
 		}
@@ -113,6 +118,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	tx = db.
 		Table("projects").
+		Where("id = ?", reqFields.Id).
 		Select("name", "desc", "tags", "repo_link", "com_channel", "readme", "secondary_mentor_id").
 		Updates(updatedProj)
 
