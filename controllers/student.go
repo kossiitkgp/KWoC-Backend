@@ -18,6 +18,11 @@ type RegisterStudentReqFields struct {
 	College  string `json:"college"`
 }
 
+type StudentBlogLinkReqFields struct {
+	Username string `json:"username"`
+	BlogLink string `json:"blog_link"`
+}
+
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -86,4 +91,65 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Student registration successful.")
+}
+
+func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+	var reqFields = StudentBlogLinkReqFields{}
+
+	err := utils.DecodeJSONBody(r, &reqFields)
+	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
+		return
+	}
+
+	// Check if the JWT login username is the same as the student's given username
+	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+
+	if reqFields.Username != login_username {
+		utils.LogWarn(
+			r,
+			fmt.Sprintf(
+				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
+				login_username,
+				reqFields.Username,
+			),
+		)
+
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprint(w, "Login username and given username do not match.")
+		return
+	}
+
+	// Check if the student exists in the db
+	student := models.Student{}
+	tx := db.
+		Table("students").
+		Where("username = ?", reqFields.Username).
+		First(&student)
+
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
+		return
+	}
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Student `%s` does not exists.", reqFields.Username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+	tx = tx.Update("BlogLink", reqFields.BlogLink)
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Error updating BlogLink for `%s`.", student.Username), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "BlogLink successfully updated.")
 }

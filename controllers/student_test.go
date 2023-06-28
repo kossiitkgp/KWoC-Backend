@@ -122,3 +122,117 @@ func TestStudentRegOK(t *testing.T) {
 		},
 	)
 }
+
+func createStudentBlogLinkRequest(reqFields *controllers.StudentBlogLinkReqFields) *http.Request {
+	reqBody, _ := json.Marshal(reqFields)
+
+	req, _ := http.NewRequest(
+		"POST",
+		"/student/bloglink/",
+		bytes.NewReader(reqBody),
+	)
+
+	return req
+}
+
+// Test unauthenticated request to /student/bloglink/
+func TestStudentBloglinkNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "POST", "/student/bloglink/")
+}
+
+// Test request to /student/bloglink/ with invalid jwt
+func TestStudentBloglinkInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "POST", "/student/bloglink/")
+}
+
+// Test request to /student/bloglink/ with session hijacking attempt
+func TestStudentBloglinkSessionHijacking(t *testing.T) {
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
+
+	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	reqFields := controllers.StudentBlogLinkReqFields{Username: "anotheruser", BlogLink: "https://grugbrain.dev"}
+
+	req := createStudentBlogLinkRequest(&reqFields)
+	req.Header.Add("Bearer", someuserJwt)
+
+	res := executeRequest(req, nil)
+
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
+}
+
+// Test an existing user request to /student/bloglink/ with proper authentication and input
+func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	reqFieldsReg := controllers.RegisterStudentReqFields{Username: testUsername}
+
+	req := createStudentRegRequest(&reqFieldsReg)
+	req.Header.Add("Bearer", testJwt)
+
+	_ = executeRequest(req, db)
+
+	// Execute the bloglink request
+	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
+	req = createStudentBlogLinkRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	expectResponseBodyToBe(t, res, "BlogLink successfully updated.")
+}
+
+// Test a non existing/registered user's request to /student/bloglink/ with proper authentication and input
+func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	// Execute the bloglink request
+	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
+	req := createStudentBlogLinkRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` does not exists.", testUsername))
+}
+
+// Test request  /student/bloglink/ with proper authentication and input
+func TestStudentBlogLink(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Existing student test
+	t.Run(
+		"Test: existing student bloglink request",
+		func(t *testing.T) {
+			tStudentBlogLinkExistingUser(db, t)
+		},
+	)
+
+	// Non Existing student test
+	t.Run(
+		"Test: non existing student bloglink request",
+		func(t *testing.T) {
+			tStudentBlogLinkNonExistingUser(db, t)
+		},
+	)
+}
