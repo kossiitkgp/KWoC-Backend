@@ -19,7 +19,7 @@ type Mentor struct {
 type Project struct {
 	Id              uint   `json:"id"`
 	Name            string `json:"name"`
-	Desc            string `json:"desc"`
+	Desc            string `json:"description"`
 	Tags            string `json:"tags"`
 	RepoLink        string `json:"repo_link"`
 	ComChannel      string `json:"com_channel"`

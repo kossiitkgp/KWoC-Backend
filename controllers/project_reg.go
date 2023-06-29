@@ -14,7 +14,7 @@ type RegisterProjectReqFields struct {
 	// Name of the project
 	Name string `json:"name"`
 	// Description for the project
-	Description string `json:"desc"`
+	Description string `json:"description"`
 	// List of tags for the project
 	Tags string `json:"tags"`
 	// Mentor's username
@@ -22,9 +22,9 @@ type RegisterProjectReqFields struct {
 	// Secondary mentor's username
 	SecondaryMentorUsername string `json:"secondaryMentor"`
 	// Link to the repository of the project
-	RepoLink string `json:"repoLink"`
+	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
-	ComChannel string `json:"comChannel"`
+	ComChannel string `json:"com_channel"`
 	// Link to the project's README file
 	ReadmeURL string `json:"readme"`
 }
