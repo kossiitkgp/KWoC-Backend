@@ -8,26 +8,25 @@ import "gorm.io/gorm"
 type Student struct {
 	gorm.Model
 
-	Name           string `gorm:"column:name"`
-	Email          string `gorm:"column:email"`
-	College        string `gorm:"column:college"`
-	Username       string `gorm:"column:username"`
-	PassedMidEvals bool   `gorm:"column:passed_mid_evals"`
-	PassedEndEvals bool   `gorm:"column:passed_end_evals"`
-	BlogLink       string `gorm:"size:2550;column:blog_link"`
+	Name     string
+	Email    string
+	College  string
+	Username string
+	Evals    int    `gorm:"default:0"`
+	BlogLink string `gorm:"size:2550"`
 
 	// stats table
-	CommitCount  uint `gorm:"column:commit_count"`
-	PullCount    uint `gorm:"column:pull_count"`
-	AddedLines   uint `gorm:"column:added_lines"`
-	RemovedLines uint `gorm:"column:removed_lines"`
+	CommitCount  uint
+	PRCount      uint
+	AddedLines   uint
+	RemovedLines uint
 
 	// TechWorked is a string of languages separated by comma(,)
-	TechWorked string `gorm:"column:tech_worked"`
+	TechWorked string
 
 	// ProjectsWorked is a string of project IDs separated by comma(,)
-	ProjectsWorked string `gorm:"column:projects_worked"`
+	ProjectsWorked string
 
 	// list of URLs to PRs contributed by the student (a string of links separated by comma(,))
-	Pulls string `gorm:"column:pulls"`
+	Pulls string
 }

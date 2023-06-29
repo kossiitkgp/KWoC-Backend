@@ -8,7 +8,7 @@ import "gorm.io/gorm"
 type Mentor struct {
 	gorm.Model
 
-	Name     string `gorm:"column:name"`
-	Email    string `gorm:"column:email"`
-	Username string `gorm:"column:username"`
+	Name     string
+	Email    string
+	Username string
 }

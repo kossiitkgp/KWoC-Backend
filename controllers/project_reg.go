@@ -126,11 +126,11 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 
 	tx = db.Create(&models.Project{
 		Name:            reqFields.Name,
-		Description:     reqFields.Description,
+		Desc:            reqFields.Description,
 		Tags:            reqFields.Tags,
 		RepoLink:        reqFields.RepoLink,
 		ComChannel:      reqFields.ComChannel,
-		ReadmeLink:      reqFields.ReadmeURL,
+		README:          reqFields.ReadmeURL,
 		Mentor:          mentor,
 		SecondaryMentor: secondaryMentor,
 	})
