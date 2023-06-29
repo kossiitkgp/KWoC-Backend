@@ -86,3 +86,22 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Mentor registration successful.")
 }
+
+func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	var mentors []Mentor
+
+	tx := db.
+		Table("mentors").
+		Select("name", "username").
+		Find(&mentors)
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(r, w, tx.Error, "Database Error fetching mentors", http.StatusInternalServerError)
+		return
+	}
+
+	utils.RespondWithJson(r, w, mentors)
+}
