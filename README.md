@@ -27,7 +27,7 @@
 
 ### Setting up pre-commit hook (optional)
 - Check if `golangci-lint` is installed, if not, install using `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3`
-- Run `./setup_hook.sh` (make sure it is executable using `chmod +x setup_hook.sh`)
+- Run `git config core.hooksPath .githooks` (make sure it is executable using `chmod +x .githooks/*`)
 
 ### File Naming Convention
 [WIP]
