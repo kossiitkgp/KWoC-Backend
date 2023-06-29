@@ -38,11 +38,11 @@ func newProject(dbProject *models.Project) Project {
 	return Project{
 		Id:              dbProject.ID,
 		Name:            dbProject.Name,
-		Desc:            dbProject.Desc,
+		Desc:            dbProject.Description,
 		Tags:            dbProject.Tags,
 		RepoLink:        dbProject.RepoLink,
 		ComChannel:      dbProject.ComChannel,
-		ReadmeURL:       dbProject.README,
+		ReadmeURL:       dbProject.ReadmeLink,
 		Mentor:          newMentor(&dbProject.Mentor),
 		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
 	}
