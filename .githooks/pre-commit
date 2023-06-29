@@ -4,6 +4,9 @@ set -eu -o pipefail
 
 echo "Pre-commit hook running"
 
+echo "Running gofmt..."
+gofmt -w -s .
+
 echo "Running go mod tidy..."
 go mod tidy
 
