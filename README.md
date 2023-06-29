@@ -10,6 +10,7 @@ KWoC backend server v2.0 (also) written in Go (but better).
   - [Libraries Used](#libraries-used)
   - [File Structure](#file-structure)
   - [Endpoints](#endpoints)
+  - [Middleware](#middleware)
   - [Command-Line Arguments](#command-line-arguments)
   - [Environment Variables](#environment-variables)
   - [Github OAuth](#github-oauth)
@@ -149,6 +150,38 @@ Files: `controllers/project_fetch.go`, `controllers/project_reg.go`
     - `readme_link`: A link to the project's README file.
 
 ### Middleware
+The `middleware/` directory contains all the middleware used in the server. The middleware are used in `server/routes.go` and `server/router.go` files. The following middelware are exported under the `middelware` package.
+
+All middleware take an `http.Handler` function as an argument and return the wrapper `http.Handler` function.
+
+#### Logger
+File: `middleware/logger.go`
+
+Logs information regarding the incoming request and the time taken to handle the request.
+
+#### Login
+File: `middleware/login.go`
+
+Handles login/authentication for requests. Requests must included the `Bearer` key in the header with the JWT string for login.
+
+The middleware responds to invalid/unauthenticated requests and only passes valid requests to the inner function. The middleware also adds the logged in user's username to the request's context.
+
+A constant `LOGIN_CTX_USERNAME_KEY` is exported by the middleware. This is the key used to access the login username.
+```go
+login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+```
+
+#### Wrap
+File `middleware/wrap.go`
+
+Adds an instance of the `App` struct (also defined in the same file) to the requests's context. This struct contains the database (`*gorm.DB`) used by the server.
+
+A constant `APP_CTX_KEY` is exported by the middleware. This is the key used to access the `App`.
+```go
+app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+db := app.Db
+```
+
 ### Utils
 ### Database Models
 
