@@ -26,8 +26,8 @@
 > To view the program as doc, run : `godoc -http=:6060` and checkout at `http://localhost:6060/pkg/kwoc-backend/`
 
 ### Setting up pre-commit hook (optional)
-- Check if `golangci-lint` is installed, if not, install using `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3`
-- Run `git config core.hooksPath .githooks` (make sure it is executable using `chmod +x .githooks/*`)
+- Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/)
+- Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath)
 
 ### File Naming Convention
 [WIP]
