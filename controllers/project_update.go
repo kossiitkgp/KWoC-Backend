@@ -71,7 +71,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
-	} else if tx.Error == gorm.ErrRecordNotFound {
+	} 
+	if tx.Error == gorm.ErrRecordNotFound {
 		utils.LogWarnAndRespond(
 			r,
 			w,
