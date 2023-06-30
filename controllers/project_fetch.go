@@ -19,7 +19,7 @@ type Mentor struct {
 type Project struct {
 	Id              uint   `json:"id"`
 	Name            string `json:"name"`
-	Desc            string `json:"description"`
+	Description     string `json:"description"`
 	Tags            string `json:"tags"`
 	RepoLink        string `json:"repo_link"`
 	ComChannel      string `json:"com_channel"`
@@ -38,7 +38,7 @@ func newProject(dbProject *models.Project) Project {
 	return Project{
 		Id:              dbProject.ID,
 		Name:            dbProject.Name,
-		Desc:            dbProject.Description,
+		Description:     dbProject.Description,
 		Tags:            dbProject.Tags,
 		RepoLink:        dbProject.RepoLink,
 		ComChannel:      dbProject.ComChannel,
@@ -59,7 +59,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "com_channel", "readme_link", "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {

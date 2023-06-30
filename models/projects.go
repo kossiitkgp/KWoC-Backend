@@ -33,7 +33,7 @@ type Project struct {
 
 	// foreign keys
 	Mentor_id          int32  `gorm:"column:mentor_id"`
-	Mentor             Mentor `gorm:"ForeignKey:Mentor_id;column:mentor"`
+	Mentor             Mentor `gorm:"ForeignKey:Mentor_id"`
 	SecondaryMentor_id int32  `gorm:"column:secondary_mentor_id"`
-	SecondaryMentor    Mentor `gorm:"ForeignKey:SecondaryMentor_id;column:secondary_mentor"`
+	SecondaryMentor    Mentor `gorm:"ForeignKey:SecondaryMentor_id"`
 }
