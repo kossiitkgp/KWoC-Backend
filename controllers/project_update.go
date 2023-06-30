@@ -71,11 +71,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
 		return
-	} 
+	}
+
 	if tx.Error == gorm.ErrRecordNotFound {
-		utils.LogWarnAndRespond(
+		utils.LogErrAndRespond(
 			r,
 			w,
+			tx.Error,
 			fmt.Sprintf("Error: Project `%s` does not exist.", reqFields.RepoLink),
 			http.StatusBadRequest,
 		)
