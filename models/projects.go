@@ -12,7 +12,7 @@ type Project struct {
 	Description   string `gorm:"size:2550;column:description"`
 	Tags          string `gorm:"column:tags"`
 	RepoLink      string `gorm:"column:repo_link"`
-	ComChannel    string `gorm:"column:com_channel"`
+	CommChannel   string `gorm:"column:comm_channel"`
 	ReadmeLink    string `gorm:"column:readme_link"`
 	ProjectStatus bool   `gorm:"default:false;column:project_status"`
 

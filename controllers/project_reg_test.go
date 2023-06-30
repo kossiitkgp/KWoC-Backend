@@ -33,7 +33,7 @@ func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername s
 		MentorUsername:          mentorUsername,
 		SecondaryMentorUsername: secondaryMentorUsername,
 		RepoLink:                "https://xkcd.com/927/",
-		ComChannel:              "com-channel",
+		CommChannel:             "comm-channel",
 		ReadmeURL:               "readme",
 	}
 }

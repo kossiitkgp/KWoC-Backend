@@ -24,7 +24,7 @@ type RegisterProjectReqFields struct {
 	// Link to the repository of the project
 	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
-	ComChannel string `json:"com_channel"`
+	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
 	ReadmeURL string `json:"readme"`
 }
@@ -129,7 +129,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		Description:     reqFields.Description,
 		Tags:            reqFields.Tags,
 		RepoLink:        reqFields.RepoLink,
-		ComChannel:      reqFields.ComChannel,
+		CommChannel:     reqFields.CommChannel,
 		ReadmeLink:      reqFields.ReadmeURL,
 		Mentor:          mentor,
 		SecondaryMentor: secondaryMentor,

@@ -52,7 +52,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 				Description:   fmt.Sprintf("Yet another next-gen javascript framework v%d.1", rand.Int()),
 				Tags:          fmt.Sprintf("next-gen, javascript, framework, %dth iteration", rand.Int()),
 				RepoLink:      "https://xkcd.com/927/",
-				ComChannel:    fmt.Sprintf("https://link%d", rand.Int()),
+				CommChannel:   fmt.Sprintf("https://link%d", rand.Int()),
 				ReadmeLink:    fmt.Sprintf("https://readme%d", rand.Int()),
 				ProjectStatus: projectStatus,
 			},
@@ -67,7 +67,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 		proj1.Description == proj2.Description &&
 		proj1.Tags == proj2.Tags &&
 		proj1.RepoLink == proj2.RepoLink &&
-		proj1.ComChannel == proj2.ComChannel &&
+		proj1.CommChannel == proj2.CommChannel &&
 		proj1.ReadmeURL == proj2.ReadmeLink
 }
 
