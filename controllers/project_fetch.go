@@ -23,7 +23,7 @@ type Project struct {
 	Tags            string `json:"tags"`
 	RepoLink        string `json:"repo_link"`
 	CommChannel     string `json:"comm_channel"`
-	ReadmeURL       string `json:"readme_url"`
+	ReadmeLink      string `json:"readme_link"`
 	Mentor          Mentor `json:"mentor"`
 	SecondaryMentor Mentor `json:"secondary_mentor"`
 }
@@ -42,7 +42,7 @@ func newProject(dbProject *models.Project) Project {
 		Tags:            dbProject.Tags,
 		RepoLink:        dbProject.RepoLink,
 		CommChannel:     dbProject.CommChannel,
-		ReadmeURL:       dbProject.ReadmeLink,
+		ReadmeLink:      dbProject.ReadmeLink,
 		Mentor:          newMentor(&dbProject.Mentor),
 		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
 	}

@@ -68,7 +68,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 		proj1.Tags == proj2.Tags &&
 		proj1.RepoLink == proj2.RepoLink &&
 		proj1.CommChannel == proj2.CommChannel &&
-		proj1.ReadmeURL == proj2.ReadmeLink
+		proj1.ReadmeLink == proj2.ReadmeLink
 }
 
 func TestFetchAllProjects(t *testing.T) {
