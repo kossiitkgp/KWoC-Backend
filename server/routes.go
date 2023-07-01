@@ -46,6 +46,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
 		},
 		{
+			"Fetch All Mentors",
+			"GET",
+			"/mentor/all/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchAllMentors)),
+		},
+		{
 			"HealthCheck",
 			"GET",
 			"/healthcheck/",
