@@ -36,6 +36,7 @@ func FetchAllStudentStats(w http.ResponseWriter, r *http.Request) {
 			"Error fetching projects from the database.",
 			http.StatusInternalServerError,
 		)
+		return
 	}
 
 	var response []StudentBriefStats = make([]StudentBriefStats, 0)
