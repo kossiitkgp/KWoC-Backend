@@ -27,9 +27,9 @@ type UpdateProjectReqFields struct {
 	// Link to the repository of the project
 	RepoLink string `json:"repoLink"`
 	// Link to a communication channel/platform
-	ComChannel string `json:"comChannel"`
+	CommChannel string `json:"comChannel"`
 	// Link to the project's README file
-	ReadmeURL string `json:"readme"`
+	ReadmeLink string `json:"readme"`
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
@@ -111,18 +111,18 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	updatedProj := &models.Project{
 		Name:               reqFields.Name,
-		Desc:               reqFields.Description,
+		Description:        reqFields.Description,
 		Tags:               reqFields.Tags,
 		RepoLink:           reqFields.RepoLink,
-		ComChannel:         reqFields.ComChannel,
-		README:             reqFields.ReadmeURL,
+		CommChannel:        reqFields.CommChannel,
+		ReadmeLink:         reqFields.ReadmeLink,
 		SecondaryMentor_id: int32(secondaryMentor.ID),
 	}
 
 	tx = db.
 		Table("projects").
 		Where("id = ?", reqFields.Id).
-		Select("name", "desc", "tags", "repo_link", "com_channel", "readme", "secondary_mentor_id").
+		Select("name", "desc", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
 		Updates(updatedProj)
 
 	if tx.Error != nil {
