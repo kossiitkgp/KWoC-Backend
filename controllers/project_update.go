@@ -122,7 +122,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	tx = db.
 		Table("projects").
 		Where("id = ?", reqFields.Id).
-		Select("name", "desc", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
+		Select("name", "description", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
 		Updates(updatedProj)
 
 	if tx.Error != nil {
