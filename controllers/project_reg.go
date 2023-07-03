@@ -26,7 +26,7 @@ type RegisterProjectReqFields struct {
 	// Link to a communication channel/platform
 	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
-	ReadmeLink string `json:"readme"`
+	ReadmeLink string `json:"readme_link"`
 }
 
 func RegisterProject(w http.ResponseWriter, r *http.Request) {
