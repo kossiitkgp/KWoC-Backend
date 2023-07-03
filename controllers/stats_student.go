@@ -33,7 +33,7 @@ func FetchAllStudentStats(w http.ResponseWriter, r *http.Request) {
 			r,
 			w,
 			tx.Error,
-			"Error fetching projects from the database.",
+			"Error fetching student stats from the database.",
 			http.StatusInternalServerError,
 		)
 		return
