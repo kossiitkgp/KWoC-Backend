@@ -19,11 +19,11 @@ type Mentor struct {
 type Project struct {
 	Id              uint   `json:"id"`
 	Name            string `json:"name"`
-	Desc            string `json:"desc"`
+	Description     string `json:"description"`
 	Tags            string `json:"tags"`
 	RepoLink        string `json:"repo_link"`
-	ComChannel      string `json:"com_channel"`
-	ReadmeURL       string `json:"readme_url"`
+	CommChannel     string `json:"comm_channel"`
+	ReadmeLink      string `json:"readme_link"`
 	Mentor          Mentor `json:"mentor"`
 	SecondaryMentor Mentor `json:"secondary_mentor"`
 }
@@ -38,11 +38,11 @@ func newProject(dbProject *models.Project) Project {
 	return Project{
 		Id:              dbProject.ID,
 		Name:            dbProject.Name,
-		Desc:            dbProject.Desc,
+		Description:     dbProject.Description,
 		Tags:            dbProject.Tags,
 		RepoLink:        dbProject.RepoLink,
-		ComChannel:      dbProject.ComChannel,
-		ReadmeURL:       dbProject.README,
+		CommChannel:     dbProject.CommChannel,
+		ReadmeLink:      dbProject.ReadmeLink,
 		Mentor:          newMentor(&dbProject.Mentor),
 		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
 	}
@@ -59,7 +59,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {
@@ -101,7 +101,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
 		Where("id = ?", project_id).
-		Select("id", "name", "desc", "tags", "repo_link", "com_channel", "readme", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
 		First(&project)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {

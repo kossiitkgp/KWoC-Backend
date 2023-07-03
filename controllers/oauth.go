@@ -23,7 +23,7 @@ type OAuthResBodyFields struct {
 	// `mentor` or `student`
 	Type string `json:"type"`
 	// Whether the user has newly registered or was registered before
-	IsNewUser bool   `json:"isNewUser"`
+	IsNewUser bool   `json:"is_new_user"`
 	Jwt       string `json:"jwt"`
 }
 

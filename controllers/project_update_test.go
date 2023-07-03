@@ -91,8 +91,8 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		Tags:           "New tags.",
 		MentorUsername: testUsername,
 		RepoLink:       "http://NewRepoLink",
-		ComChannel:     "totallynewcomchannel",
-		ReadmeURL:      "http://NewRepoLink/README",
+		CommChannel:    "totallynewcomchannel",
+		ReadmeLink:     "http://NewRepoLink/README",
 	}
 
 	// Test with invalid new secondary mentor
@@ -130,8 +130,8 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		t.Errorf("Project Name field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.Name, updatedProj.Name)
 	}
 
-	if updatedProj.Desc != projUpdateFields.Description {
-		t.Errorf("Project Description field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.Description, updatedProj.Desc)
+	if updatedProj.Description != projUpdateFields.Description {
+		t.Errorf("Project Description field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.Description, updatedProj.Description)
 	}
 
 	if updatedProj.Tags != projUpdateFields.Tags {
@@ -142,12 +142,12 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		t.Errorf("Project RepoLink field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.RepoLink, updatedProj.RepoLink)
 	}
 
-	if updatedProj.ComChannel != projUpdateFields.ComChannel {
-		t.Errorf("Project ComChannel field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.ComChannel, updatedProj.ComChannel)
+	if updatedProj.CommChannel != projUpdateFields.CommChannel {
+		t.Errorf("Project CommChannel field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.CommChannel, updatedProj.CommChannel)
 	}
 
-	if updatedProj.README != projUpdateFields.ReadmeURL {
-		t.Errorf("Project Readme field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.ReadmeURL, updatedProj.README)
+	if updatedProj.ReadmeLink != projUpdateFields.ReadmeLink {
+		t.Errorf("Project ReadmeLink field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.ReadmeLink, updatedProj.ReadmeLink)
 	}
 
 	if updatedProj.SecondaryMentor.Username != projUpdateFields.SecondaryMentorUsername {

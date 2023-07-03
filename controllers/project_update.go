@@ -17,19 +17,19 @@ type UpdateProjectReqFields struct {
 	// Name of the project
 	Name string `json:"name"`
 	// Description for the project
-	Description string `json:"desc"`
+	Description string `json:"description"`
 	// List of tags for the project
 	Tags string `json:"tags"`
 	// Mentor's username
-	MentorUsername string `json:"username"`
+	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username (if updated)
-	SecondaryMentorUsername string `json:"secondaryMentor"`
+	SecondaryMentorUsername string `json:"secondary_mentor_username"`
 	// Link to the repository of the project
-	RepoLink string `json:"repoLink"`
+	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
-	ComChannel string `json:"comChannel"`
+	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
-	ReadmeURL string `json:"readme"`
+	ReadmeLink string `json:"readme_link"`
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
@@ -110,19 +110,19 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedProj := &models.Project{
-		Name:               reqFields.Name,
-		Desc:               reqFields.Description,
-		Tags:               reqFields.Tags,
-		RepoLink:           reqFields.RepoLink,
-		ComChannel:         reqFields.ComChannel,
-		README:             reqFields.ReadmeURL,
-		SecondaryMentor_id: int32(secondaryMentor.ID),
+		Name:              reqFields.Name,
+		Description:       reqFields.Description,
+		Tags:              reqFields.Tags,
+		RepoLink:          reqFields.RepoLink,
+		CommChannel:       reqFields.CommChannel,
+		ReadmeLink:        reqFields.ReadmeLink,
+		SecondaryMentorId: int32(secondaryMentor.ID),
 	}
 
 	tx = db.
 		Table("projects").
 		Where("id = ?", reqFields.Id).
-		Select("name", "desc", "tags", "repo_link", "com_channel", "readme", "secondary_mentor_id").
+		Select("name", "description", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
 		Updates(updatedProj)
 
 	if tx.Error != nil {
