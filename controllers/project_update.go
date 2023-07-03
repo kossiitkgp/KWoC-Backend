@@ -17,17 +17,17 @@ type UpdateProjectReqFields struct {
 	// Name of the project
 	Name string `json:"name"`
 	// Description for the project
-	Description string `json:"desc"`
+	Description string `json:"description"`
 	// List of tags for the project
 	Tags string `json:"tags"`
 	// Mentor's username
-	MentorUsername string `json:"username"`
+	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username (if updated)
-	SecondaryMentorUsername string `json:"secondaryMentor"`
+	SecondaryMentorUsername string `json:"secondary_mentor_username"`
 	// Link to the repository of the project
-	RepoLink string `json:"repoLink"`
+	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
-	CommChannel string `json:"comChannel"`
+	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
 	ReadmeLink string `json:"readme"`
 }

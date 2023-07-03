@@ -18,9 +18,9 @@ type RegisterProjectReqFields struct {
 	// List of tags for the project
 	Tags string `json:"tags"`
 	// Mentor's username
-	MentorUsername string `json:"username"`
+	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username
-	SecondaryMentorUsername string `json:"secondaryMentor"`
+	SecondaryMentorUsername string `json:"secondary_mentor_username"`
 	// Link to the repository of the project
 	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
