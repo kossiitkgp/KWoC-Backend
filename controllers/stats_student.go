@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"kwoc-backend/middleware"
-	"kwoc-backend/models"
 	"kwoc-backend/utils"
 	"net/http"
 )
@@ -21,12 +20,12 @@ func FetchAllStudentStats(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	var students []models.Student
+	var student_stats []StudentBriefStats
 
 	tx := db.
 		Table("students").
 		Select("name", "username", "pull_count", "commit_count", "lines_added", "lines_removed").
-		Find(&students)
+		Find(&student_stats)
 
 	if tx.Error != nil {
 		utils.LogErrAndRespond(
@@ -39,21 +38,5 @@ func FetchAllStudentStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []StudentBriefStats = make([]StudentBriefStats, 0)
-
-	for _, student := range students {
-		response = append(
-			response,
-			StudentBriefStats{
-				Name:         student.Name,
-				Username:     student.Username,
-				PullCount:    student.PullCount,
-				CommitCount:  student.CommitCount,
-				LinesAdded:   student.LinesAdded,
-				LinesRemoved: student.LinesRemoved,
-			},
-		)
-	}
-
-	utils.RespondWithJson(r, w, response)
+	utils.RespondWithJson(r, w, student_stats)
 }
