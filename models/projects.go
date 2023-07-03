@@ -32,8 +32,8 @@ type Project struct {
 	Pulls string `gorm:"column:pulls"`
 
 	// foreign keys
-	Mentor_id          int32  `gorm:"column:mentor_id"`
-	Mentor             Mentor `gorm:"ForeignKey:Mentor_id"`
-	SecondaryMentor_id int32  `gorm:"column:secondary_mentor_id"`
-	SecondaryMentor    Mentor `gorm:"ForeignKey:SecondaryMentor_id"`
+	MentorId          int32  `gorm:"column:mentor_id"`
+	Mentor            Mentor `gorm:"ForeignKey:mentor_id"`
+	SecondaryMentorId int32  `gorm:"column:secondary_mentor_id"`
+	SecondaryMentor   Mentor `gorm:"ForeignKey:secondary_mentor_id"`
 }
