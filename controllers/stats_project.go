@@ -24,6 +24,7 @@ func FetchAllProjectStats(w http.ResponseWriter, r *http.Request) {
 
 	tx := db.
 		Table("projects").
+		Where("project_status = ?", true).
 		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed").
 		Find(&project_stats)
 
