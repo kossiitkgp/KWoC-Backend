@@ -19,11 +19,11 @@ type Student struct {
 	// stats table
 	CommitCount  uint `gorm:"column:commit_count"`
 	PullCount    uint `gorm:"column:pull_count"`
-	AddedLines   uint `gorm:"column:added_lines"`
-	RemovedLines uint `gorm:"column:removed_lines"`
+	LinesAdded   uint `gorm:"column:lines_added"`
+	LinesRemoved uint `gorm:"column:lines_removed"`
 
-	// TechWorked is a string of languages separated by comma(,)
-	TechWorked string `gorm:"column:tech_worked"`
+	// LanguagesUsed is a string of languages separated by comma(,)
+	LanguagesUsed string `gorm:"column:languages_used"`
 
 	// ProjectsWorked is a string of project IDs separated by comma(,)
 	ProjectsWorked string `gorm:"column:projects_worked"`

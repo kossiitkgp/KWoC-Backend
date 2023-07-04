@@ -22,8 +22,8 @@ type Project struct {
 	// stats table
 	CommitCount  uint `gorm:"column:commit_count"`
 	PullCount    uint `gorm:"column:pull_count"`
-	AddedLines   uint `gorm:"column:added_lines"`
-	RemovedLines uint `gorm:"column:removed_lines"`
+	LinesAdded   uint `gorm:"column:lines_added"`
+	LinesRemoved uint `gorm:"column:lines_removed"`
 
 	// list of students who contributed to the project (a string of usernames separated by comma(,))
 	Contributors string `gorm:"column:contributors"`
