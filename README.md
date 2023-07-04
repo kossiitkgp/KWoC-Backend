@@ -1,4 +1,4 @@
-# KWoC Backend v2.0 dummy commit
+# KWoC Backend v2.0 
 [WIP] KWoC backend server v2.0 (also) written in Go (but better).
 
 ## Table of Contents
