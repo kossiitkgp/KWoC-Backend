@@ -154,3 +154,6 @@ To set up the KWoC server, a Github OAuth application has to be created and the 
 - Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
 - Set the Homepage URL to `https://kwoc.kossiitkgp.org` and the authorization callback URL to `https://kwoc.kossiitkgp.org/oauth/` in the production application.
 - Copy the client ID and the client secret (this should NEVER be made public) and set the `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` [environment variables](#environment-variables) to these values.
+
+****
+> Please update this documentation if you make changes to the KWoC backend or any other part of KWoC which affects the backend. Future humans will praise you.
