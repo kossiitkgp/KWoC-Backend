@@ -30,11 +30,11 @@ KWoC backend server v2.0 (also) written in Go (but better).
 - Run `go run cmd/backend.go` to start the server.
 - Optionally install [SQLiteStudio](https://sqlitestudio.pl/) or a similar tool to help manage the local database `devDB.db` (sqlite3).
 - Optionally install [Postman](https://www.postman.com/) or a similar tool to test the API endpoints.
-- Optional but **recommended**: [Setting Up Pre-Commit Hooks](#setting-up-pre-commit-hooks)
+- Optionally (but **recommended**) [set up pre-commit hooks](#setting-up-pre-commit-hooks).
 
 #### Setting Up Pre-Commit Hooks
-- Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/)
-- Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath)
+- Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/).
+- Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath).
 
 ### Building
 - Install all the dependencies using `go mod tidy` or `go mod download`.
