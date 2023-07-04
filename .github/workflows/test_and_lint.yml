@@ -1,6 +1,11 @@
 name: Testing and Linting
 
-on: [pull_request]
+on: 
+  push:
+    branches:
+      - main
+      - v2-dev
+  pull_request:
 
 jobs:
   test_and_lint:
