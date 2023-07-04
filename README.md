@@ -40,10 +40,6 @@ KWoC backend server v2.0 (also) written in Go (but better).
 - Install all the dependencies using `go mod tidy` or `go mod download`.
 - Run `go build cmd/backend.go` to build the server executable. The executable file will be named `backend`.
 
-### Setting up pre-commit hook (optional)
-- Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/)
-- Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath)
-
 ### File Naming Convention
 See also [File Structure](#file-structure).
 
@@ -143,7 +139,7 @@ Files: `controllers/project_fetch.go`, `controllers/project_reg.go`
   - `description`: The description for the project.
   - `tags`: The JSON string of an array of tags applied to the project.
   - `repo_link`: A link to the project repository.
-  - `com_channel`: A link to the official communication channel of the repository.
+  - `comm_channel`: A link to the official communication channel of the repository.
   - `readme_link`: A link to the README file of the project.
   - `mentor`: An object with the `name` and `username` of the project's mentor.
   - `secondary_mentor`: An object with the `name` and `username` of the project's secondary mentor.
@@ -155,7 +151,7 @@ Files: `controllers/project_fetch.go`, `controllers/project_reg.go`
     - `mentor_username`: The username of the project's mentor.
     - `secondary_mentor_username`: The username of the project's secondary mentor.
     - `repo_link`: A link to the project's repository.
-    - `com_channel`: A link to the project's communication channel.
+    - `comm_channel`: A link to the project's communication channel.
     - `readme_link`: A link to the project's README file.
 
 ### Middleware
