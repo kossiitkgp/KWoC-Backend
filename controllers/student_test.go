@@ -236,3 +236,55 @@ func TestStudentBlogLink(t *testing.T) {
 		},
 	)
 }
+
+// Test unauthenticated request to /student/dashboard/
+func TestStudentDashboardNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "GET", "/student/dashboard/")
+}
+
+// Test request to /student/dashboard/ with invalid jwt
+func TestStudentDashboardInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "GET", "/student/dashboard/")
+}
+
+// Test requests to /student/dashboard/ with proper authentication
+func TestStudentDashboardOK(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	modelStudent := controllers.StudentDashboard{
+		Name:     "Test",
+		Username: testUsername,
+		College:  "The best university",
+	}
+
+	_ = db.Table("students").Create(modelStudent)
+
+	req, _ := http.NewRequest(
+		"GET",
+		"/student/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	var resStudent controllers.StudentDashboard
+	_ = json.NewDecoder(res.Body).Decode(&resStudent)
+
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	if modelStudent != resStudent {
+		t.Fatalf("Incorrect data returned from /student/dashboard/")
+	}
+}

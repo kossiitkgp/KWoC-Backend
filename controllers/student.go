@@ -23,6 +23,16 @@ type StudentBlogLinkReqFields struct {
 	BlogLink string `json:"blog_link"`
 }
 
+type StudentDashboard struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	College  string `json:"college"`
+
+	PassedMidEvals bool   `json:"passed_mid_evals"`
+	PassedEndEvals bool   `json:"passed_end_evals"`
+	ProjectsWorked string `json:"projects_worked"`
+}
+
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -152,4 +162,25 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "BlogLink successfully updated.")
+}
+
+func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	var student StudentDashboard
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	tx := db.
+		Table("students").
+		Select("name", "username", "college", "passed_mid_evals", "passed_end_evals", "projects_worked").
+		Where("username = ?", login_username).
+		First(&student)
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Database Error fetching student with username `%s`,Error: `%v`", login_username, tx.Error), http.StatusInternalServerError)
+		return
+	}
+
+	utils.RespondWithJson(r, w, student)
 }
