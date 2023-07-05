@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"kwoc-backend/controllers"
+	"kwoc-backend/models"
 	"kwoc-backend/utils"
+	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 
 	"gorm.io/gorm"
@@ -263,13 +266,29 @@ func TestStudentDashboardOK(t *testing.T) {
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
-	modelStudent := controllers.StudentDashboard{
-		Name:     "Test",
-		Username: testUsername,
-		College:  "The best university",
+	testProjects := generateTestProjects(5, false, true)
+	_ = db.Table("projects").Create(testProjects)
+
+	var project_ids []string
+	for _, p := range testProjects {
+		project_ids = append(project_ids, fmt.Sprint(p.ID))
+
+	}
+	modelStudent := models.Student{
+		Name:           "Test",
+		Username:       testUsername,
+		College:        "The best university",
+		ProjectsWorked: strings.Join(project_ids, ","),
+		PassedMidEvals: true,
+		PassedEndEvals: true,
+		CommitCount:    uint(rand.Int()),
+		PullCount:      uint(rand.Int()),
+		LinesAdded:     uint(rand.Int()),
+		LinesRemoved:   uint(rand.Int()),
 	}
 
-	_ = db.Table("students").Create(modelStudent)
+	_ = db.Table("students").Create(&modelStudent)
+	testStudent := controllers.CreateStudentDashboard(modelStudent, db)
 
 	req, _ := http.NewRequest(
 		"GET",
@@ -284,7 +303,7 @@ func TestStudentDashboardOK(t *testing.T) {
 	_ = json.NewDecoder(res.Body).Decode(&resStudent)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	if modelStudent != resStudent {
+	if fmt.Sprint(testStudent) != fmt.Sprint(resStudent) {
 		t.Fatalf("Incorrect data returned from /student/dashboard/")
 	}
 }

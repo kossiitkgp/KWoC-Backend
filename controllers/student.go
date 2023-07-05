@@ -5,6 +5,7 @@ import (
 	"kwoc-backend/middleware"
 	"kwoc-backend/utils"
 	"net/http"
+	"strings"
 
 	"kwoc-backend/models"
 
@@ -23,14 +24,25 @@ type StudentBlogLinkReqFields struct {
 	BlogLink string `json:"blog_link"`
 }
 
-type StudentDashboard struct {
+type ProjectDashboard struct {
 	Name     string `json:"name"`
-	Username string `json:"username"`
-	College  string `json:"college"`
+	RepoLink string `json:"repo_link"`
+}
 
+type StudentDashboard struct {
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	College        string `json:"college"`
 	PassedMidEvals bool   `json:"passed_mid_evals"`
 	PassedEndEvals bool   `json:"passed_end_evals"`
-	ProjectsWorked string `json:"projects_worked"`
+
+	CommitCount  uint `json:"commit_count"`
+	PullCount    uint `json:"pull_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
+
+	LanguagesUsed  []string           `json:"languages_used"`
+	ProjectsWorked []ProjectDashboard `json:"projects_worked"`
 }
 
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
@@ -163,24 +175,46 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "BlogLink successfully updated.")
 }
+func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
+	student := StudentDashboard{
+		Name:           modelStudent.Name,
+		Username:       modelStudent.Username,
+		College:        modelStudent.College,
+		PassedMidEvals: modelStudent.PassedMidEvals,
+		PassedEndEvals: modelStudent.PassedEndEvals,
+		CommitCount:    modelStudent.CommitCount,
+		PullCount:      modelStudent.PullCount,
+		LinesAdded:     modelStudent.LinesAdded,
+		LinesRemoved:   modelStudent.LinesRemoved,
+	}
+	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
+		var project ProjectDashboard
+		db.Table("projects").
+			Where("id = ?", proj_id).
+			Select("name", "repo_link").
+			First(&project)
+		student.ProjectsWorked = append(student.ProjectsWorked, project)
+	}
+	student.LanguagesUsed = strings.Split(modelStudent.LanguagesUsed, ",")
+	return student
+}
 
 func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	var student StudentDashboard
+	var modelStudent models.Student
 
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
 	tx := db.
 		Table("students").
-		Select("name", "username", "college", "passed_mid_evals", "passed_end_evals", "projects_worked").
 		Where("username = ?", login_username).
-		First(&student)
+		First(&modelStudent)
 
 	if tx.Error != nil {
 		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Database Error fetching student with username `%s`,Error: `%v`", login_username, tx.Error), http.StatusInternalServerError)
 		return
 	}
-
+	student := CreateStudentDashboard(modelStudent, db)
 	utils.RespondWithJson(r, w, student)
 }
