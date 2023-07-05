@@ -125,7 +125,49 @@ db := app.Db
 ```
 
 ### Utils
+The `utils/` directory contains utility functions reused in multiple controllers. (See also: [File Structure](#file-structure))
+
+The following utilities are exported.
+#### Database
+File: `utils/database.go`
+
+Contains utilities related to database handling.
+- `GetDB()`: Connects to the database and returns a `*gorm.DB`.
+- `MigrateModels()`: Automigrates database models.
+
+#### JSON
+File: `utils/json.go`
+
+Contains utilities for handling of JSON body of request and response.
+- `DecodeJSONBody()`: Decodes the JSON body of an HTTP request.
+- `RespondWithJson()`: Takes a response struct and responds to with the JSON string of the response with the appropriate headers set.
+
+#### JWT
+File: `utils/jwt.go`
+
+Contains utilities for handling [JSON Web Tokens (JWTs)](https://jwt.io/).
+- `ParseLoginJwtString()`: Parses a JWT string used for login and returns the claims.
+- `GenerateLoginJwtString()`: Generates a JWT string used for login using the given claims.
+
+#### Logging
+File `utils/log.go`
+
+Contains functions for logging information, warnings, and errors encountered during the handling of an HTTP request in a consistent manner.
+- `LogInfo()`: Logs an information message with information regarding the HTTP request that triggered the log.
+- `LogWarn()`: Logs a warning with information regarding the HTTP request that triggered the warning.
+- `LogWarnAndRespond()`: Logs a warning, same as the `LogWarn()` function and responds to the HTTP request with the warning message.
+- `LogErr()`: Logs an error with an error message and information regarding the HTTP request that triggered the error.
+- `LogErrAndRespond()`: Logs an error, same as the `LogErr()` function and responds to the HTTP request with the error message.
+
+#### OAuth
+File: `utils/oauth.go`
+
+Contains functions for authenticating a user via [Github OAuth](#github-oauth). (See also: [Web application flow - Github OAuth Docs](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow))
+- `GetOauthAccessToken()`: Gets an access token from the Github API using the given code generated during the authentication process. (See [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github) for more information)
+- `GetOauthUserInfo()`: Gets basic information about the user from the Github API using an access token. (See: [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api) for more information)
+
 ### Database Models
+[WIP]
 
 ### Command-Line Arguments
 The following command-line arguments are accepted by `cmd/backend.go`. `--argument=value`, `--argument value`, `-argument=value`, and `-argument value` are all acceptable formats to pass a value to the command-line argument.
