@@ -127,7 +127,6 @@ db := app.Db
 ### Utils
 The `utils/` directory contains utility functions reused in multiple controllers. (See also: [File Structure](#file-structure))
 
-The following utilities are exported.
 #### Database
 File: `utils/database.go`
 
@@ -167,7 +166,60 @@ Contains functions for authenticating a user via [Github OAuth](#github-oauth). 
 - `GetOauthUserInfo()`: Gets basic information about the user from the Github API using an access token. (See: [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api) for more information)
 
 ### Database Models
-[WIP]
+The `models/` directory contains database models for the KWoC datatabase tables. (See also: [File Structure](#file-structure) and [File Naming Convention](#file-naming-convention))
+
+#### Mentors
+- Table: `mentors`
+- Structure:
+  - `name` (string): Name of the mentor.
+  - `email` (string): Email of the mentor.
+  - `username` (string): Username of the mentor.
+
+#### Projects
+- Table: `projects`
+- Structure:
+  - `name` (string): Name of the project.
+  - `description` (string): Description for the project.
+  - `tags` (string): A list of tags for the project.
+  - `comm_channel` (string): A link to the project's official communication channel.
+  - `readme_link` (string): A link to the project's README file.
+  - `project_status` (bool): Whether the project is approved.
+  - `last_pull_time` (int64): The timestamp of merging of the last tracked (for statistics) pull request.
+  - `commit_count` (uint): The number of commits contributed to this project during KWoC.
+  - `pull_count` (uint): The number of pull requests contributed to this project during KWoC.
+  - `lines_added` (uint): The number of lines added to this project during KWoC.
+  - `lines_removed` (uint): The number of lines removed from this project during KWoC.
+  - `contributors` (string): A list of usernames of students who contributed to the project during KWoC, separated by comma(,).
+  - `pulls` (string): A list of links to pull requests contributed to the project during KWoC, separated by comma(,).
+  - `mentor_id` (int32): The ID of the project's primary mentor.
+  - `secondary_mentor_id` (int32):The ID of the project's secondary mentor.
+
+#### Stats
+- Table: `stats`
+- Structure:
+  - `total_commit_count` (uint): The total number of commits contributed during KWoC.
+  - `total_pull_count` (uint): The total number of pull requests contributed during KWoC.
+  - `total_lines_added` (uint): The total number of lines added during KWoC.
+  - `total_lines_removed` (uint): The total number of lines removed during KWoC.
+
+#### Students
+- Table: `students`
+- Structure:
+  - `name` (string): The name of the KWoC student.
+  - `email` (string): The email of the KWoC student.
+  - `college` (string): The college in which the KWoC student is enrolled.
+  - `username` (string): The username of the KWoC student.
+  - `passed_mid_evals` (bool): Whether the student has passed the mid evals.
+  - `passed_end_evals` (bool): Whether the student has passed the end evals.
+  - `blog_link` (string): A link to the student's final KWoC blog.
+  - `commit_count` (uint): The number of commits contributed by the student during KWoC.
+  - `pull_count` (uint): The number of pull requests contributed by the student during KWoC.
+  - `lines_added` (uint): The number of lines added by the student during KWoC.
+  - `lines_removed` (uint): The number of lines removed by the student during KWoC.
+  - `languages_used` (string): A list of languages used by the student in KWoC contributions, separated by comma(,).
+  - `projects_worked` (string): A list of IDs of projects the student contributed to during KWoC.
+  - `pulls` (string): A list of links to pull requests contributed by the student during KWoC, separated by comma(,).
+
 
 ### Command-Line Arguments
 The following command-line arguments are accepted by `cmd/backend.go`. `--argument=value`, `--argument value`, `-argument=value`, and `-argument value` are all acceptable formats to pass a value to the command-line argument.
