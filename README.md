@@ -47,7 +47,11 @@ See also [File Structure](#file-structure).
 2. Model Files: Database models are placed in the `models` directory. Each file corresponds to one table in the database and the name of the file corresponds with the name of the database table.
 
 ### Testing
-[WIP]
+See also [File Naming Convention](#file-naming-convention).
+
+All controllers except `/oauth/` are tested. New controllers should include tests. For controllers, not only successes but the failures should also be tested.
+
+The file `controllers/common_test.go` exports functions commonly used in controller tests.
 
 ## Project Structure
 [WIP]
