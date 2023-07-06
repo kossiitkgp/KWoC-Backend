@@ -251,7 +251,36 @@ func TestStudentDashboardInvalidAuth(t *testing.T) {
 	testRequestInvalidAuth(t, "GET", "/student/dashboard/")
 }
 
-// Test requests to /student/dashboard/ with proper authentication
+// Test unauthenticated request to /student/dashboard/ with no registration
+func TestStudentDashboardNoReg(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	req, _ := http.NewRequest(
+		"GET",
+		"/student/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` does not exists.", testUsername))
+}
+
+// Test requests to /student/dashboard/ with registered and  proper authentication
 func TestStudentDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
@@ -291,8 +320,30 @@ func TestStudentDashboardOK(t *testing.T) {
 	}
 
 	_ = db.Table("students").Create(&modelStudent)
-	testStudent := controllers.CreateStudentDashboard(modelStudent, db)
 
+	var projects []controllers.ProjectDashboard
+	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
+		var project controllers.ProjectDashboard
+		db.Table("projects").
+			Where("id = ?", proj_id).
+			Select("name", "repo_link").
+			First(&project)
+		projects = append(projects, project)
+	}
+	languages := strings.Split(modelStudent.LanguagesUsed, ",")
+	testStudent := controllers.StudentDashboard{
+		Name:           modelStudent.Name,
+		Username:       modelStudent.Username,
+		College:        modelStudent.College,
+		PassedMidEvals: modelStudent.PassedMidEvals,
+		PassedEndEvals: modelStudent.PassedEndEvals,
+		CommitCount:    modelStudent.CommitCount,
+		PullCount:      modelStudent.PullCount,
+		LinesAdded:     modelStudent.LinesAdded,
+		LinesRemoved:   modelStudent.LinesRemoved,
+		LanguagesUsed:  languages,
+		ProjectsWorked: projects,
+	}
 	req, _ := http.NewRequest(
 		"GET",
 		"/student/dashboard/",

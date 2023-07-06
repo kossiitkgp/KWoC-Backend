@@ -3,11 +3,10 @@ package controllers
 import (
 	"fmt"
 	"kwoc-backend/middleware"
+	"kwoc-backend/models"
 	"kwoc-backend/utils"
 	"net/http"
 	"strings"
-
-	"kwoc-backend/models"
 
 	"gorm.io/gorm"
 )
@@ -48,7 +47,7 @@ type StudentDashboard struct {
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
-	var reqFields = RegisterStudentReqFields{}
+	reqFields := RegisterStudentReqFields{}
 
 	err := utils.DecodeJSONBody(r, &reqFields)
 	if err != nil {
@@ -118,7 +117,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
-	var reqFields = StudentBlogLinkReqFields{}
+	reqFields := StudentBlogLinkReqFields{}
 
 	err := utils.DecodeJSONBody(r, &reqFields)
 	if err != nil {
@@ -168,13 +167,20 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	tx = tx.Update("BlogLink", reqFields.BlogLink)
 
 	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Error updating BlogLink for `%s`.", student.Username), http.StatusInternalServerError)
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Error updating BlogLink for `%s`.", student.Username),
+			http.StatusInternalServerError,
+		)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "BlogLink successfully updated.")
 }
+
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
 	var projects []ProjectDashboard
 	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
@@ -213,8 +219,24 @@ func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 		Where("username = ?", login_username).
 		First(&modelStudent)
 
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Student `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
 	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Database Error fetching student with username `%s`", login_username), http.StatusInternalServerError)
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Database Error fetching student with username `%s`", login_username),
+			http.StatusInternalServerError,
+		)
 		return
 	}
 	student := CreateStudentDashboard(modelStudent, db)
