@@ -9,6 +9,7 @@ import (
 	"kwoc-backend/utils"
 	"math/rand"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -303,7 +304,7 @@ func TestStudentDashboardOK(t *testing.T) {
 	_ = json.NewDecoder(res.Body).Decode(&resStudent)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	if fmt.Sprint(testStudent) != fmt.Sprint(resStudent) {
+	if !reflect.DeepEqual(testStudent, resStudent) {
 		t.Fatalf("Incorrect data returned from /student/dashboard/")
 	}
 }

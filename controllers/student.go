@@ -212,7 +212,7 @@ func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 		First(&modelStudent)
 
 	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Database Error fetching student with username `%s`,Error: `%v`", login_username, tx.Error), http.StatusInternalServerError)
+		utils.LogErrAndRespond(r, w, tx.Error, fmt.Sprintf("Database Error fetching student with username `%s`", login_username), http.StatusInternalServerError)
 		return
 	}
 	student := CreateStudentDashboard(modelStudent, db)
