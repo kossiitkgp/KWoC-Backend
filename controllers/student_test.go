@@ -275,6 +275,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		project_ids = append(project_ids, fmt.Sprint(p.ID))
 
 	}
+
 	modelStudent := models.Student{
 		Name:           "Test",
 		Username:       testUsername,
@@ -286,6 +287,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		PullCount:      uint(rand.Int()),
 		LinesAdded:     uint(rand.Int()),
 		LinesRemoved:   uint(rand.Int()),
+		LanguagesUsed:  "Python,JavaScript,Java,C/C++,C#",
 	}
 
 	_ = db.Table("students").Create(&modelStudent)

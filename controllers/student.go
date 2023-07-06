@@ -176,7 +176,17 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "BlogLink successfully updated.")
 }
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
-	student := StudentDashboard{
+	var projects []ProjectDashboard
+	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
+		var project ProjectDashboard
+		db.Table("projects").
+			Where("id = ?", proj_id).
+			Select("name", "repo_link").
+			First(&project)
+		projects = append(projects, project)
+	}
+	languages := strings.Split(modelStudent.LanguagesUsed, ",")
+	return StudentDashboard{
 		Name:           modelStudent.Name,
 		Username:       modelStudent.Username,
 		College:        modelStudent.College,
@@ -186,17 +196,9 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 		PullCount:      modelStudent.PullCount,
 		LinesAdded:     modelStudent.LinesAdded,
 		LinesRemoved:   modelStudent.LinesRemoved,
+		LanguagesUsed:  languages,
+		ProjectsWorked: projects,
 	}
-	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
-		var project ProjectDashboard
-		db.Table("projects").
-			Where("id = ?", proj_id).
-			Select("name", "repo_link").
-			First(&project)
-		student.ProjectsWorked = append(student.ProjectsWorked, project)
-	}
-	student.LanguagesUsed = strings.Split(modelStudent.LanguagesUsed, ",")
-	return student
 }
 
 func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
