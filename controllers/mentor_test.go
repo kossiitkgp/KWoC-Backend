@@ -185,7 +185,7 @@ func TestFetchMentorOK(t *testing.T) {
 	_ = json.NewDecoder(res.Body).Decode(&resMentors)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	if len(resMentors) != 10 {
+	if len(resMentors) != numMentors {
 		t.Fatalf("Not getting expected numbers of mentors from /mentor/all/")
 	}
 

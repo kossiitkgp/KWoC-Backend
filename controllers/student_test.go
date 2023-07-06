@@ -5,8 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"kwoc-backend/controllers"
+	"kwoc-backend/models"
 	"kwoc-backend/utils"
+	"math/rand"
 	"net/http"
+	"reflect"
+	"strings"
 	"testing"
 
 	"gorm.io/gorm"
@@ -235,4 +239,122 @@ func TestStudentBlogLink(t *testing.T) {
 			tStudentBlogLinkNonExistingUser(db, t)
 		},
 	)
+}
+
+// Test unauthenticated request to /student/dashboard/
+func TestStudentDashboardNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "GET", "/student/dashboard/")
+}
+
+// Test request to /student/dashboard/ with invalid jwt
+func TestStudentDashboardInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "GET", "/student/dashboard/")
+}
+
+// Test unauthenticated request to /student/dashboard/ with no registration
+func TestStudentDashboardNoReg(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	req, _ := http.NewRequest(
+		"GET",
+		"/student/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` does not exists.", testUsername))
+}
+
+// Test requests to /student/dashboard/ with registered and  proper authentication
+func TestStudentDashboardOK(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	testProjects := generateTestProjects(5, false, true)
+	_ = db.Table("projects").Create(testProjects)
+
+	var project_ids []string
+	for _, p := range testProjects {
+		project_ids = append(project_ids, fmt.Sprint(p.ID))
+	}
+
+	modelStudent := models.Student{
+		Name:           "Test",
+		Username:       testUsername,
+		College:        "The best university",
+		ProjectsWorked: strings.Join(project_ids, ","),
+		PassedMidEvals: true,
+		PassedEndEvals: true,
+		CommitCount:    uint(rand.Int()),
+		PullCount:      uint(rand.Int()),
+		LinesAdded:     uint(rand.Int()),
+		LinesRemoved:   uint(rand.Int()),
+		LanguagesUsed:  "Python,JavaScript,Java,C/C++,C#",
+	}
+
+	_ = db.Table("students").Create(&modelStudent)
+
+	var projects []controllers.ProjectDashboard
+	for _, p := range testProjects {
+		projects = append(projects, controllers.ProjectDashboard{
+			Name:     p.Name,
+			RepoLink: p.RepoLink,
+		})
+	}
+	languages := strings.Split(modelStudent.LanguagesUsed, ",")
+	testStudent := controllers.StudentDashboard{
+		Name:           modelStudent.Name,
+		Username:       modelStudent.Username,
+		College:        modelStudent.College,
+		PassedMidEvals: modelStudent.PassedMidEvals,
+		PassedEndEvals: modelStudent.PassedEndEvals,
+		CommitCount:    modelStudent.CommitCount,
+		PullCount:      modelStudent.PullCount,
+		LinesAdded:     modelStudent.LinesAdded,
+		LinesRemoved:   modelStudent.LinesRemoved,
+		LanguagesUsed:  languages,
+		ProjectsWorked: projects,
+	}
+	req, _ := http.NewRequest(
+		"GET",
+		"/student/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	var resStudent controllers.StudentDashboard
+	_ = json.NewDecoder(res.Body).Decode(&resStudent)
+
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	if !reflect.DeepEqual(testStudent, resStudent) {
+		t.Fatalf("Incorrect data returned from /student/dashboard/")
+	}
 }
