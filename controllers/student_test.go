@@ -302,7 +302,6 @@ func TestStudentDashboardOK(t *testing.T) {
 	var project_ids []string
 	for _, p := range testProjects {
 		project_ids = append(project_ids, fmt.Sprint(p.ID))
-
 	}
 
 	modelStudent := models.Student{
@@ -322,13 +321,11 @@ func TestStudentDashboardOK(t *testing.T) {
 	_ = db.Table("students").Create(&modelStudent)
 
 	var projects []controllers.ProjectDashboard
-	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
-		var project controllers.ProjectDashboard
-		db.Table("projects").
-			Where("id = ?", proj_id).
-			Select("name", "repo_link").
-			First(&project)
-		projects = append(projects, project)
+	for _, p := range testProjects {
+		projects = append(projects, controllers.ProjectDashboard{
+			Name:     p.Name,
+			RepoLink: p.RepoLink,
+		})
 	}
 	languages := strings.Split(modelStudent.LanguagesUsed, ",")
 	testStudent := controllers.StudentDashboard{
