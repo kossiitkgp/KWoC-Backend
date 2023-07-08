@@ -54,8 +54,6 @@ All controllers except `/oauth/` are tested. New controllers should include test
 The file `controllers/common_test.go` exports functions commonly used in controller tests.
 
 ## Project Structure
-[WIP]
-
 ### Libraries Used
 - [gorilla/mux](https://github.com/gorilla/mux): Used for routing.
 - [gorm.io/gorm](https://gorm.io): Used for database modelling.
