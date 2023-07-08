@@ -247,6 +247,16 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 ### Github OAuth
 KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.
 
+#### How It Works
+KWoC follows the [web application workflow](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow) for authorizing OAuth apps.
+1. The [frontend](https://github.com/kossiitkgp/KWoC-Frontend) redirects the user to the OAuth login page.
+2. The user is redirected back to the frontend with a temporary `code`.
+3. The frontend makes a request to the `/oauth/` endpoint with the `code`.
+4. The backend obtains the user's username, name (if available), and email (if avaiable) from the Github API using the `code`.
+5. The backend registers the user in the database and generates a [JWT](https://jwt.io) for authentication.
+6. This generated JWT is stored in the localstorage by the frontend and sent as with the `Bearer` header in subsequent requests to endpoints that require login/registration.
+
+#### Setting Up OAuth
 To set up the KWoC server, a Github OAuth application has to be created and the client id and secret has to be set in the [environment variables](#environment-variables).
 
 - Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
