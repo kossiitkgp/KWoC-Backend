@@ -33,7 +33,7 @@ KWoC backend server v2.0 (also) written in Go (but better).
 - Optionally (but **recommended**) [set up pre-commit hooks](#setting-up-pre-commit-hooks).
 
 #### Setting Up Pre-Commit Hooks
-- Check if `golangci-lint` is installed, if not, install from [golangci-lint](https://golangci-lint.run/usage/install/).
+- Check if `golangci-lint` is installed. If not, install from [golangci-lint](https://golangci-lint.run/usage/install/).
 - Run `git config core.hooksPath .githooks`, see [core.hooksPath](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath).
 
 ### Building
@@ -43,13 +43,13 @@ KWoC backend server v2.0 (also) written in Go (but better).
 ### File Naming Convention
 See also [File Structure](#file-structure).
 
-1. Test Files: Tests for a particular `file.go` are placed in a file named `file_test.go` and are placed in the same directory.
-2. Model Files: Database models are placed in the `models` directory. Each file corresponds to one table in the database and the name of the file corresponds with the name of the database table.
+1. Test Files: Tests for a particular `file.go` are placed in a file named `file_test.go` and in the same directory.
+2. Model Files: Database models are placed in the `models` directory. Each file corresponds to one table in the database, and the name of the file corresponds with the name of the database table.
 
 ### Testing
 See also [File Naming Convention](#file-naming-convention).
 
-All controllers except `/oauth/` are tested. New controllers should include tests. For controllers, not only successes but the failures should also be tested.
+All controllers except `/oauth/` are tested. New controllers should include tests. For controllers, not only successes but failures should also be tested.
 
 The file `controllers/common_test.go` exports functions commonly used in controller tests.
 
@@ -63,15 +63,15 @@ The file `controllers/common_test.go` exports functions commonly used in control
 ### File Structure
 ```
 ├── cmd
-│   ├── backend.go
-│   └── ...
+│   ├── backend.go
+│   └── ...
 ├── controllers
-│   ├── index.go
-│   └── ...
+│   ├── index.go
+│   └── ...
 ├── server
-│   ├── router.go
-│   ├── routes.go
-│   └── ...
+│   ├── router.go
+│   ├── routes.go
+│   └── ...
 ├── models
 │   ├── mentors.go
 │   └── ...
@@ -83,20 +83,20 @@ The file `controllers/common_test.go` exports functions commonly used in control
     └── ...
 ```
 
-- `cmd` : Contains executable files including the entrypoing of the server (`backend.go`).
-- `controllers` : Contains controllers for the endpoints. (See also [Endpoints](#endpoints))
-- `server` : Contains the router logic and routes.
-- `models` : Contains KWoC database models.
-- `utils` : Contains misc functions like database utils.
+- `cmd`: Contains executable files, including the entry point of the server (`backend.go`).
+- `controllers`: Contains controllers for the endpoints. (See also [Endpoints](#endpoints))
+- `server`: Contains the router logic and routes.
+- `models`: Contains KWoC database models.
+- `utils`: Contains misc functions like database utils.
 - `middleware`: Contains all middleware.
 
 ### Endpoints
 TODO: Find a good, automated way to generate endpoint documentation. (See also: [File Structure](#file-structure))
 
 ### Middleware
-The `middleware/` directory contains all the middleware used in the server. The middleware are used in `server/routes.go` and `server/router.go` files. The following middelware are exported under the `middelware` package.
+The `middleware/` directory contains all the middleware used in the server. The middleware is used in the `server/routes.go` and `server/router.go` files. The following middleware is exported under the `middleware` package.
 
-All middleware take an `http.Handler` function as an argument and return the wrapper `http.Handler` function.
+All middleware takes an `http.Handler` function as an argument and returns the wrapper `http.Handler` function.
 
 #### Logger
 File: `middleware/logger.go`
@@ -106,11 +106,11 @@ Logs information regarding the incoming request and the time taken to handle the
 #### Login
 File: `middleware/login.go`
 
-Handles login/authentication for requests. Requests must included the `Bearer` key in the header with the JWT string for login.
+Handles login/authentication for requests. Requests must include the `Bearer` key in the header with the JWT string for login.
 
-The middleware responds to invalid/unauthenticated requests and only passes valid requests to the inner function. The middleware also adds the logged in user's username to the request's context.
+The middleware responds to invalid/unauthenticated requests and only passes valid requests to the inner function. The middleware adds the logged-in user's username to the request's context.
 
-A constant `LOGIN_CTX_USERNAME_KEY` is exported by the middleware. This is the key used to access the login username.
+A constant `LOGIN_CTX_USERNAME_KEY` exported by the middleware is the key for the login username in the request's context.
 ```go
 login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 ```
@@ -118,9 +118,9 @@ login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 #### Wrap
 File `middleware/wrap.go`
 
-Adds an instance of the `App` struct (also defined in the same file) to the requests's context. This struct contains the database (`*gorm.DB`) used by the server.
+Adds an instance of the `App` struct (defined in the same file) to the requests' context. This struct contains the database (`*gorm.DB`) used by the server.
 
-A constant `APP_CTX_KEY` is exported by the middleware. This is the key used to access the `App`.
+A constant `APP_CTX_KEY` exported by the middleware is the key used to access the `App`.
 ```go
 app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 db := app.Db
@@ -156,9 +156,9 @@ File `utils/log.go`
 Contains functions for logging information, warnings, and errors encountered during the handling of an HTTP request in a consistent manner.
 - `LogInfo()`: Logs an information message with information regarding the HTTP request that triggered the log.
 - `LogWarn()`: Logs a warning with information regarding the HTTP request that triggered the warning.
-- `LogWarnAndRespond()`: Logs a warning, same as the `LogWarn()` function and responds to the HTTP request with the warning message.
+- `LogWarnAndRespond()`: Logs a warning, same as the `LogWarn()` function, and responds to the HTTP request with the warning message.
 - `LogErr()`: Logs an error with an error message and information regarding the HTTP request that triggered the error.
-- `LogErrAndRespond()`: Logs an error, same as the `LogErr()` function and responds to the HTTP request with the error message.
+- `LogErrAndRespond()`: Logs an error, same as the `LogErr()` function, and responds to the HTTP request with the error message.
 
 #### OAuth
 File: `utils/oauth.go`
@@ -168,7 +168,7 @@ Contains functions for authenticating a user via [Github OAuth](#github-oauth). 
 - `GetOauthUserInfo()`: Gets basic information about the user from the Github API using an access token. (See: [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api) for more information)
 
 ### Database Models
-The `models/` directory contains database models for the KWoC datatabase tables. (See also: [File Structure](#file-structure) and [File Naming Convention](#file-naming-convention))
+The `models/` directory contains database models for the KWoC database tables. (See also: [File Structure](#file-structure) and [File Naming Convention](#file-naming-convention))
 
 #### Mentors
 - Table: `mentors`
@@ -186,23 +186,23 @@ The `models/` directory contains database models for the KWoC datatabase tables.
   - `comm_channel` (string): A link to the project's official communication channel.
   - `readme_link` (string): A link to the project's README file.
   - `project_status` (bool): Whether the project is approved.
-  - `last_pull_time` (int64): The timestamp of merging of the last tracked (for statistics) pull request.
+  - `last_pull_time` (int64): The timestamp of merging the last tracked pull request (for statistics).
   - `commit_count` (uint): The number of commits contributed to this project during KWoC.
   - `pull_count` (uint): The number of pull requests contributed to this project during KWoC.
   - `lines_added` (uint): The number of lines added to this project during KWoC.
   - `lines_removed` (uint): The number of lines removed from this project during KWoC.
   - `contributors` (string): A list of usernames of students who contributed to the project during KWoC, separated by comma(,).
-  - `pulls` (string): A list of links to pull requests contributed to the project during KWoC, separated by comma(,).
+  - `pulls` (string): A list of links to pull requests contributed to the project during KWoC, separated by a comma(,).
   - `mentor_id` (int32): The ID of the project's primary mentor.
-  - `secondary_mentor_id` (int32):The ID of the project's secondary mentor.
+  - `secondary_mentor_id` (int32): The ID of the project's secondary mentor.
 
 #### Stats
 - Table: `stats`
 - Structure:
   - `total_commit_count` (uint): The total number of commits contributed during KWoC.
   - `total_pull_count` (uint): The total number of pull requests contributed during KWoC.
-  - `total_lines_added` (uint): The total number of lines added during KWoC.
-  - `total_lines_removed` (uint): The total number of lines removed during KWoC.
+  - `total_lines_added` (uint): The number of lines added during KWoC.
+  - `total_lines_removed` (uint): The number of lines removed during KWoC.
 
 #### Students
 - Table: `students`
@@ -211,8 +211,8 @@ The `models/` directory contains database models for the KWoC datatabase tables.
   - `email` (string): The email of the KWoC student.
   - `college` (string): The college in which the KWoC student is enrolled.
   - `username` (string): The username of the KWoC student.
-  - `passed_mid_evals` (bool): Whether the student has passed the mid evals.
-  - `passed_end_evals` (bool): Whether the student has passed the end evals.
+  - `passed_mid_evals` (bool): Whether the student has passed the mid-evals.
+  - `passed_end_evals` (bool): Whether the student has passed the end-evals.
   - `blog_link` (string): A link to the student's final KWoC blog.
   - `commit_count` (uint): The number of commits contributed by the student during KWoC.
   - `pull_count` (uint): The number of pull requests contributed by the student during KWoC.
@@ -220,7 +220,7 @@ The `models/` directory contains database models for the KWoC datatabase tables.
   - `lines_removed` (uint): The number of lines removed by the student during KWoC.
   - `languages_used` (string): A list of languages used by the student in KWoC contributions, separated by comma(,).
   - `projects_worked` (string): A list of IDs of projects the student contributed to during KWoC.
-  - `pulls` (string): A list of links to pull requests contributed by the student during KWoC, separated by comma(,).
+  - `pulls` (string): A list of links to pull requests contributed by the student during KWoC, separated by a comma(,).
 
 
 ### Command-Line Arguments
@@ -243,21 +243,21 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 - `JWT_VALIDITY_TIME`: The amount of time (in hours) for which the generated JWT tokens should be valid.
 
 ### Github OAuth
-KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for log in authentication instead of passwords.
+KWoC uses Github [OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps#about-github-apps-and-oauth-apps) for authentication instead of passwords.
 
 #### How It Works
 KWoC follows the [web application workflow](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow) for authorizing OAuth apps.
-1. The [frontend](https://github.com/kossiitkgp/KWoC-Frontend) redirects the user to the OAuth login page.
-2. The user is redirected back to the frontend with a temporary `code`.
+1. The [frontend](https://github.com/kossiitkgp/KWoC-Frontend) redirects users to the OAuth login page.
+2. The user is redirected to the frontend with a temporary `code`.
 3. The frontend makes a request to the `/oauth/` endpoint with the `code`.
-4. The backend obtains the user's username, name (if available), and email (if avaiable) from the Github API using the `code`.
+4. The backend obtains the user's username, name (if available), and email (if available) from the Github API using the `code`.
 5. The backend registers the user in the database and generates a [JWT](https://jwt.io) for authentication.
-6. This generated JWT is stored in the localstorage by the frontend and sent as with the `Bearer` header in subsequent requests to endpoints that require login/registration.
+6. This generated JWT is stored in the local storage by the frontend and sent with the `Bearer` header in subsequent requests to endpoints that require login/registration.
 
 #### Setting Up OAuth
-To set up the KWoC server, a Github OAuth application has to be created and the client id and secret has to be set in the [environment variables](#environment-variables).
+To set up the KWoC server, a Github OAuth application has to be created, and the client id and secret have to be set in the [environment variables](#environment-variables).
 
-- Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. In the production server, use the `koss-service` account to create the application.
+- Follow [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) documentation to create an OAuth app. Use the `kossiitkgp` organization account in the production server to create the application.
 - Set the Homepage URL to `https://kwoc.kossiitkgp.org` and the authorization callback URL to `https://kwoc.kossiitkgp.org/oauth/` in the production application.
 - Copy the client ID and the client secret (this should NEVER be made public) and set the `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` [environment variables](#environment-variables) to these values.
 
