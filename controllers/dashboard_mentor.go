@@ -11,18 +11,35 @@ import (
 	"gorm.io/gorm"
 )
 
+type ProjectInfo struct {
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Tags          string `json:"tags"`
+	RepoLink      string `json:"repo_link"`
+	CommChannel   string `json:"comm_channel"`
+	ReadmeLink    string `json:"readme_link"`
+	ProjectStatus bool   `json:"project_status"`
+
+	// stats table
+	CommitCount  uint `json:"commit_count"`
+	PullCount    uint `json:"pull_count"`
+	LinesAdded   uint `json:"lines_added"`
+	LinesRemoved uint `json:"lines_removed"`
+}
+
 type MentorDashboard struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 
-	Projects []models.Project `json:"projects"`
-	Students []models.Student `json:"students"`
+	Projects []ProjectInfo      `json:"projects"`
+	Students []StudentDashboard `json:"students"`
 }
 
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	var projects []models.Project
-	var students []models.Student
+	var projectsInfo []ProjectInfo
+	var students []StudentDashboard
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
@@ -30,9 +47,27 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Find(&projects)
 
 	for _, project := range projects {
-		var student models.Student
+		projectInfo := ProjectInfo{
+			Name:          project.Name,
+			Description:   project.Description,
+			Tags:          project.Tags,
+			RepoLink:      project.RepoLink,
+			CommChannel:   project.CommChannel,
+			ReadmeLink:    project.ReadmeLink,
+			ProjectStatus: project.ProjectStatus,
+
+			// stats table
+			CommitCount:  project.CommitCount,
+			PullCount:    project.PullCount,
+			LinesAdded:   project.LinesAdded,
+			LinesRemoved: project.LinesRemoved,
+		}
+		projectsInfo = append(projectsInfo, projectInfo)
+
+		var modelStudent models.Student
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
-			db.Table("students").Where("username = ?", studentUsername).First(&student)
+			db.Table("students").Where("username = ?", studentUsername).First(&modelStudent)
+			student := CreateStudentDashboard(modelStudent, db)
 			students = append(students, student)
 		}
 	}
@@ -42,7 +77,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Username: mentor.Username,
 		Email:    mentor.Email,
 
-		Projects: projects,
+		Projects: projectsInfo,
 		Students: students,
 	}
 }
