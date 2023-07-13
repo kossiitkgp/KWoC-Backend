@@ -20,13 +20,8 @@ type RegisterMentorReqFields struct {
 }
 
 type ProjectInfo struct {
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	Tags          string `json:"tags"`
-	RepoLink      string `json:"repo_link"`
-	CommChannel   string `json:"comm_channel"`
-	ReadmeLink    string `json:"readme_link"`
-	ProjectStatus bool   `json:"project_status"`
+	Name     string `json:"name"`
+	RepoLink string `json:"repo_link"`
 
 	// stats table
 	CommitCount  uint `json:"commit_count"`
@@ -147,13 +142,8 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	for _, project := range projects {
 		projectInfo := ProjectInfo{
-			Name:          project.Name,
-			Description:   project.Description,
-			Tags:          project.Tags,
-			RepoLink:      project.RepoLink,
-			CommChannel:   project.CommChannel,
-			ReadmeLink:    project.ReadmeLink,
-			ProjectStatus: project.ProjectStatus,
+			Name:     project.Name,
+			RepoLink: project.RepoLink,
 
 			// stats table
 			CommitCount:  project.CommitCount,
