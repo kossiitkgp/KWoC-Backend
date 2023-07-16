@@ -24,7 +24,7 @@
     <img width="140" alt="KWoC Logo" src="https://raw.githubusercontent.com/kossiitkgp/design/master/logo/kwoc_logo.png">
   </a>
 
-  <h3 align="center">KWoC Backend v2</h3>
+  <h3 align="center">KWoC Backend v2.0</h3>
 
   <p align="center">
   <!-- UPDATE -->
@@ -37,9 +37,6 @@
     <a href="https://github.com/kossiitkgp/KWoC-Frontend">Frontend</a>
   </p>
 </div>
-
-# KWoC Backend v2.0
-KWoC backend server v2.0 (also) written in Go (but better).
 
 ## Table of Contents
 - [Development](#development)
