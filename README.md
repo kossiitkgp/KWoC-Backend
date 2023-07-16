@@ -30,7 +30,7 @@
   <!-- UPDATE -->
     <i>Backend, revamped.</i>
     <br />
-    <a href="#table-of-contents"><strong>Get Started »</strong></a>
+    <a href="#development"><strong>Get Started »</strong></a>
     <br />
     <a href="https://kwoc.kossiitkgp.org">Kharagpur Winter of Code</a>
     ·
