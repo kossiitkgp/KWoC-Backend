@@ -142,7 +142,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Preload("Mentor").Preload("SecondaryMentor").
+		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed").
 		Find(&projects)
 
 	for _, project := range projects {
@@ -160,7 +160,8 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 		var modelStudent models.Student
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
-			db.Table("students").Where("username = ?", studentUsername).First(&modelStudent)
+			db.Table("students").Where("username = ?", studentUsername).
+				Select("name", "username").First(&modelStudent)
 			student := StudentInfo{
 				Name:     modelStudent.Name,
 				Username: modelStudent.Username,
