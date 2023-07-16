@@ -1,3 +1,43 @@
+<div id="top></div>
+
+<!-- README TEMPLATE BASED ON https://github.com/proffapt/myREADME -->
+<!-- PROJECT SHIELDS -->
+<div align="center">
+  <p align="center">
+    <a href="https://kossiitkgp.org">
+      <img alt="KOSS Shield" src="https://img.shields.io/badge/With%20%E2%9D%A4%EF%B8%8F-KOSS-blue?style=for-the-badge">
+    </a>
+    <a href="https://github.com/kossiitkgp/KWoC-Backend/blob/main/LICENSE">
+      <img alt="License Shield" src="https://img.shields.io/github/license/kossiitkgp/KWoC-Backend.svg?style=for-the-badge">
+    </a>
+    <a href="https://github.com/kossiitkgp/KWoC-Backend/contributors">
+      <img alt="Contributors Shield" src="https://img.shields.io/github/contributors/kossiitkgp/KWoC-Backend.svg?style=for-the-badge">
+    </a>
+  </p>
+</div>
+
+<!-- PROJECT LOGO -->
+<br />
+<!-- UPDATE -->
+<div align="center">
+  <a href="https://github.com/kossiitkgp/KWoC-Backend">
+    <img width="140" alt="KWoC Logo" src="https://raw.githubusercontent.com/kossiitkgp/design/master/logo/kwoc_logo.png">
+  </a>
+
+  <h3 align="center">KWoC Backend v2</h3>
+
+  <p align="center">
+  <!-- UPDATE -->
+    <i>Backend, revamped.</i>
+    <br />
+    <a href="#table-of-contents"><strong>Get Started »</strong></a>
+    <br />
+    <a href="https://kwoc.kossiitkgp.org">Kharagpur Winter of Code</a>
+    ·
+    <a href="https://github.com/kossiitkgp/KWoC-Frontend">Frontend</a>
+  </p>
+</div>
+
 # KWoC Backend v2.0
 KWoC backend server v2.0 (also) written in Go (but better).
 
