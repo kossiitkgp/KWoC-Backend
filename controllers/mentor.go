@@ -190,6 +190,7 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
+		Select("name", "username", "email", "ID").
 		First(&modelMentor)
 
 	if tx.Error == gorm.ErrRecordNotFound {
