@@ -267,7 +267,7 @@ func TestMentorDashboardOK(t *testing.T) {
 	db.Table("mentors").Create(&modelMentor)
 
 	var projects []controllers.ProjectInfo
-	var students []controllers.StudentDashboard
+	var students []controllers.StudentInfo
 
 	modelStudents := generateTestStudents(5)
 
@@ -299,7 +299,10 @@ func TestMentorDashboardOK(t *testing.T) {
 	}
 
 	for _, student := range modelStudents {
-		students = append(students, controllers.CreateStudentDashboard(student, db))
+		students = append(students, controllers.StudentInfo{
+			Name:     student.Name,
+			Username: student.Username,
+		})
 	}
 
 	db.Table("projects").Create(testProjects)

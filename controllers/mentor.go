@@ -30,13 +30,18 @@ type ProjectInfo struct {
 	LinesRemoved uint `json:"lines_removed"`
 }
 
+type StudentInfo struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+}
+
 type MentorDashboard struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 
-	Projects []ProjectInfo      `json:"projects"`
-	Students []StudentDashboard `json:"students"`
+	Projects []ProjectInfo `json:"projects"`
+	Students []StudentInfo `json:"students"`
 }
 
 func RegisterMentor(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +138,7 @@ func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	var projects []models.Project
 	var projectsInfo []ProjectInfo
-	var students []StudentDashboard
+	var students []StudentInfo
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
@@ -156,7 +161,10 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		var modelStudent models.Student
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
 			db.Table("students").Where("username = ?", studentUsername).First(&modelStudent)
-			student := CreateStudentDashboard(modelStudent, db)
+			student := StudentInfo{
+				Name:     modelStudent.Name,
+				Username: modelStudent.Username,
+			}
 			students = append(students, student)
 		}
 	}
