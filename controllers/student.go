@@ -50,14 +50,11 @@ type StudentDashboard struct {
 //	@Description	Register a new student with the provided details.
 //	@Accept			json
 //	@Produce		plain
-//	@Param			username	body		string	true	"The username of the student"
-//	@Param			name		body		string	true	"The name of the student"
-//	@Param			email		body		string	true	"The email of the student"
-//	@Param			college		body		string	true	"The college of the student"
-//	@Success		200			{string}	string	"Student registration successful."
-//	@Failure		401			{string}	string	"Login username and given username do not match."
-//	@Failure		400			{string}	string	"Student 'username' already exists."
-//	@Failure		500			{string}	string	"Database error."
+//	@Param			request	body		RegisterStudentReqFields	true	"Fields required for student registeration"
+//	@Success		200		{string}	string						"Student registration successful."
+//	@Failure		401		{string}	string						"Login username and given username do not match."
+//	@Failure		400		{string}	string						"Student 'username' already exists."
+//	@Failure		500		{string}	string						"Database error."
 //	@Router			/student/form/ [post]
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
@@ -136,12 +133,11 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 //	@Description	requires login
 //	@Accept			json
 //	@Produce		plain
-//	@Param			username	body		string	true	"The username of the student"
-//	@Param			blog_link	body		string	true	"The URL of the student's blog"
-//	@Success		200			{string}	string	"BlogLink successfully updated."
-//	@Failure		401			{string}	string	"Login username and given username do not match."
-//	@Failure		400			{string}	string	"Student 'username' does not exist."
-//	@Failure		500			{string}	string	"Error updating BlogLink for 'username'."
+//	@Param			request	body		StudentBlogLinkReqFields	true	"Fields required for student bloglink"
+//	@Success		200		{string}	string						"BlogLink successfully updated."
+//	@Failure		401		{string}	string						"Login username and given username do not match."
+//	@Failure		400		{string}	string						"Student 'username' does not exist."
+//	@Failure		500		{string}	string						"Error updating BlogLink for 'username'."
 //	@Router			/student/bloglink/ [post]
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)

@@ -17,10 +17,9 @@ import (
 
 // main function
 //
-//	@title			Kwoc Backend
+//	@title			KwoC Backend
 //	@version		2.0.0
-//	@description	Kwoc Backend API
-//	@Host			kwoc-2022.fly.dev
+//	@description	KwoC Backend API
 //	@BasePath		/
 func main() {
 	// Parse command-line arguments
