@@ -8,7 +8,14 @@ import (
 	"time"
 )
 
-// Ping responds with "pong" and returns the latency.
+// Ping godoc
+//
+//	@Summary		ping
+//	@Description	Ping responds with "pong" and returns the latency
+//	@Accept			plain
+//	@Produce		plain
+//	@Success		200	{string}	string	"pong"
+//	@Router			/healthcheck/ping [get]
 func Ping(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 

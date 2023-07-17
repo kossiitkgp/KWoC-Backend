@@ -15,6 +15,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// main function
+//
+//	@title			Kwoc Backend
+//	@version		2.0.0
+//	@description	Kwoc Backend API
+//	@Host			kwoc-2022.fly.dev
+//	@BasePath		/
 func main() {
 	// Parse command-line arguments
 	envFile := flag.String("envFile", ".env", "A file to load environment variables from.")
