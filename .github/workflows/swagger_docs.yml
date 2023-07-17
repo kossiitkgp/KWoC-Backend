@@ -56,7 +56,7 @@ jobs:
         run: |
           mkdir -p docs
           pushd ./docs
-          npx redocly build-docs --output index.html --config redocly.yaml
+          npx @redocly/cli build-docs --output index.html --config redocly.yaml
           popd
 
       - name: Commit and push changes
