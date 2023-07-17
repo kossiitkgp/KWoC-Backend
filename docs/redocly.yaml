@@ -1,0 +1,3 @@
+apis:
+  backend-api:
+    root: ./swagger.yaml
