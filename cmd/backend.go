@@ -19,7 +19,7 @@ import (
 //
 //	@title			KWoC Backend
 //	@version		2.0.0
-//	@description	KWoC Backend API
+//	@description	KWoC Backend API written in go
 //	@BasePath		/
 func main() {
 	// Parse command-line arguments
