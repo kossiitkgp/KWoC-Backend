@@ -128,7 +128,8 @@ The file `controllers/common_test.go` exports functions commonly used in control
 - `middleware`: Contains all middleware.
 
 ### Endpoints
-TODO: Find a good, automated way to generate endpoint documentation. (See also: [File Structure](#file-structure))
+To write annotations for the endpoints, you can refer to [swag](https://github.com/swaggo/swag#readme)
+You can find the endpoints documentation [here](https://kossiitkgp.org/KWoC-Backend/).
 
 ### Middleware
 The `middleware/` directory contains all the middleware used in the server. The middleware is used in the `server/routes.go` and `server/router.go` files. The following middleware is exported under the `middleware` package.
