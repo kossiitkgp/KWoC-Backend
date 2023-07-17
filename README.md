@@ -128,7 +128,21 @@ The file `controllers/common_test.go` exports functions commonly used in control
 - `middleware`: Contains all middleware.
 
 ### Endpoints
-TODO: Find a good, automated way to generate endpoint documentation. (See also: [File Structure](#file-structure))
+The documentation for the endpoints can be found [here](https://kossiitkgp.org/KWoC-Backend/).
+
+The endpoints documentation is generated through annotations using the [swagger_docs.yml](./.github/workflows/swagger_docs.yml)
+workflow. The generated documentation is saved in the `docs` branch.
+
+For generating the Swagger specification, [swag](https://github.com/swaggo/swag) is used, and [redocly](https://redocly.com/docs/cli/) is used to create the visually appealing webpage that is hosted on GitHub Pages.
+
+[swag](https://github.com/swaggo/swag) is used to generate the swagger specification and [redocly](https://redocly.com/docs/cli/)
+is used to generate the beautiful webpage which is hosted on github pages.
+
+To customize the rendering of the documentation, you can edit the `docs/redocly.yaml` file in the docs branch.
+
+Please avoid directly editing the `docs/swagger.yaml` or `docs/index.html` files.
+
+To write annotations for the endpoints, you can refer to [swag](https://github.com/swaggo/swag#readme)
 
 ### Middleware
 The `middleware/` directory contains all the middleware used in the server. The middleware is used in the `server/routes.go` and `server/router.go` files. The following middleware is exported under the `middleware` package.

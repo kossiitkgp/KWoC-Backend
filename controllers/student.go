@@ -44,6 +44,18 @@ type StudentDashboard struct {
 	ProjectsWorked []ProjectDashboard `json:"projects_worked"`
 }
 
+// RegisterStudent godoc
+//
+//	@Summary		Register a student
+//	@Description	Register a new student with the provided details.
+//	@Accept			json
+//	@Produce		plain
+//	@Param			request	body		RegisterStudentReqFields	true	"Fields required for student registeration"
+//	@Success		200		{string}	string						"Student registration successful."
+//	@Failure		401		{string}	string						"Login username and given username do not match."
+//	@Failure		400		{string}	string						"Student 'username' already exists."
+//	@Failure		500		{string}	string						"Database error."
+//	@Router			/student/form/ [post]
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -114,6 +126,19 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Student registration successful.")
 }
 
+// StudentBlogLink godoc
+//
+//	@Summary		Submit blog link
+//	@Description	submit a blog link for a student
+//	@Description	requires login
+//	@Accept			json
+//	@Produce		plain
+//	@Param			request	body		StudentBlogLinkReqFields	true	"Fields required for student bloglink"
+//	@Success		200		{string}	string						"BlogLink successfully updated."
+//	@Failure		401		{string}	string						"Login username and given username do not match."
+//	@Failure		400		{string}	string						"Student 'username' does not exist."
+//	@Failure		500		{string}	string						"Error updating BlogLink for 'username'."
+//	@Router			/student/bloglink/ [post]
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db

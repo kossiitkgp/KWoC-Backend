@@ -15,6 +15,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// main function
+//
+//	@title			KWoC Backend
+//	@version		2.0.0
+//	@description	KWoC Backend API written in go
+//	@BasePath		/
 func main() {
 	// Parse command-line arguments
 	envFile := flag.String("envFile", ".env", "A file to load environment variables from.")

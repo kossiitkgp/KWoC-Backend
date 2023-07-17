@@ -1,0 +1,75 @@
+name: Generate Endpoint Docs
+
+on:
+  push:
+    branches:
+      - "v2-dev" # TODO: remove this when merged into main
+      - "main"
+    paths:
+      - "controllers/*.go"
+      - "cmd/backend.go"
+  workflow_dispatch:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.KS_PAT }}
+          ref: docs
+
+      - name: Configure SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.KS_SSH_PRIVATE_KEY }}
+          SSH_PUBLIC_KEY: ${{ secrets.KS_SSH_PUBLIC_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/koss-service
+          echo "$SSH_PUBLIC_KEY" > ~/.ssh/koss-service.pub
+          chmod 600 ~/.ssh/koss-service
+          chmod 600 ~/.ssh/koss-service.pub
+
+      - name: Setup go
+        uses: actions/setup-go@v4
+
+      - name: install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+
+      - name: Merge the changes from main branch to docs branch
+        run: git merge ${{ github.ref }}
+
+      - name: Generate swagger.yaml and exit if no changes
+        run: |
+          swag init -g cmd/backend.go --ot yaml
+          if [ -z "$(git status --porcelain docs/swagger.yaml)" ]; then
+            exit 0 
+          fi
+
+      - name: Generate the html doc
+        run: |
+          mkdir -p docs
+          pushd ./docs
+          npx @redocly/cli build-docs --output index.html --config redocly.yaml
+          popd
+
+      - name: Commit and push changes
+        run: |
+          cd ./docs || exit 1
+          git config user.email "admin@kossiitkgp.org"
+          git config user.name "koss-service"
+          git config gpg.format ssh
+          git config user.signingkey ~/.ssh/koss-service.pub
+
+          if [ -n "$(git status --porcelain swagger.yaml index.html)" ]; then
+            git add swagger.yaml index.html
+            git commit -S -m "Updated endpoints documentation"
+            git push
+          else
+            echo "No changes endpoint documentation"
+          fi
