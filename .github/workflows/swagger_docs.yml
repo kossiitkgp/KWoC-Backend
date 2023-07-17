@@ -2,9 +2,11 @@ name: Generate Endpoint docs and swagger.yaml
 
 on:
   push:
+    branches:
+      - "v2-dev" # change it to master when merged
     paths:
       - "controllers/*.go"
-      - "docs/swagger.yaml"
+      - "cmd/backend.go"
   workflow_dispatch:
 
 jobs:
@@ -16,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.KS_PAT }}
-          ref: ${{ github.ref }}
+          ref: v2-swagger-docs
 
       - name: Configure SSH key
         env:
@@ -38,13 +40,22 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
 
-      - name: Generate swagger.yaml
+      - name: Merge the changes from main branch to v2-docs branch
+        run: git merge ${{ github.ref }}
+
+      - name: Generate swagger.yaml and exit if no changes
         run: |
           swag init -g cmd/backend.go --ot yaml
+          if [ -z "$(git status --porcelain docs/swagger.yaml)" ]; then
+            exit 0 
+          fi
 
-      - name: Generate the markdown doc
+      - name: Generate the html doc
         run: |
-          npx swagger-markdown -i ./docs/swagger.yaml -o ./docs/ENDPOINTS.md
+          mkdir -p docs
+          pushd ./docs
+          npx redocly build-docs --output index.html --config redocly.yaml
+          popd
 
       - name: Commit and push changes
         run: |
@@ -54,12 +65,9 @@ jobs:
           git config gpg.format ssh
           git config user.signingkey ~/.ssh/koss-service.pub
 
-          if [ -n "$(git status --porcelain swagger.yaml ENDPOINTS.md)" ]; then
-            git add swagger.yaml ENDPOINTS.md
+          if [ -n "$(git status --porcelain swagger.yaml index.html)" ]; then
+            git add swagger.yaml index.html
             git commit -S -m "Updated endpoints documentation"
-            git push
           else
             echo "No changes endpoint documentation"
           fi
-
-
