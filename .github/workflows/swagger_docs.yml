@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Merge the changes from main branch to docs branch
-        run: git merge ${{ github.ref }}
+        run: git merge ${{ github.ref_name }}
 
       - name: Generate swagger.yaml and exit if no changes
         run: |

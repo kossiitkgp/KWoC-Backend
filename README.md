@@ -135,9 +135,6 @@ workflow. The generated documentation is saved in the `docs` branch.
 
 For generating the Swagger specification, [swag](https://github.com/swaggo/swag) is used, and [redocly](https://redocly.com/docs/cli/) is used to create the visually appealing webpage that is hosted on GitHub Pages.
 
-[swag](https://github.com/swaggo/swag) is used to generate the swagger specification and [redocly](https://redocly.com/docs/cli/)
-is used to generate the beautiful webpage which is hosted on github pages.
-
 To customize the rendering of the documentation, you can edit the `docs/redocly.yaml` file in the docs branch.
 
 Please avoid directly editing the `docs/swagger.yaml` or `docs/index.html` files.
