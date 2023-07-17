@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/kossiitkgp/kwoc-backend/controllers"
-	"github.com/kossiitkgp/kwoc-backend/middleware"
+	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
+	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 )
 
 type Route struct {

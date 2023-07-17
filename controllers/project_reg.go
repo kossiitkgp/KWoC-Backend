@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kossiitkgp/kwoc-backend/middleware"
-	"github.com/kossiitkgp/kwoc-backend/models"
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
+	"github.com/kossiitkgp/kwoc-backend/v2/models"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
 	"gorm.io/gorm"
 )

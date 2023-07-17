@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 )
 
 func TestJwtUtils(t *testing.T) {

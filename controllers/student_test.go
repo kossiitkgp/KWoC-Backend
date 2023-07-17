@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kossiitkgp/kwoc-backend/controllers"
-	"github.com/kossiitkgp/kwoc-backend/models"
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
+	"github.com/kossiitkgp/kwoc-backend/v2/models"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
 	"gorm.io/gorm"
 )

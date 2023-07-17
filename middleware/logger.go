@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 )
 
 // Logging middleware for incoming requests

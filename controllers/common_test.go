@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kossiitkgp/kwoc-backend/server"
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/server"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
 	"gorm.io/gorm"
 )

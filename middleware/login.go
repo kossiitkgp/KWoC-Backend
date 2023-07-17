@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/kossiitkgp/kwoc-backend/utils"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 )
 
 type LoginCtxKey string
