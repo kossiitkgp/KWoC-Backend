@@ -17,9 +17,9 @@ import (
 
 // main function
 //
-//	@title			KwoC Backend
+//	@title			KWoC Backend
 //	@version		2.0.0
-//	@description	KwoC Backend API
+//	@description	KWoC Backend API
 //	@BasePath		/
 func main() {
 	// Parse command-line arguments
