@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"kwoc-backend/controllers"
-	"kwoc-backend/models"
-	"kwoc-backend/utils"
 	"math/rand"
 	"net/http"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/kossiitkgp/kwoc-backend/controllers"
+	"github.com/kossiitkgp/kwoc-backend/models"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 
 	"gorm.io/gorm"
 )

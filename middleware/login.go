@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"context"
-	"kwoc-backend/utils"
 	"net/http"
+
+	"github.com/kossiitkgp/kwoc-backend/utils"
 )
 
 type LoginCtxKey string

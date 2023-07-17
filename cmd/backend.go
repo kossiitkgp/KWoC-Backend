@@ -2,13 +2,14 @@ package main
 
 import (
 	"flag"
-	"kwoc-backend/server"
-	"kwoc-backend/utils"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+
+	"github.com/kossiitkgp/kwoc-backend/server"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"

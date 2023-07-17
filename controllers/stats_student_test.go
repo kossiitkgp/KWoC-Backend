@@ -3,12 +3,13 @@ package controllers_test
 import (
 	"encoding/json"
 	"fmt"
-	"kwoc-backend/controllers"
-	"kwoc-backend/models"
 	"math/rand"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/controllers"
+	"github.com/kossiitkgp/kwoc-backend/models"
 )
 
 func createFetchAllStudentsStatsRequest() *http.Request {

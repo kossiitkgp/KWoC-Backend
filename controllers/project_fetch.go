@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"fmt"
-	"kwoc-backend/middleware"
-	"kwoc-backend/models"
-	"kwoc-backend/utils"
 	"net/http"
 	"strconv"
+
+	"github.com/kossiitkgp/kwoc-backend/middleware"
+	"github.com/kossiitkgp/kwoc-backend/models"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"

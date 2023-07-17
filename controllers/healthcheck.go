@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"fmt"
-	"kwoc-backend/middleware"
-	"kwoc-backend/utils"
 	"net/http"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/middleware"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 )
 
 // Ping godoc

@@ -1,4 +1,4 @@
-module kwoc-backend
+module github.com/kossiitkgp/kwoc-backend
 
 go 1.19
 

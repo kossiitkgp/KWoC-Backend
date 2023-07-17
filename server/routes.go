@@ -1,9 +1,10 @@
 package server
 
 import (
-	"kwoc-backend/controllers"
-	"kwoc-backend/middleware"
 	"net/http"
+
+	"github.com/kossiitkgp/kwoc-backend/controllers"
+	"github.com/kossiitkgp/kwoc-backend/middleware"
 )
 
 type Route struct {

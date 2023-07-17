@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"kwoc-backend/middleware"
-	"kwoc-backend/utils"
 	"net/http"
+
+	"github.com/kossiitkgp/kwoc-backend/middleware"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 )
 
 type ProjectStats struct {

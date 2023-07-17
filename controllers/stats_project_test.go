@@ -2,10 +2,11 @@ package controllers_test
 
 import (
 	"encoding/json"
-	"kwoc-backend/controllers"
-	"kwoc-backend/models"
 	"net/http"
 	"testing"
+
+	"github.com/kossiitkgp/kwoc-backend/controllers"
+	"github.com/kossiitkgp/kwoc-backend/models"
 )
 
 func createFetchAllProjectStatsRequest() *http.Request {

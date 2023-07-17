@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"fmt"
-	"kwoc-backend/utils"
 	"net/http"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/utils"
 )
 
 // Logging middleware for incoming requests

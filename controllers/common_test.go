@@ -2,14 +2,15 @@ package controllers_test
 
 import (
 	"fmt"
-	"kwoc-backend/server"
-	"kwoc-backend/utils"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/server"
+	"github.com/kossiitkgp/kwoc-backend/utils"
 
 	"gorm.io/gorm"
 )

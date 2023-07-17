@@ -2,11 +2,12 @@ package utils_test
 
 import (
 	"fmt"
-	"kwoc-backend/utils"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/utils"
 )
 
 func TestJwtUtils(t *testing.T) {
