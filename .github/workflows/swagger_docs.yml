@@ -1,4 +1,4 @@
-name: Generate Endpoint docs and swagger.yaml
+name: Generate Endpoint Docs
 
 on:
   push:
