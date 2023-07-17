@@ -69,6 +69,7 @@ jobs:
           if [ -n "$(git status --porcelain swagger.yaml index.html)" ]; then
             git add swagger.yaml index.html
             git commit -S -m "Updated endpoints documentation"
+            git push
           else
             echo "No changes endpoint documentation"
           fi
