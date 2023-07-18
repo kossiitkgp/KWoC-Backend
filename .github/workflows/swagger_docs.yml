@@ -58,9 +58,6 @@ jobs:
 
       - name: Generate the html doc
         run: |
-          git branch --show-current #some debug info # TODO remove after test 
-          ls -R  # TODO remove after test 
-          git checkout docs
           mkdir -p docs
           pushd ./docs
           npx @redocly/cli build-docs --output index.html --config redocly.yaml
