@@ -145,8 +145,6 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors").
 		Find(&projects)
 
-	fmt.Println(len(projects), mentor.ID)
-
 	for _, project := range projects {
 		projectInfo := ProjectInfo{
 			Name:     project.Name,
