@@ -3,8 +3,8 @@ name: Generate Endpoint Docs
 on:
   push:
     branches:
-      - "v2-dev" # TODO: remove this when merged into main
-      - "main"
+      - "v2-dev"  # TODO: remove this when merged into main
+      - "main" 
     paths:
       - "controllers/*.go"
       - "cmd/backend.go"
@@ -18,6 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           token: ${{ secrets.KS_PAT }}
           ref: docs
 
@@ -42,7 +43,10 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Merge the changes from main branch to docs branch
-        run: git merge ${{ github.ref_name }}
+        run: |
+          git checkout -b docs || git checkout docs
+          git pull origin docs
+          git merge 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
