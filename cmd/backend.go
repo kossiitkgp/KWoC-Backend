@@ -18,10 +18,14 @@ import (
 
 // main function
 //
-//	@title			KWoC Backend
-//	@version		2.0.0
-//	@description	KWoC Backend API written in go
-//	@BasePath		/
+//	@title						KWoC Backend
+//	@version					2.0.0
+//	@description				KWoC Backend API written in go
+//	@securityDefinitions.apikey	JWT
+//	@in							Header
+//	@name						Bearer
+//	@description				Must include the Bearer key in the header with the JWT string for login.
+//	@BasePath					/
 func main() {
 	// Parse command-line arguments
 	envFile := flag.String("envFile", ".env", "A file to load environment variables from.")
