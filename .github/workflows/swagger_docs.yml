@@ -3,11 +3,11 @@ name: Generate Endpoint Docs
 on:
   push:
     branches:
-      - "v2-dev" 
-      - "main"  
+      - "v2-dev"  # TODO: remove this when merged into main
+      - "main" 
     paths:
       - "controllers/*.go"
-      - "cmd/backend.go" 
+      - "cmd/backend.go"
   workflow_dispatch:
 
 jobs:
