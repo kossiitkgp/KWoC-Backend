@@ -142,8 +142,10 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed").
+		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors").
 		Find(&projects)
+
+	fmt.Println(len(projects), mentor.ID)
 
 	for _, project := range projects {
 		projectInfo := ProjectInfo{
@@ -166,6 +168,17 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 				Name:     modelStudent.Name,
 				Username: modelStudent.Username,
 			}
+			containsStud := false
+			for _, stud := range students {
+				if stud == student {
+					containsStud = true
+				}
+			}
+
+			if containsStud {
+				continue
+			}
+
 			students = append(students, student)
 		}
 	}
