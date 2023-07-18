@@ -3,11 +3,12 @@ name: Generate Endpoint Docs
 on:
   push:
     branches:
-      - "v2-dev" # TODO: remove this when merged into main
-      - "main"
-    paths:
-      - "controllers/*.go"
-      - "cmd/backend.go"
+      # - "v2-dev" # TODO: remove this when merged into main # TODO uncomment after test complete
+      # - "main"   # TODO: uncomment after test complete
+      - "v2-docswf-test" # TODO Remove this after test complete
+    # paths:
+    #   - "controllers/*.go" # TODO uncomments after test complete
+    #   - "cmd/backend.go"  # TODO uncomment after test complete
   workflow_dispatch:
 
 jobs:
@@ -18,6 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           token: ${{ secrets.KS_PAT }}
           ref: docs
 
@@ -42,7 +44,10 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Merge the changes from main branch to docs branch
-        run: git merge ${{ github.ref_name }}
+        run: |
+          git checkout -b docs
+          git pull origin docs
+          git merge '${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
