@@ -140,6 +140,10 @@ To customize the rendering of the documentation, you can edit the `docs/redocly.
 Please avoid directly editing the `docs/swagger.yaml` or `docs/index.html` files.
 
 To write annotations for the endpoints, you can refer to [swag](https://github.com/swaggo/swag#readme)
+Note: For the endpoints which require login with JWT Please include Security annotations like this
+```go
+// @Security JWT
+```
 
 ### Middleware
 The `middleware/` directory contains all the middleware used in the server. The middleware is used in the `server/routes.go` and `server/router.go` files. The following middleware is exported under the `middleware` package.

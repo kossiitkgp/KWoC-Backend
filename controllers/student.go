@@ -56,6 +56,7 @@ type StudentDashboard struct {
 //	@Failure		401		{string}	string						"Login username and given username do not match."
 //	@Failure		400		{string}	string						"Student 'username' already exists."
 //	@Failure		500		{string}	string						"Database error."
+//	@Security		JWT
 //	@Router			/student/form/ [post]
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
@@ -139,6 +140,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 //	@Failure		401		{string}	string						"Login username and given username do not match."
 //	@Failure		400		{string}	string						"Student 'username' does not exist."
 //	@Failure		500		{string}	string						"Error updating BlogLink for 'username'."
+//	@Security		JWT
 //	@Router			/student/bloglink/ [post]
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
