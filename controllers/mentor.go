@@ -28,7 +28,7 @@ type ProjectInfo struct {
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls string `gorm:"column:pulls"`
+	Pulls string `json:"pulls"`
 }
 
 type StudentInfo struct {
