@@ -150,7 +150,6 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			Name:     project.Name,
 			RepoLink: project.RepoLink,
 
-			// stats table
 			CommitCount:  project.CommitCount,
 			PullCount:    project.PullCount,
 			LinesAdded:   project.LinesAdded,
@@ -158,14 +157,11 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 
-		var modelStudent models.Student
+		var student StudentInfo
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
 			db.Table("students").Where("username = ?", studentUsername).
-				Select("name", "username").First(&modelStudent)
-			student := StudentInfo{
-				Name:     modelStudent.Name,
-				Username: modelStudent.Username,
-			}
+				Select("name", "username").First(&student)
+
 			containsStud := false
 			for _, stud := range students {
 				if stud == student {
