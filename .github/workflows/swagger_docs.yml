@@ -47,7 +47,7 @@ jobs:
         run: |
           git checkout -b docs || git checkout docs
           git pull origin docs
-          git merge '${{ github.ref_name }}'
+          git merge 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
