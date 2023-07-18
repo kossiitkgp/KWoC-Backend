@@ -291,6 +291,8 @@ func TestMentorDashboardOK(t *testing.T) {
 			PullCount:    p.PullCount,
 			LinesAdded:   p.LinesAdded,
 			LinesRemoved: p.LinesRemoved,
+
+			Pulls: p.Pulls,
 		})
 	}
 

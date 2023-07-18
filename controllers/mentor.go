@@ -23,11 +23,12 @@ type ProjectInfo struct {
 	Name     string `json:"name"`
 	RepoLink string `json:"repo_link"`
 
-	// stats table
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
+
+	Pulls string `gorm:"column:pulls"`
 }
 
 type StudentInfo struct {
@@ -142,7 +143,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors").
+		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls").
 		Find(&projects)
 
 	for _, project := range projects {
@@ -154,6 +155,8 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			PullCount:    project.PullCount,
 			LinesAdded:   project.LinesAdded,
 			LinesRemoved: project.LinesRemoved,
+
+			Pulls: project.Pulls,
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 
