@@ -66,8 +66,7 @@ func TestProjectRegSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
-	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-	expectResponseBodyToBe(t, res, "Login username and mentor username do not match.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and mentor username do not match."})
 }
 
 // Test a request to /project/ with non-existent mentors
@@ -94,8 +93,7 @@ func TestProjectRegInvalidMentor(t *testing.T) {
 
 	projectRes := executeRequest(projectReq, db)
 
-	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
-	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Mentor `%s` does not exist.", testUsername))
+	expectResponseJSONBodyToBe(t, projectRes, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Error: Mentor `%s` does not exist.", testUsername)})
 	// --- TEST PROJECT REGISTRATION WITH INVALID PRIMARY MENTOR ---
 }
 
@@ -108,8 +106,7 @@ func tProjectRegNew(db *gorm.DB, testUsername string, testJwt string, t *testing
 
 	projectRes := executeRequest(projectReq, db)
 
-	expectStatusCodeToBe(t, projectRes, http.StatusOK)
-	expectResponseBodyToBe(t, projectRes, "Success.")
+	expectResponseJSONBodyToBe(t, projectRes, utils.HTTPMessage{Code: http.StatusOK, Message: "Success."})
 }
 
 // Test an existing project registration request to /project/ with proper authentication and input
@@ -127,8 +124,7 @@ func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *te
 
 	projectRes := executeRequest(projectReq, db)
 
-	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
-	expectResponseBodyToBe(t, projectRes, fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink))
+	expectResponseJSONBodyToBe(t, projectRes, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Error: Project `%s` already exists.", projectReqFields.RepoLink)})
 }
 
 // Test requests to /project/ with proper authentication and input

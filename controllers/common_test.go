@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -36,6 +37,18 @@ func expectResponseBodyToBe(t *testing.T, res *httptest.ResponseRecorder, expect
 
 	if resBody != expectedBody {
 		t.Errorf("Expected response `%s`. Got `%s`.", expectedBody, resBody)
+	}
+}
+
+func expectResponseJSONBodyToBe[T comparable](t *testing.T, res *httptest.ResponseRecorder, expectedBody T) {
+	var resBody T
+	err := json.NewDecoder(res.Body).Decode(&resBody)
+	if err != nil {
+		t.Errorf("Error decoding `%s`.", res.Body.String())
+	}
+
+	if resBody != expectedBody {
+		t.Errorf("Expected response `%v`. Got `%v`.", expectedBody, resBody)
 	}
 }
 

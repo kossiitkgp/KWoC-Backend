@@ -55,8 +55,7 @@ func TestStudentRegSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
-	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
 // Test a new user registration request to /student/form/ with proper authentication and input
@@ -73,8 +72,7 @@ func tStudentRegNewUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseBodyToBe(t, res, "Student registration successful.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Student registration successful."})
 }
 
 // Test an existing user registration request to /student/form/ with proper authentication and input
@@ -97,8 +95,7 @@ func tStudentRegExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` already exists.", testUsername))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` already exists.", testUsername)})
 }
 
 // Test requests to /student/form/ with proper authentication and input
@@ -167,8 +164,7 @@ func TestStudentBloglinkSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
-	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
 // Test an existing user request to /student/bloglink/ with proper authentication and input
@@ -192,8 +188,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseBodyToBe(t, res, "BlogLink successfully updated.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "BlogLink successfully updated."})
 }
 
 // Test a non existing/registered user's request to /student/bloglink/ with proper authentication and input
@@ -211,8 +206,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` does not exists.", testUsername))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` does not exists.", testUsername)})
 }
 
 // Test request  /student/bloglink/ with proper authentication and input
@@ -277,8 +271,7 @@ func TestStudentDashboardNoReg(t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Student `%s` does not exists.", testUsername))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` does not exists.", testUsername)})
 }
 
 // Test requests to /student/dashboard/ with registered and  proper authentication

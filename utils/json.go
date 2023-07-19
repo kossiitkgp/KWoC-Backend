@@ -36,6 +36,7 @@ func RespondWithJson(r *http.Request, w http.ResponseWriter, response any) {
 }
 
 func RespondWithHTTPMessage(r *http.Request, w http.ResponseWriter, status int, message string) {
+	w.WriteHeader(status)
 	res := HTTPMessage{
 		Code:    status,
 		Message: message,

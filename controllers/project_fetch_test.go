@@ -10,6 +10,7 @@ import (
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
+	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 )
 
 func createFetchAllProjRequest() *http.Request {
@@ -132,8 +133,7 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 	req := createFetchProjDetailsRequest("kekw")
 	res := executeRequest(req, nil)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, "Error parsing project id.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: "Error parsing project id."})
 }
 
 // Try fetching a project that does not exist
@@ -146,8 +146,7 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 	req := createFetchProjDetailsRequest(testProjId)
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Project with id `%d` does not exist.", testProjId))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", testProjId)})
 }
 
 // Try to fetch an unapproved project
@@ -162,8 +161,7 @@ func TestFetchProjDetailsUnapproved(t *testing.T) {
 	req := createFetchProjDetailsRequest(1)
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Project with id `%d` does not exist.", 1))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", 1)})
 }
 
 // Try to fetch a valid project
