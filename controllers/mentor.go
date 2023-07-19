@@ -20,15 +20,16 @@ type RegisterMentorReqFields struct {
 }
 
 type ProjectInfo struct {
-	Name     string `json:"name"`
-	RepoLink string `json:"repo_link"`
+	Name          string `json:"name"`
+	RepoLink      string `json:"repo_link"`
+	ProjectStatus bool   `json:"project_status"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls string `json:"pulls"`
+	Pulls []string `json:"pulls"`
 }
 
 type StudentInfo struct {
@@ -143,20 +144,26 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls").
+		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
 		Find(&projects)
 
 	for _, project := range projects {
+		var pulls []string
+		if len(project.Pulls) != 0 {
+			pulls = strings.Split(project.Pulls, ",")
+		}
+
 		projectInfo := ProjectInfo{
-			Name:     project.Name,
-			RepoLink: project.RepoLink,
+			Name:          project.Name,
+			RepoLink:      project.RepoLink,
+			ProjectStatus: project.ProjectStatus,
 
 			CommitCount:  project.CommitCount,
 			PullCount:    project.PullCount,
 			LinesAdded:   project.LinesAdded,
 			LinesRemoved: project.LinesRemoved,
 
-			Pulls: project.Pulls,
+			Pulls: pulls,
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 

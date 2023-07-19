@@ -283,16 +283,19 @@ func TestMentorDashboardOK(t *testing.T) {
 			continue
 		}
 
+		var pulls []string
+
 		projects = append(projects, controllers.ProjectInfo{
-			Name:     p.Name,
-			RepoLink: p.RepoLink,
+			Name:          p.Name,
+			RepoLink:      p.RepoLink,
+			ProjectStatus: p.ProjectStatus,
 
 			CommitCount:  p.CommitCount,
 			PullCount:    p.PullCount,
 			LinesAdded:   p.LinesAdded,
 			LinesRemoved: p.LinesRemoved,
 
-			Pulls: p.Pulls,
+			Pulls: pulls,
 		})
 	}
 
