@@ -133,6 +133,7 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 	req := createFetchProjDetailsRequest("kekw")
 	res := executeRequest(req, nil)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: "Error parsing project id."})
 }
 
@@ -146,6 +147,7 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 	req := createFetchProjDetailsRequest(testProjId)
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", testProjId)})
 }
 
@@ -161,6 +163,7 @@ func TestFetchProjDetailsUnapproved(t *testing.T) {
 	req := createFetchProjDetailsRequest(1)
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", 1)})
 }
 

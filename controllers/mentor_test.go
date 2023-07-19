@@ -54,6 +54,7 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
+	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
@@ -71,6 +72,7 @@ func tMentorRegNewUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Mentor registration successful."})
 }
 
@@ -94,6 +96,7 @@ func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
 }
 

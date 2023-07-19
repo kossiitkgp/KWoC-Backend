@@ -54,6 +54,7 @@ func TestProjectUpdateSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and mentor username do not match."})
 }
 
@@ -70,6 +71,7 @@ func tProjectUpdateNonExistent(db *gorm.DB, testUsername string, testJwt string,
 
 	projectRes := executeRequest(projectReq, db)
 
+	expectStatusCodeToBe(t, projectRes, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, projectRes, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Error: Project `%s` does not exist.", projectReqFields.RepoLink)})
 }
 
@@ -102,6 +104,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Secondary mentor `%s` does not exist.", projUpdateFields.SecondaryMentorUsername)})
 
 	// Test with a valid new secondary mentor
@@ -112,6 +115,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 
 	res = executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Project successfully updated."})
 
 	// Check if the project got updated

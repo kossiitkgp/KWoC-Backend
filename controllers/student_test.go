@@ -55,6 +55,7 @@ func TestStudentRegSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
@@ -72,6 +73,7 @@ func tStudentRegNewUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Student registration successful."})
 }
 
@@ -95,6 +97,7 @@ func tStudentRegExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` already exists.", testUsername)})
 }
 
@@ -164,6 +167,7 @@ func TestStudentBloglinkSessionHijacking(t *testing.T) {
 
 	res := executeRequest(req, nil)
 
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
@@ -188,6 +192,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "BlogLink successfully updated."})
 }
 
@@ -206,6 +211,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` does not exists.", testUsername)})
 }
 
@@ -271,6 +277,7 @@ func TestStudentDashboardNoReg(t *testing.T) {
 
 	res := executeRequest(req, db)
 
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` does not exists.", testUsername)})
 }
 
