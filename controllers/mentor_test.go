@@ -283,7 +283,7 @@ func TestMentorDashboardOK(t *testing.T) {
 			continue
 		}
 
-		var pulls []string
+		pulls := make([]string, 0)
 
 		projects = append(projects, controllers.ProjectInfo{
 			Name:          p.Name,

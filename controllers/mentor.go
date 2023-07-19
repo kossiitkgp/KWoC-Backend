@@ -148,7 +148,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Find(&projects)
 
 	for _, project := range projects {
-		var pulls []string
+		pulls := make([]string, 0)
 		if len(project.Pulls) != 0 {
 			pulls = strings.Split(project.Pulls, ",")
 		}
