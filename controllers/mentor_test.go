@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
@@ -277,6 +278,9 @@ func TestMentorDashboardOK(t *testing.T) {
 			testProjects[3].Contributors = testProjects[3].Contributors + student.Username + ","
 		}
 	}
+
+	testProjects[1].Contributors = strings.TrimSuffix(testProjects[1].Contributors, ",")
+	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
 
 	for _, p := range testProjects {
 		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != int32(modelMentor.ID)) {

@@ -147,6 +147,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
 		Find(&projects)
 
+	studentMap := make(map[string]bool)
 	for _, project := range projects {
 		pulls := make([]string, 0)
 		if len(project.Pulls) != 0 {
@@ -169,20 +170,14 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 		var student StudentInfo
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
+			contains := studentMap[studentUsername]
+			if contains {
+				continue
+			}
 			db.Table("students").Where("username = ?", studentUsername).
 				Select("name", "username").First(&student)
 
-			containsStud := false
-			for _, stud := range students {
-				if stud == student {
-					containsStud = true
-				}
-			}
-
-			if containsStud {
-				continue
-			}
-
+			studentMap[studentUsername] = true
 			students = append(students, student)
 		}
 	}
