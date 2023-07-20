@@ -3,11 +3,11 @@ name: Generate Endpoint Docs
 on:
   push:
     branches:
-      - "v2-dev"  # TODO: remove this when merged into main
       - "main" 
     paths:
       - "controllers/*.go"
       - "cmd/backend.go"
+      - "docs/redocly.yaml"
   workflow_dispatch:
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
       - name: Generate swagger.yaml and exit if no changes
         run: |
           swag init -g cmd/backend.go --ot yaml
-          if [ -z "$(git status --porcelain docs/swagger.yaml)" ]; then
+          if [ -z "$(git status --porcelain docs/swagger.yaml docs/redocly.yaml)" ]; then
             exit 0 
           fi
 
