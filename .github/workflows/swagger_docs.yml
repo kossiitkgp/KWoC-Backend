@@ -3,12 +3,11 @@ name: Generate Endpoint Docs
 on:
   push:
     branches:
-      # - "v2-dev" # TODO: remove this when merged into main # TODO uncomment after test complete
-      # - "main"   # TODO: uncomment after test complete
-      - "v2-docswf-test" # TODO Remove this after test complete
-    # paths:
-    #   - "controllers/*.go" # TODO uncomments after test complete
-    #   - "cmd/backend.go"  # TODO uncomment after test complete
+      - "main" 
+    paths:
+      - "controllers/*.go"
+      - "cmd/backend.go"
+      - "docs/redocly.yaml"
   workflow_dispatch:
 
 jobs:
@@ -45,14 +44,18 @@ jobs:
 
       - name: Merge the changes from main branch to docs branch
         run: |
+          git config user.email "admin@kossiitkgp.org"
+          git config user.name "koss-service"
+          git config gpg.format ssh
+          git config user.signingkey ~/.ssh/koss-service.pub
           git checkout -b docs || git checkout docs
-          git pull origin docs
-          git merge 'origin/${{ github.ref_name }}'
+          git pull -S origin docs
+          git merge -S 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
           swag init -g cmd/backend.go --ot yaml
-          if [ -z "$(git status --porcelain docs/swagger.yaml)" ]; then
+          if [ -z "$(git status --porcelain docs/swagger.yaml docs/redocly.yaml)" ]; then
             exit 0 
           fi
 

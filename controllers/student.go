@@ -50,12 +50,12 @@ type StudentDashboard struct {
 //	@Summary		Register a student
 //	@Description	Register a new student with the provided details.
 //	@Accept			json
-//	@Produce		plain
+//	@Produce		json
 //	@Param			request	body		RegisterStudentReqFields	true	"Fields required for student registeration"
-//	@Success		200		{string}	string						"Student registration successful."
-//	@Failure		401		{string}	string						"Login username and given username do not match."
-//	@Failure		400		{string}	string						"Student 'username' already exists."
-//	@Failure		500		{string}	string						"Database error."
+//	@Success		200		{object}	utils.HTTPMessage			"Student registration successful."
+//	@Failure		401		{object}	utils.HTTPMessage			"Login username and given username do not match."
+//	@Failure		400		{object}	utils.HTTPMessage			"Student 'username' already exists."
+//	@Failure		500		{object}	utils.HTTPMessage			"Database error."
 //	@Security		JWT
 //	@Router			/student/form/ [post]
 func RegisterStudent(w http.ResponseWriter, r *http.Request) {
@@ -82,8 +82,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "Login username and given username do not match.")
+		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
 		return
 	}
 
@@ -124,8 +123,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Student registration successful.")
+	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Student registration successful.")
 }
 
 // StudentBlogLink godoc
@@ -134,12 +132,12 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 //	@Description	submit a blog link for a student
 //	@Description	requires login
 //	@Accept			json
-//	@Produce		plain
+//	@Produce		json
 //	@Param			request	body		StudentBlogLinkReqFields	true	"Fields required for student bloglink"
-//	@Success		200		{string}	string						"BlogLink successfully updated."
-//	@Failure		401		{string}	string						"Login username and given username do not match."
-//	@Failure		400		{string}	string						"Student 'username' does not exist."
-//	@Failure		500		{string}	string						"Error updating BlogLink for 'username'."
+//	@Success		200		{object}	utils.HTTPMessage			"BlogLink successfully updated."
+//	@Failure		401		{object}	utils.HTTPMessage			"Login username and given username do not match."
+//	@Failure		400		{object}	utils.HTTPMessage			"Student 'username' does not exist."
+//	@Failure		500		{object}	utils.HTTPMessage			"Error updating BlogLink for 'username'."
 //	@Security		JWT
 //	@Router			/student/bloglink/ [post]
 func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
@@ -166,8 +164,7 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "Login username and given username do not match.")
+		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
 		return
 	}
 
@@ -205,8 +202,7 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "BlogLink successfully updated.")
+	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "BlogLink successfully updated.")
 }
 
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {

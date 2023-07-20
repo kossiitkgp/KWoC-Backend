@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
@@ -53,7 +55,7 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-	expectResponseBodyToBe(t, res, "Login username and given username do not match.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
 // Test a new user registration request to /mentor/form/ with proper authentication and input
@@ -71,7 +73,7 @@ func tMentorRegNewUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseBodyToBe(t, res, "Mentor registration successful.")
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Mentor registration successful."})
 }
 
 // Test an existing user registration request to /mentor/form/ with proper authentication and input
@@ -95,7 +97,7 @@ func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseBodyToBe(t, res, fmt.Sprintf("Mentor `%s` already exists.", testUsername))
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
 }
 
 // Test requests to /mentor/form/ with proper authentication and input
@@ -194,5 +196,146 @@ func TestFetchMentorOK(t *testing.T) {
 		if mentor != testMentors[i] {
 			t.Fatalf("Incorrect mentors returned from /mentor/all/")
 		}
+	}
+}
+
+// Test unauthenticated request to /mentor/dashboard/
+func TestMentorDashboardNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "GET", "/mentor/dashboard/")
+}
+
+// Test request to /mentor/dashboard/ with invalid jwt
+func TestMentorDashboardInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "GET", "/mentor/dashboard/")
+}
+
+// Test unauthenticated request to /mentor/dashboard/ with no registration
+func TestMentorDashboardNoReg(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	req, _ := http.NewRequest(
+		"GET",
+		"/mentor/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` does not exists.", testUsername)})
+}
+
+// Test requests to /mentor/dashboard/ with registered and  proper authentication
+func TestMentorDashboardOK(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	modelMentor := models.Mentor{
+		Name:     "TestMentor",
+		Email:    "iamamentor@cool.com",
+		Username: testUsername,
+	}
+
+	db.Table("mentors").Create(&modelMentor)
+
+	testProjects := generateTestProjects(5, false, true)
+	testProjects[1].MentorId = int32(modelMentor.ID)
+	testProjects[3].SecondaryMentorId = int32(modelMentor.ID)
+
+	var projects []controllers.ProjectInfo
+	var students []controllers.StudentInfo
+
+	modelStudents := generateTestStudents(5)
+
+	for i, student := range modelStudents {
+		if i < 3 {
+			testProjects[1].Contributors = testProjects[1].Contributors + student.Username + ","
+		} else {
+			testProjects[3].Contributors = testProjects[3].Contributors + student.Username + ","
+		}
+	}
+
+	testProjects[1].Contributors = strings.TrimSuffix(testProjects[1].Contributors, ",")
+	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
+
+	for _, p := range testProjects {
+		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != int32(modelMentor.ID)) {
+			continue
+		}
+
+		pulls := make([]string, 0)
+
+		projects = append(projects, controllers.ProjectInfo{
+			Name:          p.Name,
+			RepoLink:      p.RepoLink,
+			ProjectStatus: p.ProjectStatus,
+
+			CommitCount:  p.CommitCount,
+			PullCount:    p.PullCount,
+			LinesAdded:   p.LinesAdded,
+			LinesRemoved: p.LinesRemoved,
+
+			Pulls: pulls,
+		})
+	}
+
+	for _, student := range modelStudents {
+		students = append(students, controllers.StudentInfo{
+			Name:     student.Name,
+			Username: student.Username,
+		})
+	}
+
+	db.Table("projects").Create(testProjects)
+	db.Table("students").Create(modelStudents)
+
+	testMentor := controllers.MentorDashboard{
+		Name:     modelMentor.Name,
+		Username: modelMentor.Username,
+		Email:    modelMentor.Email,
+
+		Projects: projects,
+		Students: students,
+	}
+
+	req, _ := http.NewRequest(
+		"GET",
+		"/mentor/dashboard/",
+		nil,
+	)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	var resMentor controllers.MentorDashboard
+	_ = json.NewDecoder(res.Body).Decode(&resMentor)
+
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	if !reflect.DeepEqual(testMentor, resMentor) {
+		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
 	}
 }
