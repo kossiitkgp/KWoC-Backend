@@ -44,6 +44,10 @@ jobs:
 
       - name: Merge the changes from main branch to docs branch
         run: |
+          git config user.email "admin@kossiitkgp.org"
+          git config user.name "koss-service"
+          git config gpg.format ssh
+          git config user.signingkey ~/.ssh/koss-service.pub
           git checkout -b docs || git checkout docs
           git pull origin docs
           git merge 'origin/${{ github.ref_name }}'
