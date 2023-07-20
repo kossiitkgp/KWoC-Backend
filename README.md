@@ -135,12 +135,13 @@ workflow. The generated documentation is saved in the `docs` branch.
 
 For generating the Swagger specification, [swag](https://github.com/swaggo/swag) is used, and [redocly](https://redocly.com/docs/cli/) is used to create the visually appealing webpage that is hosted on GitHub Pages.
 
-To customize the rendering of the documentation, you can edit the `docs/redocly.yaml` file in the docs branch.
+To customize the rendering of the documentation, you can edit the `docs/redocly.yaml`.
 
-Please avoid directly editing the `docs/swagger.yaml` or `docs/index.html` files.
+*Please avoid directly pushing to the `docs` branch.*
 
 To write annotations for the endpoints, you can refer to [swag](https://github.com/swaggo/swag#readme)
-Note: For the endpoints which require login with JWT Please include Security annotations like this
+
+*Note:* For the endpoints which require login with JWT Please include Security annotations like this
 ```go
 // @Security JWT
 ```
@@ -194,6 +195,7 @@ File: `utils/json.go`
 Contains utilities for handling of JSON body of request and response.
 - `DecodeJSONBody()`: Decodes the JSON body of an HTTP request.
 - `RespondWithJson()`: Takes a response struct and responds to with the JSON string of the response with the appropriate headers set.
+- `RespondWithHTTPMessage()`: Takes a status code and a message string and responds with the specified status code and message, and JSON-encodes the response.
 
 #### JWT
 File: `utils/jwt.go`
