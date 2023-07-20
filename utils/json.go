@@ -6,6 +6,7 @@ import (
 )
 
 type HTTPMessage struct {
+	// HTTP Response Status Code
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
