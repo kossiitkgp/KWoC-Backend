@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+type HTTPMessage struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 func DecodeJSONBody(r *http.Request, data any) error {
 	err := json.NewDecoder(r.Body).Decode(data)
 	defer r.Body.Close()
@@ -26,7 +31,15 @@ func RespondWithJson(r *http.Request, w http.ResponseWriter, response any) {
 
 	if err != nil {
 		LogErr(r, err, "Error writing the response.")
-
 		return
 	}
+}
+
+func RespondWithHTTPMessage(r *http.Request, w http.ResponseWriter, status int, message string) {
+	w.WriteHeader(status)
+	res := HTTPMessage{
+		Code:    status,
+		Message: message,
+	}
+	RespondWithJson(r, w, res)
 }

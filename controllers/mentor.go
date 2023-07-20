@@ -70,8 +70,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "Login username and given username do not match.")
+		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
 		return
 	}
 
@@ -112,8 +111,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Mentor registration successful.")
+	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
 func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
