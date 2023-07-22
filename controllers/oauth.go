@@ -42,10 +42,7 @@ const OAUTH_TYPE_MENTOR string = "mentor"
 //	@Success		200		{object}	OAuthResBodyFields	"Succesfully authenticated."
 //	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body."
 //	@Failure		400		{object}	utils.HTTPMessage	"Empty body parameters."
-//	@Failure		500		{object}	utils.HTTPMessage	"Error getting OAuth access token."
-//	@Failure		500		{object}	utils.HTTPMessage	"Error getting OAuth user info."
-//	@Failure		500		{object}	utils.HTTPMessage	"Could not get username from the Github API."
-//	@Failure		500		{object}	utils.HTTPMessage	"Error generating a JWT string."
+//	@Failure		500		{object}	utils.HTTPMessage	"Error getting OAuth access token. | Error getting OAuth user info. | Could not get username from the Github API. | Error generating a JWT string."
 //
 //	@Router			/oauth [post]
 func OAuth(w http.ResponseWriter, r *http.Request) {
