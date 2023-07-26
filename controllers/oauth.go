@@ -40,8 +40,7 @@ const OAUTH_TYPE_MENTOR string = "mentor"
 //	@Produce		json
 //	@Param			request	body		OAuthReqBodyFields	true	"Fields required for authentication."
 //	@Success		200		{object}	OAuthResBodyFields	"Succesfully authenticated."
-//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body."
-//	@Failure		400		{object}	utils.HTTPMessage	"Empty body parameters."
+//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body. | Empty body parameters."
 //	@Failure		500		{object}	utils.HTTPMessage	"Error getting OAuth access token. | Error getting OAuth user info. | Could not get username from the Github API. | Error generating a JWT string."
 //
 //	@Router			/oauth [post]
