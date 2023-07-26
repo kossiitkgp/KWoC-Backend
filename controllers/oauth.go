@@ -24,13 +24,26 @@ type OAuthResBodyFields struct {
 	// `mentor` or `student`
 	Type string `json:"type"`
 	// Whether the user has newly registered or was registered before
-	IsNewUser bool   `json:"is_new_user"`
-	Jwt       string `json:"jwt"`
+	IsNewUser bool `json:"is_new_user"`
+	// The generated JWT string for the user
+	Jwt string `json:"jwt"`
 }
 
 const OAUTH_TYPE_STUDENT string = "student"
 const OAUTH_TYPE_MENTOR string = "mentor"
 
+// OAuth godoc
+//
+//	@Summary		OAuth Authentication
+//	@Description	Authenticates a user throught Github OAuth.
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		OAuthReqBodyFields	true	"Fields required for authentication."
+//	@Success		200		{object}	OAuthResBodyFields	"Succesfully authenticated."
+//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body. | Empty body parameters."
+//	@Failure		500		{object}	utils.HTTPMessage	"Error getting OAuth access token. | Error getting OAuth user info. | Could not get username from the Github API. | Error generating a JWT string."
+//
+//	@Router			/oauth [post]
 func OAuth(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
