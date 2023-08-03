@@ -231,6 +231,17 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 	}
 }
 
+// FetchStudentDashboard godoc
+//
+//	@Summary		Fetches the student dashboard
+//	@Description	Fetches the required details for the student dashboard
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	StudentDashboard	"Student registration successful."
+//	@Failure		400	{object}	utils.HTTPMessage	"Student `username` does not exists."
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching student with username `username`"
+//	@Security		JWT
+//	@Router			/student/dashboard/ [get]
 func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
