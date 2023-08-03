@@ -26,6 +26,13 @@ definitions:
       username:
         type: string
     type: object
+  controllers.ProjectDashboard:
+    properties:
+      name:
+        type: string
+      repo_link:
+        type: string
+    type: object
   controllers.RegisterStudentReqFields:
     properties:
       college:
@@ -44,6 +51,35 @@ definitions:
       username:
         type: string
     type: object
+  controllers.StudentDashboard:
+    properties:
+      college:
+        type: string
+      commit_count:
+        type: integer
+      languages_used:
+        items:
+          type: string
+        type: array
+      lines_added:
+        type: integer
+      lines_removed:
+        type: integer
+      name:
+        type: string
+      passed_end_evals:
+        type: boolean
+      passed_mid_evals:
+        type: boolean
+      projects_worked:
+        items:
+          $ref: '#/definitions/controllers.ProjectDashboard'
+        type: array
+      pull_count:
+        type: integer
+      username:
+        type: string
+    type: object
   utils.HTTPMessage:
     properties:
       code:
@@ -58,6 +94,24 @@ info:
   title: KWoC Backend
   version: 2.0.0
 paths:
+  /healthcheck/:
+    get:
+      consumes:
+      - text/plain
+      description: The HealthCheck endpoint examines the operational status of the
+        server and the associated database.
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Could not ping the database
+          schema:
+            type: string
+      summary: Checks the health status of the server and database.
   /healthcheck/ping:
     get:
       consumes:
@@ -137,6 +191,29 @@ paths:
       security:
       - JWT: []
       summary: Submit blog link
+  /student/dashboard/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches the required details for the student dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Student registration successful.
+          schema:
+            $ref: '#/definitions/controllers.StudentDashboard'
+        "400":
+          description: Student `username` does not exists.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Database Error fetching student with username `username`
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Fetches the student dashboard
   /student/form/:
     post:
       consumes:
