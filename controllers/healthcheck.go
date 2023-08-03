@@ -31,7 +31,15 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 	utils.LogInfo(r, fmt.Sprintf("latency: %dns Ping request processed", elapsed))
 }
 
-// HealthCheck checks the server and database status.
+// HealthCheck godoc
+//
+//	@Summary		Checks the health status of the server and database.
+//	@Description	The HealthCheck endpoint examines the operational status of the server and the associated database.
+//	@Accept			plain
+//	@Produce		plain
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Could not ping the database"
+//	@Router			/healthcheck/ [get]
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
