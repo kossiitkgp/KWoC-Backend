@@ -35,6 +35,8 @@
     <a href="https://kwoc.kossiitkgp.org">Kharagpur Winter of Code</a>
     ·
     <a href="https://github.com/kossiitkgp/KWoC-Frontend">Frontend</a>
+    ·
+    <a href="https://kossiitkgp.org/KWoC-Backend/">Endpoint Docs</a>
   </p>
 </div>
 
