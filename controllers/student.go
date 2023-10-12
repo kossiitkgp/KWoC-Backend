@@ -110,6 +110,29 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if a mentor of the same username exists
+	mentor := models.Mentor{}
+	tx = db.
+		Table("mentors").
+		Where("username = ?", reqFields.Username).
+		First(&mentor)
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
+		return
+	}
+	mentor_exists := mentor.Username == reqFields.Username
+
+	if mentor_exists {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("The username `%s` already exists as a mentor.", reqFields.Username),
+			http.StatusBadRequest,
+		)
+
+		return
+	}
+
 	// Create a db entry if the student doesn't exist
 	tx = db.Create(&models.Student{
 		Username: reqFields.Username,

@@ -101,11 +101,11 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 
 	// Check if a student of the same username exists
 	student := models.Student{}
-	tx1 := db.
+	tx = db.
 		Table("students").
 		Where("username = ?", reqFields.Username).
 		First(&student)
-	if tx1.Error != nil && tx1.Error != gorm.ErrRecordNotFound {
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
