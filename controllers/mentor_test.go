@@ -100,6 +100,31 @@ func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
 }
 
+// Test an existing user registration request to /mentor/form/ with proper authentication and input
+func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
+
+	req := createStudentRegRequest(&studentFields)
+	req.Header.Add("Bearer", testJwt)
+
+	_ = executeRequest(req, db)
+
+	//
+	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
+	req = createMentorRegRequest(&mentorFields)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
+}
+
 // Test requests to /mentor/form/ with proper authentication and input
 func TestMentorRegOK(t *testing.T) {
 	// Set up a local test database path
@@ -123,6 +148,14 @@ func TestMentorRegOK(t *testing.T) {
 		"Test: existing mentor registration.",
 		func(t *testing.T) {
 			tMentorRegExistingUser(db, t)
+		},
+	)
+
+	// Student registering as mentor test
+	t.Run(
+		"Test: Student registering as mentor.",
+		func(t *testing.T) {
+			tMentorRegAsStudent(db, t)
 		},
 	)
 }
