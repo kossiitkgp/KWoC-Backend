@@ -114,7 +114,6 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 
 	_ = executeRequest(req, db)
 
-	//
 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
 	req = createMentorRegRequest(&mentorFields)
 	req.Header.Add("Bearer", testJwt)
