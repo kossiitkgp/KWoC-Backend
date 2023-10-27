@@ -55,7 +55,7 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusUnauthorized, Message: "Login username and given username do not match."})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
 // Test a new user registration request to /mentor/form/ with proper authentication and input
@@ -73,7 +73,7 @@ func tMentorRegNewUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusOK, Message: "Mentor registration successful."})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Mentor registration successful."})
 }
 
 // Test an existing user registration request to /mentor/form/ with proper authentication and input
@@ -97,7 +97,7 @@ func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
 }
 
 // Test an existing student registration request to /mentor/form/ with proper authentication and input
@@ -121,7 +121,7 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
 }
 
 // Test requests to /mentor/form/ with proper authentication and input
@@ -267,7 +267,7 @@ func TestMentorDashboardNoReg(t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` does not exists.", testUsername)})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` does not exists.", testUsername)})
 }
 
 // Test requests to /mentor/dashboard/ with registered and  proper authentication

@@ -6,9 +6,9 @@ import (
 )
 
 type HTTPMessage struct {
-	// HTTP Response Status Code
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	// HTTP Response Status StatusCode
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"message"`
 }
 
 func DecodeJSONBody(r *http.Request, data any) error {
@@ -39,8 +39,8 @@ func RespondWithJson(r *http.Request, w http.ResponseWriter, response any) {
 func RespondWithHTTPMessage(r *http.Request, w http.ResponseWriter, status int, message string) {
 	w.WriteHeader(status)
 	res := HTTPMessage{
-		Code:    status,
-		Message: message,
+		StatusCode: status,
+		Message:    message,
 	}
 	RespondWithJson(r, w, res)
 }
