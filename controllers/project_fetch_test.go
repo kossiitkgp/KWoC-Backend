@@ -134,7 +134,7 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: "Error parsing project id."})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: "Error parsing project id."})
 }
 
 // Try fetching a project that does not exist
@@ -148,7 +148,7 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", testProjId)})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", testProjId)})
 }
 
 // Try to fetch an unapproved project
@@ -164,7 +164,7 @@ func TestFetchProjDetailsUnapproved(t *testing.T) {
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{Code: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", 1)})
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", 1)})
 }
 
 // Try to fetch a valid project
