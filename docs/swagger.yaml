@@ -82,11 +82,11 @@ definitions:
     type: object
   utils.HTTPMessage:
     properties:
-      code:
-        description: HTTP Response Status Code
-        type: integer
       message:
         type: string
+      status_code:
+        description: HTTP Response Status StatusCode
+        type: integer
     type: object
 info:
   contact: {}
