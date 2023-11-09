@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for kwoc-backend on 2023-11-10T01:32:04+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "kwoc-backend"
+primary_region = "sin"
+
+
+[env]
+  BACKEND_PORT = "8080"
+  DEV = "false"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
