@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -20,7 +21,7 @@ type UpdateProjectReqFields struct {
 	// Description for the project
 	Description string `json:"description"`
 	// List of tags for the project
-	Tags string `json:"tags"`
+	Tags []string `json:"tags"`
 	// Mentor's username
 	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username (if updated)
@@ -112,7 +113,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	updatedProj := &models.Project{
 		Name:              reqFields.Name,
 		Description:       reqFields.Description,
-		Tags:              reqFields.Tags,
+		Tags:              strings.Join(reqFields.Tags, ","),
 		RepoLink:          reqFields.RepoLink,
 		CommChannel:       reqFields.CommChannel,
 		ReadmeLink:        reqFields.ReadmeLink,

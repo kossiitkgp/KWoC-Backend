@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
@@ -89,7 +90,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		Id:             1,
 		Name:           fmt.Sprintf("Nename %d", rand.Int()),
 		Description:    "New description.",
-		Tags:           "New tags.",
+		Tags:           strings.Split("New,Tags,Test", ","),
 		MentorUsername: testUsername,
 		RepoLink:       "http://NewRepoLink",
 		CommChannel:    "totallynewcomchannel",
@@ -135,7 +136,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		t.Errorf("Project Description field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.Description, updatedProj.Description)
 	}
 
-	if updatedProj.Tags != projUpdateFields.Tags {
+	if updatedProj.Tags != strings.Join(projUpdateFields.Tags, ",") {
 		t.Errorf("Project Tags field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.Tags, updatedProj.Tags)
 	}
 
