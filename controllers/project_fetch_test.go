@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -73,7 +74,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bool {
 	return proj1.Name == proj2.Name &&
 		proj1.Description == proj2.Description &&
-		proj1.Tags == proj2.Tags &&
+		strings.Join(proj1.Tags, ",") == proj2.Tags &&
 		proj1.RepoLink == proj2.RepoLink &&
 		proj1.CommChannel == proj2.CommChannel &&
 		proj1.ReadmeLink == proj2.ReadmeLink

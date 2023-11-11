@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -18,15 +19,15 @@ type Mentor struct {
 	Username string `json:"username"`
 }
 type Project struct {
-	Id              uint   `json:"id"`
-	Name            string `json:"name"`
-	Description     string `json:"description"`
-	Tags            string `json:"tags"`
-	RepoLink        string `json:"repo_link"`
-	CommChannel     string `json:"comm_channel"`
-	ReadmeLink      string `json:"readme_link"`
-	Mentor          Mentor `json:"mentor"`
-	SecondaryMentor Mentor `json:"secondary_mentor"`
+	Id              uint     `json:"id"`
+	Name            string   `json:"name"`
+	Description     string   `json:"description"`
+	Tags            []string `json:"tags"`
+	RepoLink        string   `json:"repo_link"`
+	CommChannel     string   `json:"comm_channel"`
+	ReadmeLink      string   `json:"readme_link"`
+	Mentor          Mentor   `json:"mentor"`
+	SecondaryMentor Mentor   `json:"secondary_mentor"`
 }
 
 func newMentor(dbMentor *models.Mentor) Mentor {
@@ -40,7 +41,7 @@ func newProject(dbProject *models.Project) Project {
 		Id:              dbProject.ID,
 		Name:            dbProject.Name,
 		Description:     dbProject.Description,
-		Tags:            dbProject.Tags,
+		Tags:            strings.Split(dbProject.Tags, ","),
 		RepoLink:        dbProject.RepoLink,
 		CommChannel:     dbProject.CommChannel,
 		ReadmeLink:      dbProject.ReadmeLink,
