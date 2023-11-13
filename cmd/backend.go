@@ -87,6 +87,7 @@ func main() {
 	corsObj := cors.New(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("ORIGINS_ALLOWED")},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"*"},
 	})
 
 	log.Info().Msg("Starting server on port : " + port)
