@@ -21,6 +21,7 @@ type RegisterMentorReqFields struct {
 
 type ProjectInfo struct {
 	Name          string `json:"name"`
+	Description   string `json:"description"`
 	RepoLink      string `json:"repo_link"`
 	ProjectStatus bool   `json:"project_status"`
 
@@ -165,7 +166,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
+		Select("name", "description", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
 		Find(&projects)
 
 	studentMap := make(map[string]bool)
@@ -178,6 +179,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 
 		projectInfo := ProjectInfo{
 			Name:          project.Name,
+			Description:   project.Description,
 			RepoLink:      project.RepoLink,
 			ProjectStatus: project.ProjectStatus,
 
