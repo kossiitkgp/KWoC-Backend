@@ -28,7 +28,7 @@ type OAuthAccessResFields struct {
 }
 
 func GetOauthAccessToken(code string) (string, error) {
-	client_id := os.Getenv("GITHUB_OAUTH_CLIENT_ID")
+	client_id := os.Getenv("GH_OAUTH_CLIENT_ID")
 	client_secret := os.Getenv("GITHUB_OAUTH_CLIENT_SECRET")
 
 	if client_id == "" {
