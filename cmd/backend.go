@@ -85,7 +85,14 @@ func main() {
 	}()
 
 	log.Info().Msg("Starting server on port : " + port)
-	err = http.ListenAndServe(":"+port, handlers.CORS()(router))
+	err = http.ListenAndServe(
+		":"+port,
+		handlers.CORS(
+			handlers.AllowedOrigins([]string{os.Getenv("ORIGINS_ALLOWED")}),
+			handlers.AllowedHeaders([]string{"X-Requested-With"}),
+			handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
+		)(router),
+	)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error starting the server.")
