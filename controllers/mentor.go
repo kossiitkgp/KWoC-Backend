@@ -159,9 +159,9 @@ func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
 // /mentor/dashboard/ functions
 
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
-	var projects []models.Project
-	var projectsInfo []ProjectInfo
-	var students []StudentInfo
+	var projects []models.Project = make([]models.Project, 0)
+	var projectsInfo []ProjectInfo = make([]ProjectInfo, 0)
+	var students []StudentInfo = make([]StudentInfo, 0)
 
 	db.Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
