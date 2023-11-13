@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
@@ -30,7 +31,7 @@ func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername s
 	return &controllers.RegisterProjectReqFields{
 		Name:                    fmt.Sprintf("YANGJF-%d", rand.Int()),
 		Description:             "Yet another next-gen Javascript framework.",
-		Tags:                    "next-gen, javascript, framework",
+		Tags:                    strings.Split("next-gen,javascript,framework", ","),
 		MentorUsername:          mentorUsername,
 		SecondaryMentorUsername: secondaryMentorUsername,
 		RepoLink:                "https://xkcd.com/927/",
