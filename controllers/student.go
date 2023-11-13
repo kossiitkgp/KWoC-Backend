@@ -229,7 +229,8 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
-	var projects []ProjectDashboard
+	var projects []ProjectDashboard = make([]ProjectDashboard, 0)
+
 	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
 		var project ProjectDashboard
 		db.Table("projects").
@@ -238,6 +239,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 			First(&project)
 		projects = append(projects, project)
 	}
+
 	languages := strings.Split(modelStudent.LanguagesUsed, ",")
 	return StudentDashboard{
 		Name:           modelStudent.Name,
