@@ -11,6 +11,7 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/server"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -84,7 +85,7 @@ func main() {
 	}()
 
 	log.Info().Msg("Starting server on port : " + port)
-	err = http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(":"+port, handlers.CORS()(router))
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error starting the server.")
