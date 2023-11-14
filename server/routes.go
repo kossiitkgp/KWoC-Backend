@@ -53,6 +53,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
 		},
 		{
+			"Update Mentor Details",
+			"PUT",
+			"/mentor/form/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.UpdateMentorDetails)),
+		},
+		{
 			"Fetch All Mentors",
 			"GET",
 			"/mentor/all/",

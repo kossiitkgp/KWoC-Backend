@@ -19,6 +19,11 @@ type RegisterMentorReqFields struct {
 	Email    string `json:"email"`
 }
 
+type UpdateMentorReqFields struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type ProjectInfo struct {
 	Name          string `json:"name"`
 	Description   string `json:"description"`
@@ -252,4 +257,55 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	mentor := CreateMentorDashboard(modelMentor, db)
 
 	utils.RespondWithJson(r, w, mentor)
+}
+
+func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	var modelMentor models.Mentor
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	tx := db.
+		Table("mentors").
+		Where("username = ?", login_username).
+		Select("name", "username", "email", "ID").
+		First(&modelMentor)
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	var reqFields = UpdateMentorReqFields{}
+
+	err := utils.DecodeJSONBody(r, &reqFields)
+	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
+		return
+	}
+
+	tx = db.Model(&modelMentor).Updates(models.Mentor{
+		Name:  reqFields.Name,
+		Email: reqFields.Email,
+	})
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			"Invalid Details: Could not update mentor details",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
 }
