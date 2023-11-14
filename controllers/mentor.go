@@ -309,3 +309,30 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
 }
+
+func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+
+	mentor := models.Mentor{}
+	tx := db.
+		Table("mentors").
+		Where("username = ?", login_username).
+		Select("name", "username", "email", "ID").
+		First(&mentor)
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	utils.RespondWithJson(r, w, mentor)
+}

@@ -302,3 +302,34 @@ func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 	student := CreateStudentDashboard(modelStudent, db)
 	utils.RespondWithJson(r, w, student)
 }
+
+func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+
+	student := models.Student{}
+	tx := db.
+		Table("students").
+		Where("username = ?", login_username).
+		First(&student)
+
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
+		return
+	}
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Student `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	utils.RespondWithJson(r, w, student)
+}
