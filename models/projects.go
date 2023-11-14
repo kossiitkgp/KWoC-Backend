@@ -1,12 +1,10 @@
 package models
 
-import "gorm.io/gorm"
-
 // `projects` table models
 
 // Projects table row
 type Project struct {
-	gorm.Model
+	Model
 
 	Name          string `gorm:"column:name"`
 	Description   string `gorm:"size:2550;column:description"`

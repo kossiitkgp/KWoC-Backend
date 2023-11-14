@@ -117,7 +117,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		RepoLink:          reqFields.RepoLink,
 		CommChannel:       reqFields.CommChannel,
 		ReadmeLink:        reqFields.ReadmeLink,
-		SecondaryMentorId: int32(secondaryMentor.ID),
+		SecondaryMentorId: int32(*secondaryMentor.ID),
 	}
 
 	tx = db.

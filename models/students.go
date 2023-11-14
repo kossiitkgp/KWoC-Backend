@@ -1,12 +1,10 @@
 package models
 
-import "gorm.io/gorm"
-
 // `students` table model
 
 // Students table row
 type Student struct {
-	gorm.Model
+	Model
 
 	Name           string `gorm:"column:name"`
 	Email          string `gorm:"column:email"`

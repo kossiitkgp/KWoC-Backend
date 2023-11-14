@@ -1,12 +1,10 @@
 package models
 
-import "gorm.io/gorm"
-
 // `stats` table model
 
 // Stats table row
 type Stats struct {
-	gorm.Model
+	Model
 
 	TotalCommitCount  uint `gorm:"column:total_commit_count"`
 	TotalPullCount    uint `gorm:"column:total_pull_count"`
