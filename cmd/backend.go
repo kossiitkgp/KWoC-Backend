@@ -88,6 +88,7 @@ func main() {
 		AllowedOrigins:   []string{os.Getenv("ORIGINS_ALLOWED")},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 	})
 
 	log.Info().Msg("Starting server on port : " + port)
