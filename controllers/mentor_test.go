@@ -294,9 +294,10 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	db.Table("mentors").Create(&modelMentor)
 
+	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
-	testProjects[1].MentorId = int32(*modelMentor.ID)
-	testProjects[3].SecondaryMentorId = int32(*modelMentor.ID)
+	testProjects[1].MentorId = int32(modelMentor.ID)
+	testProjects[3].SecondaryMentorId = &mentorID
 
 	var projects []controllers.ProjectInfo
 	var students []controllers.StudentInfo
@@ -315,7 +316,7 @@ func TestMentorDashboardOK(t *testing.T) {
 	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
 
 	for _, p := range testProjects {
-		if (p.MentorId != int32(*modelMentor.ID)) && (p.SecondaryMentorId != int32(*modelMentor.ID)) {
+		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != &mentorID) {
 			continue
 		}
 

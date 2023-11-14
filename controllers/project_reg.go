@@ -123,37 +123,22 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 			)
 			return
 		}
+	}
 
-		tx = db.Create(&models.Project{
-			Name:            reqFields.Name,
-			Description:     reqFields.Description,
-			Tags:            strings.Join(reqFields.Tags, ","),
-			RepoLink:        reqFields.RepoLink,
-			CommChannel:     reqFields.CommChannel,
-			ReadmeLink:      reqFields.ReadmeLink,
-			Mentor:          mentor,
-			SecondaryMentor: secondaryMentor,
-		})
+	tx = db.Create(&models.Project{
+		Name:            reqFields.Name,
+		Description:     reqFields.Description,
+		Tags:            strings.Join(reqFields.Tags, ","),
+		RepoLink:        reqFields.RepoLink,
+		CommChannel:     reqFields.CommChannel,
+		ReadmeLink:      reqFields.ReadmeLink,
+		Mentor:          mentor,
+		SecondaryMentor: secondaryMentor,
+	})
 
-		if tx.Error != nil {
-			utils.LogErrAndRespond(r, w, err, "Error adding the project in the database.", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		tx = db.Create(&models.Project{
-			Name:        reqFields.Name,
-			Description: reqFields.Description,
-			Tags:        strings.Join(reqFields.Tags, ","),
-			RepoLink:    reqFields.RepoLink,
-			CommChannel: reqFields.CommChannel,
-			ReadmeLink:  reqFields.ReadmeLink,
-			Mentor:      mentor,
-		})
-
-		if tx.Error != nil {
-			utils.LogErrAndRespond(r, w, err, "Error adding the project in the database.", http.StatusInternalServerError)
-			return
-		}
+	if tx.Error != nil {
+		utils.LogErrAndRespond(r, w, err, "Error adding the project in the database.", http.StatusInternalServerError)
+		return
 	}
 
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Success.")

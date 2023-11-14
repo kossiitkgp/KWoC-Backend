@@ -38,7 +38,7 @@ func newMentor(dbMentor *models.Mentor) Mentor {
 }
 func newProject(dbProject *models.Project) Project {
 	return Project{
-		Id:              *dbProject.ID,
+		Id:              dbProject.ID,
 		Name:            dbProject.Name,
 		Description:     dbProject.Description,
 		Tags:            strings.Split(dbProject.Tags, ","),
