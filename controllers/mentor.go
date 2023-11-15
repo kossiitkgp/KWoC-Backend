@@ -35,7 +35,11 @@ type ProjectInfo struct {
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls []string `json:"pulls"`
+	Pulls                   []string `json:"pulls"`
+	MentorName              string   `json:"mentor_name"`
+	SecondaryMentorName     string   `json:"secondary_mentor_name"`
+	MentorUsername          string   `json:"mentor_username"`
+	SecondaryMentorUsername string   `json:"secondary_mentor_username"`
 }
 
 type StudentInfo struct {
@@ -169,15 +173,15 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	var projectsInfo []ProjectInfo = make([]ProjectInfo, 0)
 	var students []StudentInfo = make([]StudentInfo, 0)
 
-	db.Table("projects").
+	db.Preload("Mentor").Preload("SecondaryMentor").Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "description", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
 		Find(&projects)
 
 	studentMap := make(map[string]bool)
 	var studentUsernames []string
 	for _, project := range projects {
 		pulls := make([]string, 0)
+		fmt.Print(project.SecondaryMentor)
 		if len(project.Pulls) != 0 {
 			pulls = strings.Split(project.Pulls, ",")
 		}
@@ -193,7 +197,11 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			LinesAdded:   project.LinesAdded,
 			LinesRemoved: project.LinesRemoved,
 
-			Pulls: pulls,
+			Pulls:                   pulls,
+			MentorName:              project.Mentor.Name,
+			SecondaryMentorName:     project.SecondaryMentor.Name,
+			MentorUsername:          project.Mentor.Username,
+			SecondaryMentorUsername: project.SecondaryMentor.Username,
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 

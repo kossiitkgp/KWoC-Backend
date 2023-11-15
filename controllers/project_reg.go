@@ -111,6 +111,17 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	// Attempt to fetch secondary mentor from the database
 	secondaryMentor := models.Mentor{}
 	if reqFields.SecondaryMentorUsername != "" {
+		if reqFields.MentorUsername == reqFields.SecondaryMentorUsername {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error: Secondary mentor `%s` cannot be same as primary mentor.", reqFields.SecondaryMentorUsername),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
 		if tx.Error != nil && err != gorm.ErrRecordNotFound {
