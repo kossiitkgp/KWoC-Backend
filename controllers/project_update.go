@@ -85,6 +85,17 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if project.Mentor.Username != login_username {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_username, project.ID),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
 	// Attempt to fetch secondary mentor from the database
 	secondaryMentor := models.Mentor{}
 	if reqFields.SecondaryMentorUsername != "" {

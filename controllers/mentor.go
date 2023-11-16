@@ -133,7 +133,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a db entry if the mentor doesn't exist
+	// Create a db entry if the mentor doesn'tf exist
 	tx = db.Create(&models.Mentor{
 		Username: reqFields.Username,
 		Name:     reqFields.Name,

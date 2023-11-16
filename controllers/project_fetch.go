@@ -96,12 +96,13 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+
 	project := models.Project{}
 	tx := db.
 		Table("projects").
 		Preload("Mentor").
 		Preload("SecondaryMentor").
-		Where("project_status = ?", true).
 		Where("id = ?", project_id).
 		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
 		First(&project)
@@ -114,6 +115,17 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 			r,
 			w,
 			fmt.Sprintf("Project with id `%d` does not exist.", project_id),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	if project.Mentor.Username != login_username {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_username, project.ID),
 			http.StatusBadRequest,
 		)
 		return
