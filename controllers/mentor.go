@@ -25,6 +25,7 @@ type UpdateMentorReqFields struct {
 }
 
 type ProjectInfo struct {
+	Id            uint   `json:"id"`
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	RepoLink      string `json:"repo_link"`
@@ -187,6 +188,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		}
 
 		projectInfo := ProjectInfo{
+			Id:            project.ID,
 			Name:          project.Name,
 			Description:   project.Description,
 			RepoLink:      project.RepoLink,
