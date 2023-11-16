@@ -25,22 +25,22 @@ type UpdateMentorReqFields struct {
 }
 
 type ProjectInfo struct {
-	Id            uint   `json:"id"`
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	RepoLink      string `json:"repo_link"`
-	ProjectStatus bool   `json:"project_status"`
+	Id            uint     `json:"id"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description"`
+	RepoLink      string   `json:"repo_link"`
+	ReadmeLink    string   `json:"readme_link"`
+	Tags          []string `json:"tags"`
+	ProjectStatus bool     `json:"project_status"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls                   []string `json:"pulls"`
-	MentorName              string   `json:"mentor_name"`
-	SecondaryMentorName     string   `json:"secondary_mentor_name"`
-	MentorUsername          string   `json:"mentor_username"`
-	SecondaryMentorUsername string   `json:"secondary_mentor_username"`
+	Pulls           []string `json:"pulls"`
+	Mentor          Mentor   `json:"mentor"`
+	SecondaryMentor Mentor   `json:"secondary_mentor"`
 }
 
 type StudentInfo struct {
@@ -199,11 +199,9 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			LinesAdded:   project.LinesAdded,
 			LinesRemoved: project.LinesRemoved,
 
-			Pulls:                   pulls,
-			MentorName:              project.Mentor.Name,
-			SecondaryMentorName:     project.SecondaryMentor.Name,
-			MentorUsername:          project.Mentor.Username,
-			SecondaryMentorUsername: project.SecondaryMentor.Username,
+			Pulls:           pulls,
+			Mentor:          newMentor(&project.Mentor),
+			SecondaryMentor: newMentor(&project.SecondaryMentor),
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 
