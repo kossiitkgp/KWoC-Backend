@@ -66,6 +66,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	project := models.Project{}
 	tx := db.
 		Table("projects").
+		Preload("Mentor").
+		Preload("SecondaryMentor").
 		Where("id = ?", reqFields.Id).
 		First(&project)
 
