@@ -182,7 +182,6 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	var studentUsernames []string
 	for _, project := range projects {
 		pulls := make([]string, 0)
-		fmt.Print(project.SecondaryMentor)
 		if len(project.Pulls) != 0 {
 			pulls = strings.Split(project.Pulls, ",")
 		}
