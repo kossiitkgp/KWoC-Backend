@@ -38,7 +38,7 @@ func newMentor(dbMentor *models.Mentor) Mentor {
 }
 func newProject(dbProject *models.Project) Project {
 	tags := make([]string, 0)
-	if len(tags) != 0 {
+	if len(dbProject.Tags) != 0 {
 		tags = strings.Split(dbProject.Tags, ",")
 	}
 

@@ -186,11 +186,18 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			pulls = strings.Split(project.Pulls, ",")
 		}
 
+		tags := make([]string, 0)
+		if len(project.Tags) != 0 {
+			tags = strings.Split(project.Tags, ",")
+		}
+
 		projectInfo := ProjectInfo{
 			Id:            project.ID,
 			Name:          project.Name,
 			Description:   project.Description,
 			RepoLink:      project.RepoLink,
+			ReadmeLink:    project.ReadmeLink,
+			Tags:          tags,
 			ProjectStatus: project.ProjectStatus,
 
 			CommitCount:  project.CommitCount,
