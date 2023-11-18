@@ -126,21 +126,19 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	secondaryMentorId := int32(secondaryMentor.ID)
 	updatedProj := &models.Project{
-		Name:              reqFields.Name,
-		Description:       reqFields.Description,
-		Tags:              strings.Join(reqFields.Tags, ","),
-		RepoLink:          reqFields.RepoLink,
-		CommChannel:       reqFields.CommChannel,
-		ReadmeLink:        reqFields.ReadmeLink,
-		SecondaryMentorId: &secondaryMentorId,
+		Name:            reqFields.Name,
+		Description:     reqFields.Description,
+		Tags:            strings.Join(reqFields.Tags, ","),
+		RepoLink:        reqFields.RepoLink,
+		CommChannel:     reqFields.CommChannel,
+		ReadmeLink:      reqFields.ReadmeLink,
+		SecondaryMentor: secondaryMentor,
 	}
 
 	tx = db.
 		Table("projects").
 		Where("id = ?", reqFields.Id).
-		Select("name", "description", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
 		Updates(updatedProj)
 
 	if tx.Error != nil {
