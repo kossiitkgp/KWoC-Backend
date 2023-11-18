@@ -101,9 +101,20 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	// Attempt to fetch secondary mentor from the database
 	secondaryMentor := models.Mentor{}
 	if reqFields.SecondaryMentorUsername != "" {
+		if reqFields.MentorUsername == reqFields.SecondaryMentorUsername {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error: Secondary mentor `%s` cannot be same as primary mentor.", reqFields.SecondaryMentorUsername),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
-		if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		if tx.Error != nil && err != gorm.ErrRecordNotFound {
 			utils.LogErrAndRespond(
 				r,
 				w,
@@ -112,25 +123,18 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 				http.StatusInternalServerError,
 			)
 			return
-		} else if tx.Error == gorm.ErrRecordNotFound {
-			utils.LogWarnAndRespond(
-				r,
-				w,
-				fmt.Sprintf("Secondary mentor `%s` does not exist.", reqFields.SecondaryMentorUsername),
-				http.StatusBadRequest,
-			)
-			return
 		}
 	}
 
+	secondaryMentorId := int32(secondaryMentor.ID)
 	updatedProj := &models.Project{
-		Name:            reqFields.Name,
-		Description:     reqFields.Description,
-		Tags:            strings.Join(reqFields.Tags, ","),
-		RepoLink:        reqFields.RepoLink,
-		CommChannel:     reqFields.CommChannel,
-		ReadmeLink:      reqFields.ReadmeLink,
-		SecondaryMentor: secondaryMentor,
+		Name:              reqFields.Name,
+		Description:       reqFields.Description,
+		Tags:              strings.Join(reqFields.Tags, ","),
+		RepoLink:          reqFields.RepoLink,
+		CommChannel:       reqFields.CommChannel,
+		ReadmeLink:        reqFields.ReadmeLink,
+		SecondaryMentorId: &secondaryMentorId,
 	}
 
 	tx = db.
