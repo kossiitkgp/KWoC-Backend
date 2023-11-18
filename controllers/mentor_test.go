@@ -321,10 +321,21 @@ func TestMentorDashboardOK(t *testing.T) {
 		}
 
 		pulls := make([]string, 0)
+		if len(p.Pulls) > 0 {
+			pulls = strings.Split(p.Pulls, ",")
+		}
+
+		tags := make([]string, 0)
+		if len(p.Tags) > 0 {
+			tags = strings.Split(p.Tags, ",")
+		}
 
 		projects = append(projects, controllers.ProjectInfo{
 			Name:          p.Name,
+			Description:   p.Description,
 			RepoLink:      p.RepoLink,
+			ReadmeLink:    p.ReadmeLink,
+			Tags:          tags,
 			ProjectStatus: p.ProjectStatus,
 
 			CommitCount:  p.CommitCount,
@@ -333,6 +344,14 @@ func TestMentorDashboardOK(t *testing.T) {
 			LinesRemoved: p.LinesRemoved,
 
 			Pulls: pulls,
+			Mentor: controllers.Mentor{
+				Username: p.Mentor.Username,
+				Name:     p.Mentor.Name,
+			},
+			SecondaryMentor: controllers.Mentor{
+				Username: p.SecondaryMentor.Username,
+				Name:     p.SecondaryMentor.Name,
+			},
 		})
 	}
 
@@ -366,6 +385,8 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	var resMentor controllers.MentorDashboard
 	_ = json.NewDecoder(res.Body).Decode(&resMentor)
+
+	fmt.Printf("%+v %+v", testMentor, resMentor)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	if !reflect.DeepEqual(testMentor, resMentor) {
