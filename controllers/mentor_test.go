@@ -294,9 +294,10 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	db.Table("mentors").Create(&modelMentor)
 
+	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
 	testProjects[1].MentorId = int32(modelMentor.ID)
-	testProjects[3].SecondaryMentorId = int32(modelMentor.ID)
+	testProjects[3].SecondaryMentorId = &mentorID
 
 	var projects []controllers.ProjectInfo
 	var students []controllers.StudentInfo
@@ -315,15 +316,26 @@ func TestMentorDashboardOK(t *testing.T) {
 	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
 
 	for _, p := range testProjects {
-		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != int32(modelMentor.ID)) {
+		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != &mentorID) {
 			continue
 		}
 
 		pulls := make([]string, 0)
+		if len(p.Pulls) > 0 {
+			pulls = strings.Split(p.Pulls, ",")
+		}
+
+		tags := make([]string, 0)
+		if len(p.Tags) > 0 {
+			tags = strings.Split(p.Tags, ",")
+		}
 
 		projects = append(projects, controllers.ProjectInfo{
 			Name:          p.Name,
+			Description:   p.Description,
 			RepoLink:      p.RepoLink,
+			ReadmeLink:    p.ReadmeLink,
+			Tags:          tags,
 			ProjectStatus: p.ProjectStatus,
 
 			CommitCount:  p.CommitCount,
@@ -332,6 +344,14 @@ func TestMentorDashboardOK(t *testing.T) {
 			LinesRemoved: p.LinesRemoved,
 
 			Pulls: pulls,
+			Mentor: controllers.Mentor{
+				Username: p.Mentor.Username,
+				Name:     p.Mentor.Name,
+			},
+			SecondaryMentor: controllers.Mentor{
+				Username: p.SecondaryMentor.Username,
+				Name:     p.SecondaryMentor.Name,
+			},
 		})
 	}
 
@@ -365,6 +385,8 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	var resMentor controllers.MentorDashboard
 	_ = json.NewDecoder(res.Body).Decode(&resMentor)
+
+	fmt.Printf("%+v %+v", testMentor, resMentor)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	if !reflect.DeepEqual(testMentor, resMentor) {

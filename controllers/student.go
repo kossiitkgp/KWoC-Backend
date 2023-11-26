@@ -19,6 +19,12 @@ type RegisterStudentReqFields struct {
 	College  string `json:"college"`
 }
 
+type UpdateStudentReqFields struct {
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	College string `json:"college"`
+}
+
 type StudentBlogLinkReqFields struct {
 	Username string `json:"username"`
 	BlogLink string `json:"blog_link"`
@@ -229,7 +235,8 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
-	var projects []ProjectDashboard
+	var projects []ProjectDashboard = make([]ProjectDashboard, 0)
+
 	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
 		var project ProjectDashboard
 		db.Table("projects").
@@ -238,6 +245,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 			First(&project)
 		projects = append(projects, project)
 	}
+
 	languages := strings.Split(modelStudent.LanguagesUsed, ",")
 	return StudentDashboard{
 		Name:           modelStudent.Name,
@@ -298,5 +306,88 @@ func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	student := CreateStudentDashboard(modelStudent, db)
+	utils.RespondWithJson(r, w, student)
+}
+
+func UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	var modelStudent models.Student
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	tx := db.
+		Table("students").
+		Where("username = ?", login_username).
+		Select("name", "username", "email", "college", "ID").
+		First(&modelStudent)
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Student `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	var reqFields = UpdateStudentReqFields{}
+
+	err := utils.DecodeJSONBody(r, &reqFields)
+	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
+		return
+	}
+
+	tx = db.Model(&modelStudent).Updates(models.Student{
+		Name:    reqFields.Name,
+		Email:   reqFields.Email,
+		College: reqFields.College,
+	})
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			"Invalid Details: Could not update student details",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	utils.RespondWithJson(r, w, []string{"Student details updated successfully."})
+}
+
+func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+
+	student := models.Student{}
+	tx := db.
+		Table("students").
+		Where("username = ?", login_username).
+		First(&student)
+
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
+		return
+	}
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Student `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
 	utils.RespondWithJson(r, w, student)
 }

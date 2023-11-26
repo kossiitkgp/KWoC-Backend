@@ -12,6 +12,7 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -83,8 +84,18 @@ func main() {
 		os.Exit(1)
 	}()
 
+	corsObj := cors.New(cors.Options{
+		AllowedOrigins:   []string{os.Getenv("ORIGINS_ALLOWED")},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+	})
+
 	log.Info().Msg("Starting server on port : " + port)
-	err = http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(
+		":"+port,
+		corsObj.Handler(router),
+	)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error starting the server.")

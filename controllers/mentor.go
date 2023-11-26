@@ -19,17 +19,28 @@ type RegisterMentorReqFields struct {
 	Email    string `json:"email"`
 }
 
+type UpdateMentorReqFields struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type ProjectInfo struct {
-	Name          string `json:"name"`
-	RepoLink      string `json:"repo_link"`
-	ProjectStatus bool   `json:"project_status"`
+	Id            uint     `json:"id"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description"`
+	RepoLink      string   `json:"repo_link"`
+	ReadmeLink    string   `json:"readme_link"`
+	Tags          []string `json:"tags"`
+	ProjectStatus bool     `json:"project_status"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls []string `json:"pulls"`
+	Pulls           []string `json:"pulls"`
+	Mentor          Mentor   `json:"mentor"`
+	SecondaryMentor Mentor   `json:"secondary_mentor"`
 }
 
 type StudentInfo struct {
@@ -122,7 +133,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a db entry if the mentor doesn't exist
+	// Create a db entry if the mentor doesn'tf exist
 	tx = db.Create(&models.Mentor{
 		Username: reqFields.Username,
 		Name:     reqFields.Name,
@@ -159,13 +170,12 @@ func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
 // /mentor/dashboard/ functions
 
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
-	var projects []models.Project
-	var projectsInfo []ProjectInfo
-	var students []StudentInfo
+	var projects []models.Project = make([]models.Project, 0)
+	var projectsInfo []ProjectInfo = make([]ProjectInfo, 0)
+	var students []StudentInfo = make([]StudentInfo, 0)
 
-	db.Table("projects").
+	db.Preload("Mentor").Preload("SecondaryMentor").Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
-		Select("name", "repo_link", "commit_count", "pull_count", "lines_added", "lines_removed", "contributors", "pulls", "project_status").
 		Find(&projects)
 
 	studentMap := make(map[string]bool)
@@ -176,9 +186,18 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			pulls = strings.Split(project.Pulls, ",")
 		}
 
+		tags := make([]string, 0)
+		if len(project.Tags) != 0 {
+			tags = strings.Split(project.Tags, ",")
+		}
+
 		projectInfo := ProjectInfo{
+			Id:            project.ID,
 			Name:          project.Name,
+			Description:   project.Description,
 			RepoLink:      project.RepoLink,
+			ReadmeLink:    project.ReadmeLink,
+			Tags:          tags,
 			ProjectStatus: project.ProjectStatus,
 
 			CommitCount:  project.CommitCount,
@@ -186,7 +205,9 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			LinesAdded:   project.LinesAdded,
 			LinesRemoved: project.LinesRemoved,
 
-			Pulls: pulls,
+			Pulls:           pulls,
+			Mentor:          newMentor(&project.Mentor),
+			SecondaryMentor: newMentor(&project.SecondaryMentor),
 		}
 		projectsInfo = append(projectsInfo, projectInfo)
 
@@ -248,6 +269,84 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mentor := CreateMentorDashboard(modelMentor, db)
+
+	utils.RespondWithJson(r, w, mentor)
+}
+
+func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	var modelMentor models.Mentor
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	tx := db.
+		Table("mentors").
+		Where("username = ?", login_username).
+		Select("name", "username", "email", "ID").
+		First(&modelMentor)
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	var reqFields = UpdateMentorReqFields{}
+
+	err := utils.DecodeJSONBody(r, &reqFields)
+	if err != nil {
+		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
+		return
+	}
+
+	tx = db.Model(&modelMentor).Updates(models.Mentor{
+		Name:  reqFields.Name,
+		Email: reqFields.Email,
+	})
+
+	if tx.Error != nil {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			"Invalid Details: Could not update mentor details",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
+}
+
+func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
+	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
+	db := app.Db
+
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+
+	mentor := models.Mentor{}
+	tx := db.
+		Table("mentors").
+		Where("username = ?", login_username).
+		Select("name", "username", "email", "ID").
+		First(&mentor)
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
+			http.StatusBadRequest,
+		)
+		return
+	}
 
 	utils.RespondWithJson(r, w, mentor)
 }

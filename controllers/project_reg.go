@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -17,7 +18,7 @@ type RegisterProjectReqFields struct {
 	// Description for the project
 	Description string `json:"description"`
 	// List of tags for the project
-	Tags string `json:"tags"`
+	Tags []string `json:"tags"`
 	// Mentor's username
 	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username
@@ -110,6 +111,17 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	// Attempt to fetch secondary mentor from the database
 	secondaryMentor := models.Mentor{}
 	if reqFields.SecondaryMentorUsername != "" {
+		if reqFields.MentorUsername == reqFields.SecondaryMentorUsername {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error: Secondary mentor `%s` cannot be same as primary mentor.", reqFields.SecondaryMentorUsername),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
 		if tx.Error != nil && err != gorm.ErrRecordNotFound {
@@ -127,7 +139,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	tx = db.Create(&models.Project{
 		Name:            reqFields.Name,
 		Description:     reqFields.Description,
-		Tags:            reqFields.Tags,
+		Tags:            strings.Join(reqFields.Tags, ","),
 		RepoLink:        reqFields.RepoLink,
 		CommChannel:     reqFields.CommChannel,
 		ReadmeLink:      reqFields.ReadmeLink,

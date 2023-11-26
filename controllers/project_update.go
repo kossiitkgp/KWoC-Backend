@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -20,7 +21,7 @@ type UpdateProjectReqFields struct {
 	// Description for the project
 	Description string `json:"description"`
 	// List of tags for the project
-	Tags string `json:"tags"`
+	Tags []string `json:"tags"`
 	// Mentor's username
 	MentorUsername string `json:"mentor_username"`
 	// Secondary mentor's username (if updated)
@@ -65,6 +66,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	project := models.Project{}
 	tx := db.
 		Table("projects").
+		Preload("Mentor").
+		Preload("SecondaryMentor").
 		Where("id = ?", reqFields.Id).
 		First(&project)
 
@@ -84,12 +87,34 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if project.Mentor.Username != login_username {
+		utils.LogErrAndRespond(
+			r,
+			w,
+			tx.Error,
+			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_username, project.ID),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
 	// Attempt to fetch secondary mentor from the database
 	secondaryMentor := models.Mentor{}
 	if reqFields.SecondaryMentorUsername != "" {
+		if reqFields.MentorUsername == reqFields.SecondaryMentorUsername {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				fmt.Sprintf("Error: Secondary mentor `%s` cannot be same as primary mentor.", reqFields.SecondaryMentorUsername),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
-		if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		if tx.Error != nil && err != gorm.ErrRecordNotFound {
 			utils.LogErrAndRespond(
 				r,
 				w,
@@ -98,31 +123,22 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 				http.StatusInternalServerError,
 			)
 			return
-		} else if tx.Error == gorm.ErrRecordNotFound {
-			utils.LogWarnAndRespond(
-				r,
-				w,
-				fmt.Sprintf("Secondary mentor `%s` does not exist.", reqFields.SecondaryMentorUsername),
-				http.StatusBadRequest,
-			)
-			return
 		}
 	}
 
 	updatedProj := &models.Project{
-		Name:              reqFields.Name,
-		Description:       reqFields.Description,
-		Tags:              reqFields.Tags,
-		RepoLink:          reqFields.RepoLink,
-		CommChannel:       reqFields.CommChannel,
-		ReadmeLink:        reqFields.ReadmeLink,
-		SecondaryMentorId: int32(secondaryMentor.ID),
+		Name:            reqFields.Name,
+		Description:     reqFields.Description,
+		Tags:            strings.Join(reqFields.Tags, ","),
+		RepoLink:        reqFields.RepoLink,
+		CommChannel:     reqFields.CommChannel,
+		ReadmeLink:      reqFields.ReadmeLink,
+		SecondaryMentor: secondaryMentor,
 	}
 
 	tx = db.
 		Table("projects").
 		Where("id = ?", reqFields.Id).
-		Select("name", "description", "tags", "repo_link", "comm_channel", "readme_link", "secondary_mentor_id").
 		Updates(updatedProj)
 
 	if tx.Error != nil {

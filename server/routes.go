@@ -29,10 +29,28 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WrapApp(app, controllers.OAuth),
 		},
 		{
+			"Fetch Student Details",
+			"GET",
+			"/student/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.GetStudentDetails)),
+		},
+		{
+			"Fetch Mentor Details",
+			"GET",
+			"/mentor/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.GetMentorDetails)),
+		},
+		{
 			"Student Registration",
 			"POST",
 			"/student/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
+		},
+		{
+			"Update Student Details",
+			"PUT",
+			"/student/form/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.UpdateStudentDetails)),
 		},
 		{
 			"Student Blog Submission",
@@ -51,6 +69,12 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/mentor/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
+		},
+		{
+			"Update Mentor Details",
+			"PUT",
+			"/mentor/form/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.UpdateMentorDetails)),
 		},
 		{
 			"Fetch All Mentors",
@@ -98,7 +122,7 @@ func getRoutes(app *middleware.App) []Route {
 			"Fetch Project Details",
 			"GET",
 			"/project/{id}",
-			middleware.WrapApp(app, controllers.FetchProjectDetails),
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchProjectDetails)),
 		},
 		{
 			"Fetch All Students Stats",
