@@ -83,8 +83,9 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Check if the user has already registered
 	var isNewUser bool = false
 
-	student := models.Student{}
+	college := ""
 	if reqFields.Type == OAUTH_TYPE_STUDENT {
+		student := models.Student{}
 		db.
 			Table("students").
 			Where("username = ?", userInfo.Username).
@@ -93,6 +94,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		isNewUser = student.Username != userInfo.Username
 
 		userInfo.Email = student.Email
+		college = student.College
 
 	} else if reqFields.Type == OAUTH_TYPE_MENTOR {
 		mentor := models.Mentor{}
@@ -119,7 +121,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		Username:  userInfo.Username,
 		Name:      userInfo.Name,
 		Email:     userInfo.Email,
-		College:   student.College,
+		College:   college,
 		Type:      reqFields.Type,
 		IsNewUser: isNewUser,
 		Jwt:       jwtString,
