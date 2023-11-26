@@ -10,6 +10,8 @@ definitions:
     type: object
   controllers.OAuthResBodyFields:
     properties:
+      college:
+        type: string
       email:
         type: string
       is_new_user:
