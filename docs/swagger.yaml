@@ -28,6 +28,18 @@ definitions:
       username:
         type: string
     type: object
+  controllers.ProfileResBodyFields:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      type:
+        description: '`mentor` or `student`'
+        type: string
+      username:
+        type: string
+    type: object
   controllers.ProjectDashboard:
     properties:
       name:
@@ -157,6 +169,34 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPMessage'
       summary: OAuth Authentication
+  /profile:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches the user's profile from the JWT, if it is valid. If invalid,
+        returns an error.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succesfully authenticated.
+          schema:
+            $ref: '#/definitions/controllers.ProfileResBodyFields'
+        "400":
+          description: User is not registered.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "401":
+          description: JWT session token invalid.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Error parsing JWT string.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Fetches user profile
   /student/bloglink/:
     post:
       consumes:
