@@ -84,29 +84,26 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	var isNewUser bool = false
 
 	college := ""
-	if reqFields.Type == OAUTH_TYPE_STUDENT {
-		student := models.Student{}
-		db.
-			Table("students").
-			Where("username = ?", userInfo.Username).
-			First(&student)
+	student := models.Student{}
+	db.
+		Table("students").
+		Where("username = ?", userInfo.Username).
+		First(&student)
 
-		isNewUser = student.Username != userInfo.Username
+	isNewUser = isNewUser || (student.Username != userInfo.Username)
 
-		userInfo.Email = student.Email
-		college = student.College
+	userInfo.Email = student.Email
+	college = student.College
 
-	} else if reqFields.Type == OAUTH_TYPE_MENTOR {
-		mentor := models.Mentor{}
-		db.
-			Table("mentors").
-			Where("username = ?", userInfo.Username).
-			First(&mentor)
+	mentor := models.Mentor{}
+	db.
+		Table("mentors").
+		Where("username = ?", userInfo.Username).
+		First(&mentor)
 
-		isNewUser = mentor.Username != userInfo.Username
+	isNewUser = isNewUser || (mentor.Username != userInfo.Username)
 
-		userInfo.Email = mentor.Email
-	}
+	userInfo.Email = mentor.Email
 
 	// Generate a JWT string for the user
 	jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
