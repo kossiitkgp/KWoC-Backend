@@ -72,7 +72,7 @@ func GenerateLoginJwtString(loginJwtFields LoginJwtFields) (string, error) {
 
 	if err != nil {
 		// Default of 30 days
-		jwtValidityTime = 0
+		jwtValidityTime = 24 * 30
 
 		log.Warn().Msgf("Could not parse JWT validity time from the environment. Set to default of %d hours.", jwtValidityTime)
 	}
