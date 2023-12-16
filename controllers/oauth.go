@@ -81,7 +81,8 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the user has already registered
-	var isNewUser bool = false
+	var isNewUser bool = true
+	var userType string = reqFields.Type
 
 	college := ""
 	student := models.Student{}
@@ -90,10 +91,13 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		Where("username = ?", userInfo.Username).
 		First(&student)
 
-	isNewUser = isNewUser || (student.Username != userInfo.Username)
-
-	userInfo.Email = student.Email
-	college = student.College
+	if student.Username == userInfo.Username {
+		isNewUser = false
+		userType = "student"
+		userInfo.Email = student.Email
+		userInfo.Name = student.Name
+		college = student.College
+	}
 
 	mentor := models.Mentor{}
 	db.
@@ -101,9 +105,12 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		Where("username = ?", userInfo.Username).
 		First(&mentor)
 
-	isNewUser = isNewUser || (mentor.Username != userInfo.Username)
-
-	userInfo.Email = mentor.Email
+	if mentor.Username == userInfo.Username {
+		isNewUser = false
+		userInfo.Email = mentor.Email
+		userInfo.Name = mentor.Name
+		userType = "mentor"
+	}
 
 	// Generate a JWT string for the user
 	jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
@@ -119,7 +126,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		Name:      userInfo.Name,
 		Email:     userInfo.Email,
 		College:   college,
-		Type:      reqFields.Type,
+		Type:      userType,
 		IsNewUser: isNewUser,
 		Jwt:       jwtString,
 	}
