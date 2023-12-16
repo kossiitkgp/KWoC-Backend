@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -11,6 +12,7 @@ import (
 )
 
 var ErrJwtSecretKeyNotFound = errors.New("ERROR: JWT SECRET KEY NOT FOUND")
+var ErrJwtTokenExpired = errors.New("ERROR: JWT TOKEN EXPIRED")
 var ErrJwtTokenInvalid = errors.New("ERROR: JWT TOKEN INVALID")
 
 func getJwtKey() (string, error) {
@@ -46,6 +48,10 @@ func ParseLoginJwtString(tokenString string) (*jwt.Token, *LoginJwtClaims, error
 	var loginClaims = LoginJwtClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, &loginClaims, jwtKeyFunc)
 
+	if err.Error() == fmt.Sprintf("%s: %s", jwt.ErrTokenInvalidClaims.Error(), jwt.ErrTokenExpired.Error()) {
+		return nil, nil, ErrJwtTokenExpired
+	}
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -66,7 +72,7 @@ func GenerateLoginJwtString(loginJwtFields LoginJwtFields) (string, error) {
 
 	if err != nil {
 		// Default of 30 days
-		jwtValidityTime = 30 * 24
+		jwtValidityTime = 0
 
 		log.Warn().Msgf("Could not parse JWT validity time from the environment. Set to default of %d hours.", jwtValidityTime)
 	}

@@ -29,6 +29,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WrapApp(app, controllers.OAuth),
 		},
 		{
+			"Profile",
+			"GET",
+			"/profile/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchProfile)),
+		},
+		{
 			"Fetch Student Details",
 			"GET",
 			"/student/",

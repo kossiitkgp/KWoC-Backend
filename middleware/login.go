@@ -29,6 +29,11 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
+			if err == utils.ErrJwtTokenExpired {
+				utils.LogErrAndRespond(r, w, err, "Error: JWT session token expired.", http.StatusUnauthorized)
+				return
+			}
+
 			utils.LogErrAndRespond(r, w, err, "Error parsing JWT string.", http.StatusInternalServerError)
 			return
 		}
