@@ -48,11 +48,11 @@ func ParseLoginJwtString(tokenString string) (*jwt.Token, *LoginJwtClaims, error
 	var loginClaims = LoginJwtClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, &loginClaims, jwtKeyFunc)
 
-	if err.Error() == fmt.Sprintf("%s: %s", jwt.ErrTokenInvalidClaims.Error(), jwt.ErrTokenExpired.Error()) {
-		return nil, nil, ErrJwtTokenExpired
-	}
-
 	if err != nil {
+		if err.Error() == fmt.Sprintf("%s: %s", jwt.ErrTokenInvalidClaims.Error(), jwt.ErrTokenExpired.Error()) {
+			return nil, nil, ErrJwtTokenExpired
+		}
+
 		return nil, nil, err
 	}
 
