@@ -100,7 +100,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 		First(&student)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
-		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
 

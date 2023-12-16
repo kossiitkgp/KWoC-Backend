@@ -29,6 +29,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WrapApp(app, controllers.OAuth),
 		},
 		{
+			"Profile",
+			"GET",
+			"/profile/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchProfile)),
+		},
+		{
 			"Fetch Student Details",
 			"GET",
 			"/student/",
@@ -40,12 +46,12 @@ func getRoutes(app *middleware.App) []Route {
 			"/mentor/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.GetMentorDetails)),
 		},
-		{
-			"Student Registration",
-			"POST",
-			"/student/form/",
-			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
-		},
+		// {
+		// 	"Student Registration",
+		// 	"POST",
+		// 	"/student/form/",
+		// 	middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
+		// },
 		{
 			"Update Student Details",
 			"PUT",
@@ -64,12 +70,12 @@ func getRoutes(app *middleware.App) []Route {
 			"/student/dashboard/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchStudentDashboard)),
 		},
-		{
-			"Mentor Registration",
-			"POST",
-			"/mentor/form/",
-			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
-		},
+		// {
+		// 	"Mentor Registration",
+		// 	"POST",
+		// 	"/mentor/form/",
+		// 	middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
+		// },
 		{
 			"Update Mentor Details",
 			"PUT",
@@ -100,12 +106,12 @@ func getRoutes(app *middleware.App) []Route {
 			"/healthcheck/ping/",
 			controllers.Ping,
 		},
-		{
-			"Project Registration",
-			"POST",
-			"/project/",
-			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
-		},
+		// {
+		// 	"Project Registration",
+		// 	"POST",
+		// 	"/project/",
+		// 	middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
+		// },
 		{
 			"Fetch All Projects",
 			"GET",

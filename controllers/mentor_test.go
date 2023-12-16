@@ -386,10 +386,10 @@ func TestMentorDashboardOK(t *testing.T) {
 	var resMentor controllers.MentorDashboard
 	_ = json.NewDecoder(res.Body).Decode(&resMentor)
 
-	fmt.Printf("%+v %+v", testMentor, resMentor)
-
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	if !reflect.DeepEqual(testMentor, resMentor) {
 		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
+		fmt.Printf("Expected mentor dashboard: %#v\n\n", testMentor)
+		fmt.Printf("Received mentor dashboard: %#v\n", resMentor)
 	}
 }
