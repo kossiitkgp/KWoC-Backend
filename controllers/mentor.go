@@ -243,13 +243,14 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Students: students,
 	}
 }
+
 // FetchMentorDashboard godoc
 //
 //	@Summary		Fetches the mentor dashboard
 //	@Description	Fetches the required details for the mentor dashboard
 //	@Accept			plain
 //	@Produce		json
-//	@Success		200	{object}	MentorDashboard	"Mentor registration successful."
+//	@Success		200	{object}	MentorDashboard	    "Mentor dashboard details fetched successfuly."
 //	@Failure		400	{object}	utils.HTTPMessage	"Mentor `username` does not exists."
 //	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentor with username `username`"
 //	@Security		JWT
@@ -292,7 +293,6 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithJson(r, w, mentor)
 }
-
 
 // UpdateMentorDetails godoc
 //
@@ -365,7 +365,7 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 //	@Description	Get mentor details for logged in mentor
 //	@Accept			plain
 //	@Produce		json
-//	@Success		200		{object}	models.Mentor				"Mentor registration successful."
+//	@Success		200		{object}	models.Mentor				"Mentor details fetched successfuly."
 //	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
 //	@Security		JWT
 //	@Router			/student/form [post]

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 )
+
 // Index godoc
 //
 //	@Summary		Checks api health
