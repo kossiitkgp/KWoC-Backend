@@ -274,6 +274,7 @@ The `models/` directory contains database models for the KWoC database tables. (
   - `comm_channel` (string): A link to the project's official communication channel.
   - `readme_link` (string): A link to the project's README file.
   - `project_status` (bool): Whether the project is approved.
+  - `status_remark` (string): Message that states reason for rejection/suggested changes for project approval
   - `last_pull_time` (int64): The timestamp of merging the last tracked pull request (for statistics).
   - `commit_count` (uint): The number of commits contributed to this project during KWoC.
   - `pull_count` (uint): The number of pull requests contributed to this project during KWoC.

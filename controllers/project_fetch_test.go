@@ -58,6 +58,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 				CommChannel:   fmt.Sprintf("https://link%d", rand.Int()),
 				ReadmeLink:    fmt.Sprintf("https://readme%d", rand.Int()),
 				ProjectStatus: projectStatus,
+				StatusRemark:  fmt.Sprintf("Status remark %d", rand.Int()),
 
 				// Stats
 				CommitCount:  uint(rand.Int()),

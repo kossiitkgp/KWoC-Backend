@@ -337,6 +337,7 @@ func TestMentorDashboardOK(t *testing.T) {
 			ReadmeLink:    p.ReadmeLink,
 			Tags:          tags,
 			ProjectStatus: p.ProjectStatus,
+			StatusRemark:  p.StatusRemark,
 
 			CommitCount:  p.CommitCount,
 			PullCount:    p.PullCount,
