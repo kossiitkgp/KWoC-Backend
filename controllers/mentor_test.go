@@ -28,6 +28,27 @@ func createMentorRegRequest(reqFields *controllers.RegisterMentorReqFields) *htt
 	return req
 }
 
+func createMentorUpdateRequest(reqFields *controllers.UpdateMentorReqFields) *http.Request {
+	reqBody, _ := json.Marshal(reqFields)
+
+	req, _ := http.NewRequest(
+		"PUT",
+		"/mentor/form/",
+		bytes.NewReader(reqBody),
+	)
+
+	return req
+}
+
+var testMentor = models.Mentor {
+	Name:     "TestMentor",
+	Email:    "test@test.com",
+	Username: "someuser",
+}
+
+// Mentor Registration Endpoint Disabled
+
+/*
 // Test unauthenticated request to /mentor/form/
 func TestMentorRegNoAuth(t *testing.T) {
 	testRequestNoAuth(t, "POST", "/mentor/form/")
@@ -56,6 +77,18 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
+}
+*/
+
+
+// Test unauthenticated request to /mentor/form/ [put]
+func TestMentorUpdateNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "PUT", "/mentor/form/")
+}
+
+// Test request to /mentor/form/ [put] with invalid jwt
+func TestMentorUpdateInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "PUT", "/mentor/form/")
 }
 
 // Test a new user registration request to /mentor/form/ with proper authentication and input
@@ -124,40 +157,42 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
 }
 
-// Test requests to /mentor/form/ with proper authentication and input
-func TestMentorRegOK(t *testing.T) {
-	// Set up a local test database path
-	db := setTestDB()
-	defer unsetTestDB()
+// Currently Disabled
 
-	// Generate a jwt secret key for testing
-	setTestJwtSecretKey()
-	defer unsetTestJwtSecretKey()
+// // Test requests to /mentor/form/ with proper authentication and input
+// func TestMentorRegOK(t *testing.T) {
+// 	// Set up a local test database path
+// 	db := setTestDB()
+// 	defer unsetTestDB()
 
-	// New mentor registration test
-	t.Run(
-		"Test: new mentor registration.",
-		func(t *testing.T) {
-			tMentorRegNewUser(db, t)
-		},
-	)
+// 	// Generate a jwt secret key for testing
+// 	setTestJwtSecretKey()
+// 	defer unsetTestJwtSecretKey()
 
-	// Existing mentor registration test
-	t.Run(
-		"Test: existing mentor registration.",
-		func(t *testing.T) {
-			tMentorRegExistingUser(db, t)
-		},
-	)
+// 	// New mentor registration test
+// 	t.Run(
+// 		"Test: new mentor registration.",
+// 		func(t *testing.T) {
+// 			tMentorRegNewUser(db, t)
+// 		},
+// 	)
 
-	// Student registering as mentor test
-	t.Run(
-		"Test: Student registering as mentor.",
-		func(t *testing.T) {
-			tMentorRegAsStudent(db, t)
-		},
-	)
-}
+// 	// Existing mentor registration test
+// 	t.Run(
+// 		"Test: existing mentor registration.",
+// 		func(t *testing.T) {
+// 			tMentorRegExistingUser(db, t)
+// 		},
+// 	)
+
+// 	// Student registering as mentor test
+// 	t.Run(
+// 		"Test: Student registering as mentor.",
+// 		func(t *testing.T) {
+// 			tMentorRegAsStudent(db, t)
+// 		},
+// 	)
+// }
 
 func createFetchMentorRequest() *http.Request {
 	req, _ := http.NewRequest(
