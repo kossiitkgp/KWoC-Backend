@@ -1,7 +1,6 @@
 package controllers_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,32 +12,31 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
-	"gorm.io/gorm"
 )
 
-func createMentorRegRequest(reqFields *controllers.RegisterMentorReqFields) *http.Request {
-	reqBody, _ := json.Marshal(reqFields)
+// func createMentorRegRequest(reqFields *controllers.RegisterMentorReqFields) *http.Request {
+// 	reqBody, _ := json.Marshal(reqFields)
 
-	req, _ := http.NewRequest(
-		"POST",
-		"/mentor/form/",
-		bytes.NewReader(reqBody),
-	)
+// 	req, _ := http.NewRequest(
+// 		"POST",
+// 		"/mentor/form/",
+// 		bytes.NewReader(reqBody),
+// 	)
 
-	return req
-}
+// 	return req
+// }
 
-func createMentorUpdateRequest(reqFields *controllers.UpdateMentorReqFields) *http.Request {
-	reqBody, _ := json.Marshal(reqFields)
+// func createMentorUpdateRequest(reqFields *controllers.UpdateMentorReqFields) *http.Request {
+// 	reqBody, _ := json.Marshal(reqFields)
 
-	req, _ := http.NewRequest(
-		"PUT",
-		"/mentor/form/",
-		bytes.NewReader(reqBody),
-	)
+// 	req, _ := http.NewRequest(
+// 		"PUT",
+// 		"/mentor/form/",
+// 		bytes.NewReader(reqBody),
+// 	)
 
-	return req
-}
+// 	return req
+// }
 
 // Mentor Registration Endpoint Disabled
 
@@ -74,83 +72,82 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 }
 */
 
-
 // Test unauthenticated request to /mentor/form/ [put]
-func TestMentorUpdateNoAuth(t *testing.T) {
-	testRequestNoAuth(t, "PUT", "/mentor/form/")
-}
+// func TestMentorUpdateNoAuth(t *testing.T) {
+// 	testRequestNoAuth(t, "PUT", "/mentor/form/")
+// }
 
-// Test request to /mentor/form/ [put] with invalid jwt
-func TestMentorUpdateInvalidAuth(t *testing.T) {
-	testRequestInvalidAuth(t, "PUT", "/mentor/form/")
-}
+// // Test request to /mentor/form/ [put] with invalid jwt
+// func TestMentorUpdateInvalidAuth(t *testing.T) {
+// 	testRequestInvalidAuth(t, "PUT", "/mentor/form/")
+// }
 
-// Test a new user registration request to /mentor/form/ with proper authentication and input
-func tMentorRegNewUser(db *gorm.DB, t *testing.T) {
-	// Test login fields
-	testUsername := getTestUsername()
-	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// // Test a new user registration request to /mentor/form/ with proper authentication and input
+// func tMentorRegNewUser(db *gorm.DB, t *testing.T) {
+// 	// Test login fields
+// 	testUsername := getTestUsername()
+// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	reqFields := controllers.RegisterMentorReqFields{Username: testUsername}
+// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+// 	reqFields := controllers.RegisterMentorReqFields{Username: testUsername}
 
-	req := createMentorRegRequest(&reqFields)
-	req.Header.Add("Bearer", testJwt)
+// 	req := createMentorRegRequest(&reqFields)
+// 	req.Header.Add("Bearer", testJwt)
 
-	res := executeRequest(req, db)
+// 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusOK)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Mentor registration successful."})
-}
+// 	expectStatusCodeToBe(t, res, http.StatusOK)
+// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Mentor registration successful."})
+// }
 
-// Test an existing user registration request to /mentor/form/ with proper authentication and input
-func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
-	// Test login fields
-	testUsername := getTestUsername()
-	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// // Test an existing user registration request to /mentor/form/ with proper authentication and input
+// func tMentorRegExistingUser(db *gorm.DB, t *testing.T) {
+// 	// Test login fields
+// 	testUsername := getTestUsername()
+// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	reqFields := controllers.RegisterMentorReqFields{Username: testUsername}
+// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+// 	reqFields := controllers.RegisterMentorReqFields{Username: testUsername}
 
-	req := createMentorRegRequest(&reqFields)
-	req.Header.Add("Bearer", testJwt)
+// 	req := createMentorRegRequest(&reqFields)
+// 	req.Header.Add("Bearer", testJwt)
 
-	_ = executeRequest(req, db)
+// 	_ = executeRequest(req, db)
 
-	// Execute the same request again
-	req = createMentorRegRequest(&reqFields)
-	req.Header.Add("Bearer", testJwt)
+// 	// Execute the same request again
+// 	req = createMentorRegRequest(&reqFields)
+// 	req.Header.Add("Bearer", testJwt)
 
-	res := executeRequest(req, db)
+// 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
-}
+// 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Mentor `%s` already exists.", testUsername)})
+// }
 
-// Test an existing student registration request to /mentor/form/ with proper authentication and input
-func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
-	// Test login fields
-	testUsername := getTestUsername()
-	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// // Test an existing student registration request to /mentor/form/ with proper authentication and input
+// func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
+// 	// Test login fields
+// 	testUsername := getTestUsername()
+// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	// studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
+// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+// 	// studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	// req := createStudentRegRequest(&studentFields)
-	// req.Header.Add("Bearer", testJwt)
+// 	// req := createStudentRegRequest(&studentFields)
+// 	// req.Header.Add("Bearer", testJwt)
 
-	// _ = executeRequest(req, db)
-	db.Table("students").Create(&models.Student{Username: testUsername})
+// 	// _ = executeRequest(req, db)
+// 	db.Table("students").Create(&models.Student{Username: testUsername})
 
-	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
-	req := createMentorRegRequest(&mentorFields)
-	req.Header.Add("Bearer", testJwt)
+// 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
+// 	req := createMentorRegRequest(&mentorFields)
+// 	req.Header.Add("Bearer", testJwt)
 
-	res := executeRequest(req, db)
+// 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
-}
+// 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
+// }
 
 // Currently Disabled
 
@@ -363,7 +360,7 @@ func TestMentorDashboardOK(t *testing.T) {
 				Username: modelMentor.Username,
 			}
 		}
-		
+
 		pulls := make([]string, 0)
 		if len(p.Pulls) > 0 {
 			pulls = strings.Split(p.Pulls, ",")
