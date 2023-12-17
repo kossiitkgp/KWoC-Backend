@@ -80,7 +80,7 @@ func tProjectUpdateNonExistent(db *gorm.DB, testUsername string, testJwt string,
 func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
 	// Register a test project
 	projRegFields := createTestProjectRegFields(testUsername, "")
-	
+
 	db.Create(&models.Project{
 		Name:          projRegFields.Name,
 		Description:   projRegFields.Description,
