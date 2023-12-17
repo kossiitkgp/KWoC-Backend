@@ -210,12 +210,7 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	// reqFieldsReg := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	// req := createStudentRegRequest(&reqFieldsReg)
-	// req.Header.Add("Bearer", testJwt)
-
-	// _ = executeRequest(req, db)
 	db.Table("students").Create(&models.Student{Username: testUsername})
 
 	// Execute the bloglink request
