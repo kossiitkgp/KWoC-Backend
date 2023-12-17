@@ -233,7 +233,17 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Students: students,
 	}
 }
-
+// FetchMentorDashboard godoc
+//
+//	@Summary		Fetches the mentor dashboard
+//	@Description	Fetches the required details for the mentor dashboard
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	MentorDashboard	"Student registration successful."
+//	@Failure		400	{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentor with username `username`"
+//	@Security		JWT
+//	@Router			/mentor/dashboard/ [get]
 func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
