@@ -140,6 +140,16 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
+// FetchAllMentors godoc
+//
+//	@Summary		Fetches all mentors
+//	@Description	Fetches the public details for all the mentors
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	[]Mentor	"Mentor fetch successful"
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentors"
+//	@Security		JWT
+//	@Router			/mentor/all [get]
 func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -227,6 +237,17 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	}
 }
 
+// FetchMentorDashboard godoc
+//
+//	@Summary		Fetches the mentor dashboard
+//	@Description	Fetches the required details for the mentor dashboard
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	MentorDashboard	    "Mentor dashboard details fetched successfuly."
+//	@Failure		400	{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentor with username `username`"
+//	@Security		JWT
+//	@Router			/mentor/dashboard/ [get]
 func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -266,6 +287,20 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, mentor)
 }
 
+// UpdateMentorDetails godoc
+//
+//	@Summary		Update Mentor Details
+//	@Description	Update mentor details for logged in mentor
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdateMentorReqFields	true	"Fields required for Mentor update."
+//	@Success		200		{object}	[]string	"Succesfully updated mentor details."
+//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body."
+//	@Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+//	@Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
+//	@Security		JWT
+//
+//	@Router			/mentor/form [put]
 func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -317,6 +352,16 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
 }
 
+// GetMentorDetails godoc
+//
+//	@Summary		Fetch Mentor Details
+//	@Description	Get mentor details for logged in mentor
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	models.Mentor				"Mentor details fetched successfuly."
+//	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
+//	@Security		JWT
+//	@Router			/student/form [post]
 func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
