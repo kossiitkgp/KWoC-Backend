@@ -40,12 +40,6 @@ func createMentorUpdateRequest(reqFields *controllers.UpdateMentorReqFields) *ht
 	return req
 }
 
-var testMentor = models.Mentor {
-	Name:     "TestMentor",
-	Email:    "test@test.com",
-	Username: "someuser",
-}
-
 // Mentor Registration Endpoint Disabled
 
 /*
@@ -349,23 +343,36 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	testProjects[1].Contributors = strings.TrimSuffix(testProjects[1].Contributors, ",")
 	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
+	db.Table("projects").Create(testProjects)
 
 	for _, p := range testProjects {
 		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != &mentorID) {
 			continue
 		}
 
+		if p.MentorId == int32(modelMentor.ID) {
+			p.Mentor = models.Mentor{
+				Name:     modelMentor.Name,
+				Username: modelMentor.Username,
+			}
+		}
+		if p.SecondaryMentorId == &mentorID {
+			p.SecondaryMentor = models.Mentor{
+				Name:     modelMentor.Name,
+				Username: modelMentor.Username,
+			}
+		}
+		
 		pulls := make([]string, 0)
 		if len(p.Pulls) > 0 {
 			pulls = strings.Split(p.Pulls, ",")
 		}
-
 		tags := make([]string, 0)
 		if len(p.Tags) > 0 {
 			tags = strings.Split(p.Tags, ",")
 		}
-
 		projects = append(projects, controllers.ProjectInfo{
+			Id:            p.ID,
 			Name:          p.Name,
 			Description:   p.Description,
 			RepoLink:      p.RepoLink,
@@ -398,7 +405,6 @@ func TestMentorDashboardOK(t *testing.T) {
 		})
 	}
 
-	db.Table("projects").Create(testProjects)
 	db.Table("students").Create(modelStudents)
 
 	testMentor := controllers.MentorDashboard{
@@ -424,8 +430,8 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	if !reflect.DeepEqual(testMentor, resMentor) {
-		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
 		fmt.Printf("Expected mentor dashboard: %#v\n\n", testMentor)
 		fmt.Printf("Received mentor dashboard: %#v\n", resMentor)
+		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
 	}
 }
