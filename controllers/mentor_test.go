@@ -134,15 +134,16 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
+	// studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	req := createStudentRegRequest(&studentFields)
-	req.Header.Add("Bearer", testJwt)
+	// req := createStudentRegRequest(&studentFields)
+	// req.Header.Add("Bearer", testJwt)
 
-	_ = executeRequest(req, db)
+	// _ = executeRequest(req, db)
+	db.Table("students").Create(&models.Student{Username: testUsername})
 
 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
-	req = createMentorRegRequest(&mentorFields)
+	req := createMentorRegRequest(&mentorFields)
 	req.Header.Add("Bearer", testJwt)
 
 	res := executeRequest(req, db)
