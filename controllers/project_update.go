@@ -114,16 +114,6 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 			)
 			return
 		}
-		if tx.Error == gorm.ErrRecordNotFound {
-			utils.LogErrAndRespond(
-				r,
-				w,
-				err,
-				fmt.Sprintf("Secondary mentor `%s` does not exist.", reqFields.SecondaryMentorUsername),
-				http.StatusBadRequest,
-			)
-			return
-		}
 	}
 
 	updatedProj := &models.Project{
