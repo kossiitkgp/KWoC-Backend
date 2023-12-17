@@ -129,7 +129,6 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
 }
 
-
 // Test requests to /mentor/form/ with proper authentication and input
 func TestMentorRegOK(t *testing.T) {
 	// Set up a local test database path
