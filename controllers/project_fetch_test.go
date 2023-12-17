@@ -132,7 +132,16 @@ func TestFetchAllProjects(t *testing.T) {
 
 // Try fetching a project with an invalid id
 func TestFetchProjDetailsInvalidID(t *testing.T) {
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
 	req := createFetchProjDetailsRequest("kekw")
+	req.Header.Add("Bearer", testJwt)
 	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
