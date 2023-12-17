@@ -58,7 +58,7 @@ func main() {
 	}
 
 	log.Info().Msg("Creating mux router")
-	router := server.NewRouter(db)
+	router := server.NewRouter(db, false)
 
 	port := os.Getenv("BACKEND_PORT")
 	if port == "" {

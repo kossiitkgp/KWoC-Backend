@@ -17,152 +17,148 @@ import (
 	"gorm.io/gorm"
 )
 
-/*
-----------DISABLE TESTS FOR DISABLED ENDPOINTS--------------
-*/
+func createStudentRegRequest(reqFields *controllers.RegisterStudentReqFields) *http.Request {
+	reqBody, _ := json.Marshal(reqFields)
 
-// func createStudentRegRequest(reqFields *controllers.RegisterStudentReqFields) *http.Request {
-// 	reqBody, _ := json.Marshal(reqFields)
+	req, _ := http.NewRequest(
+		"POST",
+		"/student/form/",
+		bytes.NewReader(reqBody),
+	)
 
-// 	req, _ := http.NewRequest(
-// 		"POST",
-// 		"/student/form/",
-// 		bytes.NewReader(reqBody),
-// 	)
-
-// 	return req
-// }
+	return req
+}
 
 // Test unauthenticated request to /student/form/
-// func TestStudentRegNoAuth(t *testing.T) {
-// 	testRequestNoAuth(t, "POST", "/student/form/")
-// }
+func TestStudentRegNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "POST", "/student/form/")
+}
 
-// // Test request to /student/form/ with invalid jwt
-// func TestStudentRegInvalidAuth(t *testing.T) {
-// 	testRequestInvalidAuth(t, "POST", "/student/form/")
-// }
+// Test request to /student/form/ with invalid jwt
+func TestStudentRegInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "POST", "/student/form/")
+}
 
 // Test request to /student/form/ with session hijacking attempt
-// func TestStudentRegSessionHijacking(t *testing.T) {
-// 	// Generate a jwt secret key for testing
-// 	setTestJwtSecretKey()
+func TestStudentRegSessionHijacking(t *testing.T) {
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
 
-// 	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
+	testLoginFields := utils.LoginJwtFields{Username: "someuser"}
 
-// 	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	someuserJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
-// 	reqFields := controllers.RegisterStudentReqFields{Username: "anotheruser"}
+	reqFields := controllers.RegisterStudentReqFields{Username: "anotheruser"}
 
-// 	req := createStudentRegRequest(&reqFields)
-// 	req.Header.Add("Bearer", someuserJwt)
+	req := createStudentRegRequest(&reqFields)
+	req.Header.Add("Bearer", someuserJwt)
 
-// 	res := executeRequest(req, nil)
+	res := executeRequest(req, nil)
 
-// 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
-// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
-// }
+	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
+}
 
-// // Test a new user registration request to /student/form/ with proper authentication and input
-// func tStudentRegNewUser(db *gorm.DB, t *testing.T) {
-// 	// Test login fields
-// 	testUsername := getTestUsername()
-// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// Test a new user registration request to /student/form/ with proper authentication and input
+func tStudentRegNewUser(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-// 	reqFields := controllers.RegisterStudentReqFields{Username: testUsername}
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	reqFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-// 	req := createStudentRegRequest(&reqFields)
-// 	req.Header.Add("Bearer", testJwt)
+	req := createStudentRegRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
 
-// 	res := executeRequest(req, db)
+	res := executeRequest(req, db)
 
-// 	expectStatusCodeToBe(t, res, http.StatusOK)
-// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Student registration successful."})
-// }
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Student registration successful."})
+}
 
-// // Test an existing user registration request to /student/form/ with proper authentication and input
-// func tStudentRegExistingUser(db *gorm.DB, t *testing.T) {
-// 	// Test login fields
-// 	testUsername := getTestUsername()
-// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// Test an existing user registration request to /student/form/ with proper authentication and input
+func tStudentRegExistingUser(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-// 	reqFields := controllers.RegisterStudentReqFields{Username: testUsername}
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	reqFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-// 	req := createStudentRegRequest(&reqFields)
-// 	req.Header.Add("Bearer", testJwt)
+	req := createStudentRegRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
 
-// 	_ = executeRequest(req, db)
+	_ = executeRequest(req, db)
 
-// 	// Execute the same request again
-// 	req = createStudentRegRequest(&reqFields)
-// 	req.Header.Add("Bearer", testJwt)
+	// Execute the same request again
+	req = createStudentRegRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
 
-// 	res := executeRequest(req, db)
+	res := executeRequest(req, db)
 
-// 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` already exists.", testUsername)})
-// }
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` already exists.", testUsername)})
+}
 
-// // Test an existing mentor registration request to /student/form/ with proper authentication and input
-// func tStudentRegAsMentor(db *gorm.DB, t *testing.T) {
-// 	// Test login fields
-// 	testUsername := getTestUsername()
-// 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+// Test an existing mentor registration request to /student/form/ with proper authentication and input
+func tStudentRegAsMentor(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
-// 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-// 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
 
-// 	req := createMentorRegRequest(&mentorFields)
-// 	req.Header.Add("Bearer", testJwt)
+	req := createMentorRegRequest(&mentorFields)
+	req.Header.Add("Bearer", testJwt)
 
-// 	_ = executeRequest(req, db)
+	_ = executeRequest(req, db)
 
-// 	studentsFields := controllers.RegisterStudentReqFields{Username: testUsername}
-// 	req = createStudentRegRequest(&studentsFields)
-// 	req.Header.Add("Bearer", testJwt)
+	studentsFields := controllers.RegisterStudentReqFields{Username: testUsername}
+	req = createStudentRegRequest(&studentsFields)
+	req.Header.Add("Bearer", testJwt)
 
-// 	res := executeRequest(req, db)
+	res := executeRequest(req, db)
 
-// 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-// 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a mentor.", testUsername)})
-// }
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a mentor.", testUsername)})
+}
 
 // Test requests to /student/form/ with proper authentication and input
-// func TestStudentRegOK(t *testing.T) {
-// 	// Set up a local test database path
-// 	db := setTestDB()
-// 	defer unsetTestDB()
+func TestStudentRegOK(t *testing.T) {
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB()
 
-// 	// Generate a jwt secret key for testing
-// 	setTestJwtSecretKey()
-// 	defer unsetTestJwtSecretKey()
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
 
-// 	// New student registration test
-// 	t.Run(
-// 		"Test: new student registration.",
-// 		func(t *testing.T) {
-// 			tStudentRegNewUser(db, t)
-// 		},
-// 	)
+	// New student registration test
+	t.Run(
+		"Test: new student registration.",
+		func(t *testing.T) {
+			tStudentRegNewUser(db, t)
+		},
+	)
 
-// 	// Existing student registration test
-// 	t.Run(
-// 		"Test: existing student registration.",
-// 		func(t *testing.T) {
-// 			tStudentRegExistingUser(db, t)
-// 		},
-// 	)
+	// Existing student registration test
+	t.Run(
+		"Test: existing student registration.",
+		func(t *testing.T) {
+			tStudentRegExistingUser(db, t)
+		},
+	)
 
-// 	// Mentor registering as student test
-// 	t.Run(
-// 		"Test: Mentor registering as student.",
-// 		func(t *testing.T) {
-// 			tStudentRegAsMentor(db, t)
-// 		},
-// 	)
-// }
+	// Mentor registering as student test
+	t.Run(
+		"Test: Mentor registering as student.",
+		func(t *testing.T) {
+			tStudentRegAsMentor(db, t)
+		},
+	)
+}
 
 func createStudentBlogLinkRequest(reqFields *controllers.StudentBlogLinkReqFields) *http.Request {
 	reqBody, _ := json.Marshal(reqFields)
