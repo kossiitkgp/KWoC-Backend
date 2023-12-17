@@ -46,17 +46,8 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
 
-	if reqFields.MentorUsername != login_username {
-		utils.LogWarn(
-			r,
-			fmt.Sprintf(
-				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
-				login_username,
-				reqFields.MentorUsername,
-			),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and mentor username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_username.(string), "Login username and mentor username do not match.")
+	if err != nil {
 		return
 	}
 
