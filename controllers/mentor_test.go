@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gorm.io/gorm"
 	"net/http"
 	"reflect"
 	"strings"
@@ -12,8 +13,6 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
-
-	"gorm.io/gorm"
 )
 
 func createMentorRegRequest(reqFields *controllers.RegisterMentorReqFields) *http.Request {
@@ -56,6 +55,16 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 
 	expectStatusCodeToBe(t, res, http.StatusUnauthorized)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
+}
+
+//Test unauthenticated request to /mentor/form/ [put]
+func TestMentorUpdateNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "PUT", "/mentor/form/")
+}
+
+// Test request to /mentor/form/ [put] with invalid jwt
+func TestMentorUpdateInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "PUT", "/mentor/form/")
 }
 
 // Test a new user registration request to /mentor/form/ with proper authentication and input
@@ -107,15 +116,11 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	req := createStudentRegRequest(&studentFields)
-	req.Header.Add("Bearer", testJwt)
-
-	_ = executeRequest(req, db)
+	db.Table("students").Create(&models.Student{Username: testUsername})
 
 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
-	req = createMentorRegRequest(&mentorFields)
+	req := createMentorRegRequest(&mentorFields)
 	req.Header.Add("Bearer", testJwt)
 
 	res := executeRequest(req, db)
@@ -314,23 +319,36 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	testProjects[1].Contributors = strings.TrimSuffix(testProjects[1].Contributors, ",")
 	testProjects[3].Contributors = strings.TrimSuffix(testProjects[3].Contributors, ",")
+	db.Table("projects").Create(testProjects)
 
 	for _, p := range testProjects {
 		if (p.MentorId != int32(modelMentor.ID)) && (p.SecondaryMentorId != &mentorID) {
 			continue
 		}
 
+		if p.MentorId == int32(modelMentor.ID) {
+			p.Mentor = models.Mentor{
+				Name:     modelMentor.Name,
+				Username: modelMentor.Username,
+			}
+		}
+		if p.SecondaryMentorId == &mentorID {
+			p.SecondaryMentor = models.Mentor{
+				Name:     modelMentor.Name,
+				Username: modelMentor.Username,
+			}
+		}
+
 		pulls := make([]string, 0)
 		if len(p.Pulls) > 0 {
 			pulls = strings.Split(p.Pulls, ",")
 		}
-
 		tags := make([]string, 0)
 		if len(p.Tags) > 0 {
 			tags = strings.Split(p.Tags, ",")
 		}
-
 		projects = append(projects, controllers.ProjectInfo{
+			Id:            p.ID,
 			Name:          p.Name,
 			Description:   p.Description,
 			RepoLink:      p.RepoLink,
@@ -362,7 +380,6 @@ func TestMentorDashboardOK(t *testing.T) {
 		})
 	}
 
-	db.Table("projects").Create(testProjects)
 	db.Table("students").Create(modelStudents)
 
 	testMentor := controllers.MentorDashboard{
@@ -388,8 +405,8 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	if !reflect.DeepEqual(testMentor, resMentor) {
-		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
 		fmt.Printf("Expected mentor dashboard: %#v\n\n", testMentor)
 		fmt.Printf("Received mentor dashboard: %#v\n", resMentor)
+		t.Fatalf("Incorrect data returned from /mentor/dashboard/")
 	}
 }

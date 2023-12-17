@@ -114,7 +114,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
-		if tx.Error != nil && err != gorm.ErrRecordNotFound {
+		if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 			utils.LogErrAndRespond(
 				r,
 				w,

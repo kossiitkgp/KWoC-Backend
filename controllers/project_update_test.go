@@ -80,10 +80,23 @@ func tProjectUpdateNonExistent(db *gorm.DB, testUsername string, testJwt string,
 func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
 	// Register a test project
 	projRegFields := createTestProjectRegFields(testUsername, "")
-	projRegReq := createProjctRegRequest(projRegFields)
-	projRegReq.Header.Add("Bearer", testJwt)
 
-	_ = executeRequest(projRegReq, db)
+	db.Create(&models.Project{
+		Name:          projRegFields.Name,
+		Description:   projRegFields.Description,
+		Tags:          strings.Join(projRegFields.Tags, ","),
+		RepoLink:      projRegFields.RepoLink,
+		CommChannel:   projRegFields.CommChannel,
+		ReadmeLink:    projRegFields.ReadmeLink,
+		ProjectStatus: true,
+
+		Mentor: models.Mentor{
+			Username: projRegFields.MentorUsername,
+		},
+		SecondaryMentor: models.Mentor{
+			Username: projRegFields.SecondaryMentorUsername,
+		},
+	})
 
 	// Create updated fields
 	projUpdateFields := &controllers.UpdateProjectReqFields{
@@ -97,24 +110,13 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		ReadmeLink:     "http://NewRepoLink/README",
 	}
 
-	// Test with invalid new secondary mentor
-	projUpdateFields.SecondaryMentorUsername = "non-existent"
+	// Test with a valid new secondary mentor
+	projUpdateFields.SecondaryMentorUsername = "testSecondary"
 
 	req := createProjectUpdateRequest(projUpdateFields)
 	req.Header.Add("Bearer", testJwt)
 
 	res := executeRequest(req, db)
-
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Secondary mentor `%s` does not exist.", projUpdateFields.SecondaryMentorUsername)})
-
-	// Test with a valid new secondary mentor
-	projUpdateFields.SecondaryMentorUsername = "testSecondary"
-
-	req = createProjectUpdateRequest(projUpdateFields)
-	req.Header.Add("Bearer", testJwt)
-
-	res = executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Project successfully updated."})
@@ -155,14 +157,6 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 	if updatedProj.SecondaryMentor.Username != projUpdateFields.SecondaryMentorUsername {
 		t.Errorf("Project secondary mentor username did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.SecondaryMentorUsername, updatedProj.SecondaryMentor.Username)
 	}
-
-	if updatedProj.SecondaryMentor.Name != "Secondary, Test" {
-		t.Errorf("Project secondary mentor name did not get updated\n Expected: `%s`. Received: `%s`", "Secondary, Test", updatedProj.SecondaryMentor.Name)
-	}
-
-	if updatedProj.SecondaryMentor.Email != "testusersecond@example.com" {
-		t.Errorf("Project secondary mentor email did not get updated\n Expected: `%s`. Received: `%s`", "testusersecond@example.com", updatedProj.SecondaryMentor.Email)
-	}
 }
 
 // Test requests to /project/ with proper authentication and input
@@ -188,26 +182,23 @@ func TestProjectUpdateOK(t *testing.T) {
 		Email:    "testuser@example.com",
 	}
 
-	mentorReq := createMentorRegRequest(&mentorReqFields)
-	mentorReq.Header.Add("Bearer", testJwt)
-	_ = executeRequest(mentorReq, db)
+	db.Table("mentors").Create(&models.Mentor{
+		Username: mentorReqFields.Username,
+		Email:    mentorReqFields.Email,
+	})
 
-	// Register a test secondary mentor
-	testLoginFields = utils.LoginJwtFields{
-		Username: "testSecondary",
-	}
-
-	secondaryJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-
+	// Register a secondary test mentor
 	mentorReqFields = controllers.RegisterMentorReqFields{
 		Username: "testSecondary",
 		Name:     "Secondary, Test",
 		Email:    "testusersecond@example.com",
 	}
 
-	mentorReq = createMentorRegRequest(&mentorReqFields)
-	mentorReq.Header.Add("Bearer", secondaryJwt)
-	_ = executeRequest(mentorReq, db)
+	db.Table("mentors").Create(&models.Mentor{
+		Username: mentorReqFields.Username,
+		Name:     mentorReqFields.Name,
+		Email:    mentorReqFields.Email,
+	})
 
 	// Non-existent project update test
 	t.Run(

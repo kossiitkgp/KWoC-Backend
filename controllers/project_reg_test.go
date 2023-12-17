@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -11,21 +12,7 @@ import (
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
-
-	"gorm.io/gorm"
 )
-
-func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *http.Request {
-	reqBody, _ := json.Marshal(reqFields)
-
-	req, _ := http.NewRequest(
-		"POST",
-		"/project/",
-		bytes.NewReader(reqBody),
-	)
-
-	return req
-}
 
 func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername string) *controllers.RegisterProjectReqFields {
 	return &controllers.RegisterProjectReqFields{
@@ -38,6 +25,18 @@ func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername s
 		CommChannel:             "comm-channel",
 		ReadmeLink:              "readme",
 	}
+}
+
+func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *http.Request {
+	reqBody, _ := json.Marshal(reqFields)
+
+	req, _ := http.NewRequest(
+		"POST",
+		"/project/",
+		bytes.NewReader(reqBody),
+	)
+
+	return req
 }
 
 // Test unauthenticated request to /project/
