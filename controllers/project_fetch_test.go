@@ -153,9 +153,20 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 	db := setTestDB()
 	defer unsetTestDB()
 
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
 	testProjId := rand.Int()
 
 	req := createFetchProjDetailsRequest(testProjId)
+	req.Header.Add("Bearer", testJwt)
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
