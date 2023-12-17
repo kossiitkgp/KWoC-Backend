@@ -16,7 +16,7 @@ var ErrRouteNotFound = errors.New("route not found")
 var ErrMethodNotAllowed = errors.New("method not allowed")
 
 // Setup up mux routes and router
-func NewRouter(db *gorm.DB) *mux.Router {
+func NewRouter(db *gorm.DB, testMode bool) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		utils.LogErrAndRespond(r, w, ErrRouteNotFound, "404 Not Found.", http.StatusNotFound)
@@ -32,6 +32,11 @@ func NewRouter(db *gorm.DB) *mux.Router {
 	routes := getRoutes(app)
 
 	for _, route := range routes {
+		// skip disabled routes
+		if !testMode && route.disabled {
+			continue
+		}
+
 		var handler http.Handler
 
 		// logger middleware to log incoming requests
