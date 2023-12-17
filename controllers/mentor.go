@@ -324,6 +324,16 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
 }
 
+// GetMentorDetails godoc
+//
+//	@Summary		Fetch Mentor Details
+//	@Description	Get mentor details for logged in mentor
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	models.Mentor				"Student registration successful."
+//	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
+//	@Security		JWT
+//	@Router			/student/form/ [post]
 func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
