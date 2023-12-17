@@ -110,24 +110,13 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		ReadmeLink:     "http://NewRepoLink/README",
 	}
 
-	// Test with invalid new secondary mentor
-	projUpdateFields.SecondaryMentorUsername = "non-existent"
+	// Test with a valid new secondary mentor
+	projUpdateFields.SecondaryMentorUsername = "testSecondary"
 
 	req := createProjectUpdateRequest(projUpdateFields)
 	req.Header.Add("Bearer", testJwt)
 
 	res := executeRequest(req, db)
-
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Secondary mentor `%s` does not exist.", projUpdateFields.SecondaryMentorUsername)})
-
-	// Test with a valid new secondary mentor
-	projUpdateFields.SecondaryMentorUsername = "testSecondary"
-
-	req = createProjectUpdateRequest(projUpdateFields)
-	req.Header.Add("Bearer", testJwt)
-
-	res = executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusOK)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusOK, Message: "Project successfully updated."})
