@@ -116,12 +116,7 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	// studentFields := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	// req := createStudentRegRequest(&studentFields)
-	// req.Header.Add("Bearer", testJwt)
-
-	// _ = executeRequest(req, db)
 	db.Table("students").Create(&models.Student{Username: testUsername})
 
 	mentorFields := controllers.RegisterMentorReqFields{Username: testUsername}
@@ -134,7 +129,6 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("The username `%s` already exists as a student.", testUsername)})
 }
 
-// Currently Disabled
 
 // Test requests to /mentor/form/ with proper authentication and input
 func TestMentorRegOK(t *testing.T) {
