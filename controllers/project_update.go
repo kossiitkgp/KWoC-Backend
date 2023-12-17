@@ -9,7 +9,6 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -48,17 +47,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
 
-	if reqFields.MentorUsername != login_username {
-		log.Warn().Msgf(
-			"%s %s %s\n%s %s",
-			r.Method,
-			r.RequestURI,
-			"POSSIBLE SESSION HIJACKING.",
-			fmt.Sprintf("JWT Username: %s", login_username),
-			fmt.Sprintf("Given Username: %s", reqFields.MentorUsername),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and mentor username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_username.(string), "Login username and mentor username do not match.")
+	if err != nil {
 		return
 	}
 

@@ -71,17 +71,8 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	// Check if the JWT login username is the same as the mentor's given username
 	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
-	if reqFields.Username != login_username {
-		utils.LogWarn(
-			r,
-			fmt.Sprintf(
-				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
-				login_username,
-				reqFields.Username,
-			),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
+	if err != nil {
 		return
 	}
 

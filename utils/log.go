@@ -1,10 +1,13 @@
 package utils
 
 import (
-	"net/http"
-
+	"errors"
+	"fmt"
 	"github.com/rs/zerolog/log"
+	"net/http"
 )
+
+var SessionHijackError = errors.New("Session hijack detected")
 
 func LogErr(r *http.Request, err error, errMsg string) {
 	log.Err(err).Msgf(
@@ -41,4 +44,21 @@ func LogWarn(r *http.Request, warning string) {
 func LogWarnAndRespond(r *http.Request, w http.ResponseWriter, warning string, statusCode int) {
 	LogWarn(r, warning)
 	RespondWithHTTPMessage(r, w, statusCode, warning)
+}
+
+func DetectSessionHijackAndRespond(r *http.Request, w http.ResponseWriter, request_username string, login_username string, message string) error {
+	if request_username != login_username {
+		LogWarn(
+			r,
+			fmt.Sprintf(
+				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
+				login_username,
+				request_username,
+			),
+		)
+
+		RespondWithHTTPMessage(r, w, http.StatusUnauthorized, message)
+		return SessionHijackError
+	}
+	return nil
 }
