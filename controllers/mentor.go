@@ -148,6 +148,16 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
+// FetchAllMentors godoc
+//
+//	@Summary		Fetches all mentors
+//	@Description	Fetches the required details for all the mentors
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	[]Mentor	"Mentor fetch successful"
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentors"
+//	@Security		JWT
+//	@Router			/mentor/all [get]
 func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
