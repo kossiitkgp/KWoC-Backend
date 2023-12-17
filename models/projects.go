@@ -15,6 +15,7 @@ type Project struct {
 	CommChannel   string `gorm:"column:comm_channel"`
 	ReadmeLink    string `gorm:"column:readme_link"`
 	ProjectStatus bool   `gorm:"default:false;column:project_status"`
+	StatusRemark string `gorm:"default:null;column:status_remark"`
 
 	// for stats
 	LastPullTime int64 `gorm:"column:last_pull_time"`

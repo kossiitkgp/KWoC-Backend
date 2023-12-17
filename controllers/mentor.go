@@ -32,6 +32,7 @@ type ProjectInfo struct {
 	ReadmeLink    string   `json:"readme_link"`
 	Tags          []string `json:"tags"`
 	ProjectStatus bool     `json:"project_status"`
+	StatusRemark  string   `json:"status_remark"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
@@ -200,6 +201,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			ReadmeLink:    project.ReadmeLink,
 			Tags:          tags,
 			ProjectStatus: project.ProjectStatus,
+			StatusRemark:  project.StatusRemark,
 
 			CommitCount:  project.CommitCount,
 			PullCount:    project.PullCount,
