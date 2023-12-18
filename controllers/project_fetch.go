@@ -55,6 +55,15 @@ func newProject(dbProject *models.Project) Project {
 	}
 }
 
+// FetchAllProjects godoc
+//
+//	@Summary		Fetches all Projects
+//	@Description	Fetches the public details for all the Projects
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	[]Project	"Projects fetched successfully."
+//	@Failure		500	{object}	utils.HTTPMessage	"Error fetching projects from the database."
+//	@Router			/project/ [get]
 func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db

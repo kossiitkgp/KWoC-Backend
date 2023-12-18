@@ -49,7 +49,7 @@ type RegisterProjectReqFields struct {
 //	@Failure		500		{object}	utils.HTTPMessage			"Error adding the project in the database."
 //	@Failure		500		{object}	utils.HTTPMessage			"Database error."
 //	@Security		JWT
-//	@Router			/student/form/ [post]
+//	@Router			/project/ [post]
 func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
