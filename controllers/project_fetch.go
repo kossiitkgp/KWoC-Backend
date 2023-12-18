@@ -95,7 +95,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 // FetchProjectDetails godoc
 //
 //	@Summary		Fetches Project Details
-//	@Description	Fetches the public details for the Project with the provided ID
+//	@Description	Fetches all the details for the Project with the provided ID provided the logged in user owns the project.
 //	@Accept			plain
 //	@Produce		json
 //	@Param			id	path		int			true	"Project ID"
