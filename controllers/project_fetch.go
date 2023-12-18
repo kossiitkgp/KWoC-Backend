@@ -105,6 +105,9 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 //	@Failure		400	{object}	utils.HTTPMessage	"Project with id `id` does not exist."
 //	@Failure		400	{object}	utils.HTTPMessage	"Error: Mentor `mentor` does not own the project with ID `id`."
 //	@Failure		500	{object}	utils.HTTPMessage	"Error fetching project from the database."
+//
+//	@Security		JWT
+//
 //	@Router			/project/{id} [get]
 func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := mux.Vars(r)
