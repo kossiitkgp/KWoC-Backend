@@ -140,35 +140,6 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
-// FetchAllMentors godoc
-//
-//	@Summary		Fetches all mentors
-//	@Description	Fetches the public details for all the mentors
-//	@Accept			plain
-//	@Produce		json
-//	@Success		200	{object}	[]Mentor	"Mentor fetch successful"
-//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentors"
-//	@Security		JWT
-//	@Router			/mentor/all [get]
-func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-
-	var mentors []Mentor
-
-	tx := db.
-		Table("mentors").
-		Select("name", "username").
-		Find(&mentors)
-
-	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, "Database Error fetching mentors", http.StatusInternalServerError)
-		return
-	}
-
-	utils.RespondWithJson(r, w, mentors)
-}
-
 // /mentor/dashboard/ functions
 
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
