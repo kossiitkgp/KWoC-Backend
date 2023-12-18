@@ -31,6 +31,25 @@ type RegisterProjectReqFields struct {
 	ReadmeLink string `json:"readme_link"`
 }
 
+// RegisterProject godoc
+//
+//	@Summary		Register a Project
+//	@Description	Register a new project with the provided details.
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		RegisterProjoectReqFields	true	"Fields required for project registeration"
+//	@Success		200		{object}	utils.HTTPMessage			"Success."
+//	@Failure		401		{object}	utils.HTTPMessage			"Login username and mentor username do not match."
+//	@Failure		400		{object}	utils.HTTPMessage			"Error: Project `project` already exists."
+//	@Failure		400		{object}	utils.HTTPMessage			"Error decoding request JSON body."
+//	@Failure		400		{object}	utils.HTTPMessage			"Error: Mentor `mentor` does not exist."
+//	@Failure		400		{object}	utils.HTTPMessage			"Error: Secondary mentor `secondary_mentor` cannot be same as primary mentor."
+//	@Failure		500		{object}	utils.HTTPMessage			"Error fetching mentor `mentor`."
+//	@Failure		500		{object}	utils.HTTPMessage			"Error fetching secondary mentor `secondary_mentor`."
+//	@Failure		500		{object}	utils.HTTPMessage			"Error adding the project in the database."
+//	@Failure		500		{object}	utils.HTTPMessage			"Database error."
+//	@Security		JWT
+//	@Router			/student/form/ [post]
 func RegisterProject(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
