@@ -51,7 +51,7 @@ type UpdateProjectReqFields struct {
 //	@Failure		500		{object}	utils.HTTPMessage	"Error updating the project."
 //	@Failure		500		{object}	utils.HTTPMessage	"Database error."
 //	@Failure		500		{object}	utils.HTTPMessage	"Error fetching secondary mentor `secondary_mentor_username`."
-//  
+//
 //	@Security		JWT
 //
 //	@Router			/project/ [put]

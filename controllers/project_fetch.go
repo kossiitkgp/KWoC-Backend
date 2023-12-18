@@ -92,6 +92,20 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, response)
 }
 
+// FetchProjectDetails godoc
+//
+//	@Summary		Fetches Project Details
+//	@Description	Fetches the public details for the Project with the provided ID
+//	@Accept			plain
+//	@Produce		json
+//	@Param			id	path		int			true	"Project ID"
+//	@Success		200	{object}	Project	            "Project fetched successfully."
+//	@Failure		400	{object}	utils.HTTPMessage	"Project id not found."
+//	@Failure		400	{object}	utils.HTTPMessage	"Error parsing project id."
+//	@Failure		400	{object}	utils.HTTPMessage	"Project with id `id` does not exist."
+//	@Failure		400	{object}	utils.HTTPMessage	"Error: Mentor `mentor` does not own the project with ID `id`."
+//	@Failure		500	{object}	utils.HTTPMessage	"Error fetching project from the database."
+//	@Router			/project/{id} [get]
 func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := mux.Vars(r)
 

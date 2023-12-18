@@ -361,7 +361,7 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 //	@Success		200		{object}	models.Mentor				"Mentor details fetched successfuly."
 //	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
 //	@Security		JWT
-//	@Router			/student/form [post]
+//	@Router			/mentor/ [get]
 func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
