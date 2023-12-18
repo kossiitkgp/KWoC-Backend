@@ -55,6 +55,15 @@ func newProject(dbProject *models.Project) Project {
 	}
 }
 
+// FetchAllProjects godoc
+//
+//	@Summary		Fetches all Projects
+//	@Description	Fetches the public details for all the Projects
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	[]Project	"Projects fetched successfully."
+//	@Failure		500	{object}	utils.HTTPMessage	"Error fetching projects from the database."
+//	@Router			/project/ [get]
 func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -83,6 +92,23 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, response)
 }
 
+// FetchProjectDetails godoc
+//
+//	@Summary		Fetches Project Details
+//	@Description	Fetches all the details for the Project with the provided ID provided the logged in user owns the project.
+//	@Accept			plain
+//	@Produce		json
+//	@Param			id	path		int			true	"Project ID"
+//	@Success		200	{object}	Project	            "Project fetched successfully."
+//	@Failure		400	{object}	utils.HTTPMessage	"Project id not found."
+//	@Failure		400	{object}	utils.HTTPMessage	"Error parsing project id."
+//	@Failure		400	{object}	utils.HTTPMessage	"Project with id `id` does not exist."
+//	@Failure		400	{object}	utils.HTTPMessage	"Error: Mentor `mentor` does not own the project with ID `id`."
+//	@Failure		500	{object}	utils.HTTPMessage	"Error fetching project from the database."
+//
+//	@Security		JWT
+//
+//	@Router			/project/{id} [get]
 func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := mux.Vars(r)
 

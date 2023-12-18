@@ -17,6 +17,16 @@ type StudentBriefStats struct {
 	LinesRemoved uint `json:"lines_removed"`
 }
 
+// FetchAllStudentStats godoc
+//
+//	@Summary		Fetches all Student Stats
+//	@Description	Fetches all student stats from the database.
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	[]StudentBriefStats	"Success."
+//	@Failure		500		{object}	utils.HTTPMessage	"Error fetching student stats from the database."
+//
+//	@Router			/stats/students/ [get]
 func FetchAllStudentStats(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db

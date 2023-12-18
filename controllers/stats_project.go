@@ -17,6 +17,16 @@ type ProjectStats struct {
 	LinesRemoved uint `json:"lines_removed"`
 }
 
+// FetchAllProjectStats godoc
+//
+//	@Summary		Fetches all Project Stats
+//	@Description	Fetches all project stats from the database.
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	[]ProjectStats	"Fetch project stats successfully."
+//	@Failure		500		{object}	utils.HTTPMessage	"Error fetching project stats from the database."
+//
+//	@Router			/stats/projects/ [get]
 func FetchAllProjectStats(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
