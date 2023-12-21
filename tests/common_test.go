@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/joho/godotenv"
+	"github.com/kossiitkgp/kwoc-backend/v2/models"
 	"github.com/kossiitkgp/kwoc-backend/v2/server"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
@@ -53,18 +55,18 @@ func expectResponseJSONBodyToBe[T comparable](t *testing.T, res *httptest.Respon
 }
 
 func setTestDB() *gorm.DB {
-	os.Setenv("DEV", "true")
-	os.Setenv("DEV_DB_PATH", "testDB.db")
+	_ = godotenv.Load(".env")
 	db, _ := utils.GetDB()
 	_ = utils.MigrateModels(db)
 
 	return db
 }
 
-func unsetTestDB() {
-	os.Unsetenv("DEV_DB_PATH")
-	os.Unsetenv("DEV")
-	os.Remove("testDB.db")
+func unsetTestDB(db *gorm.DB) {
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Mentor{})
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Student{})
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Stats{})
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Project{})
 }
 
 func setTestJwtSecretKey() {

@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
 	"strings"
 	"testing"
+
+	"gorm.io/gorm"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
@@ -74,7 +75,7 @@ func TestProjectRegSessionHijacking(t *testing.T) {
 func TestProjectRegInvalidMentor(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -135,7 +136,7 @@ func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *te
 func TestProjectRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

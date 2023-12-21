@@ -163,7 +163,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 func TestProjectUpdateOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

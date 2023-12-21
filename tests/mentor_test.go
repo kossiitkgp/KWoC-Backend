@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gorm.io/gorm"
 	"net/http"
 	"reflect"
 	"strings"
 	"testing"
+
+	"gorm.io/gorm"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -133,7 +134,7 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 func TestMentorRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -164,6 +165,78 @@ func TestMentorRegOK(t *testing.T) {
 	)
 }
 
+func createFetchMentorRequest() *http.Request {
+	req, _ := http.NewRequest(
+		"GET",
+		"/mentor/all/",
+		nil,
+	)
+	return req
+}
+
+// Test unauthenticated request to /mentor/all/
+func TestFetchMentorNoAuth(t *testing.T) {
+	testRequestNoAuth(t, "GET", "/mentor/all/")
+}
+
+// Test request to /mentor/all/ with invalid jwt
+func TestFetchMentorInvalidAuth(t *testing.T) {
+	testRequestInvalidAuth(t, "GET", "/mentor/all/")
+}
+
+func TestFetchMentorOK(t *testing.T) {
+	const numMentors = 10
+	// Set up a local test database path
+	db := setTestDB()
+	defer unsetTestDB(db)
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	modelMentors := make([]models.Mentor, 0, numMentors)
+	var testMentors [numMentors]controllers.Mentor
+	for i := 0; i < numMentors; i++ {
+		modelMentors = append(modelMentors,
+			models.Mentor{
+				Name:     fmt.Sprintf("Test%d", i),
+				Username: fmt.Sprintf("test%d", i),
+				Email:    fmt.Sprintf("test%d@example.com", i),
+			})
+		testMentors[i] = controllers.Mentor{
+			Name:     fmt.Sprintf("Test%d", i),
+			Username: fmt.Sprintf("test%d", i),
+		}
+
+	}
+	_ = db.Table("mentors").Create(modelMentors)
+
+	req := createFetchMentorRequest()
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	var resMentors []controllers.Mentor
+	_ = json.NewDecoder(res.Body).Decode(&resMentors)
+
+	expectStatusCodeToBe(t, res, http.StatusOK)
+	if len(resMentors) != numMentors {
+		t.Fatalf("Not getting expected numbers of mentors from /mentor/all/")
+	}
+
+	for i, mentor := range resMentors {
+		if mentor != testMentors[i] {
+			t.Fatalf("Incorrect mentors returned from /mentor/all/")
+		}
+	}
+}
+
 // Test unauthenticated request to /mentor/dashboard/
 func TestMentorDashboardNoAuth(t *testing.T) {
 	testRequestNoAuth(t, "GET", "/mentor/dashboard/")
@@ -178,7 +251,7 @@ func TestMentorDashboardInvalidAuth(t *testing.T) {
 func TestMentorDashboardNoReg(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -207,7 +280,7 @@ func TestMentorDashboardNoReg(t *testing.T) {
 func TestMentorDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

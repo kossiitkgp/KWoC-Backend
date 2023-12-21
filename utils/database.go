@@ -9,7 +9,6 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
 
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -43,35 +42,24 @@ func MigrateModels(db *gorm.DB) error {
 }
 
 func GetDB() (db *gorm.DB, err error) {
-	isDev := os.Getenv("DEV") == "true"
-
 	var dialector gorm.Dialector
 
-	if !isDev {
-		DB_USERNAME := os.Getenv("DATABASE_USERNAME")
-		DB_PASSWORD := os.Getenv("DATABASE_PASSWORD")
-		DB_NAME := os.Getenv("DATABASE_NAME")
-		DB_HOST := os.Getenv("DATABASE_HOST")
-		DB_PORT := os.Getenv("DATABASE_PORT")
+	DB_USERNAME := os.Getenv("DATABASE_USERNAME")
+	DB_PASSWORD := os.Getenv("DATABASE_PASSWORD")
+	DB_NAME := os.Getenv("DATABASE_NAME")
+	DB_HOST := os.Getenv("DATABASE_HOST")
+	DB_PORT := os.Getenv("DATABASE_PORT")
 
-		dsn := fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-			DB_HOST,
-			DB_USERNAME,
-			DB_PASSWORD,
-			DB_NAME,
-			DB_PORT,
-		)
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		DB_HOST,
+		DB_USERNAME,
+		DB_PASSWORD,
+		DB_NAME,
+		DB_PORT,
+	)
 
-		dialector = postgres.Open(dsn)
-	} else {
-		devDbPath := os.Getenv("DEV_DB_PATH")
-		if devDbPath == "" {
-			devDbPath = "devDB.db"
-		}
-
-		dialector = sqlite.Open(devDbPath)
-	}
+	dialector = postgres.Open(dsn)
 
 	db, err = gorm.Open(dialector, &gorm.Config{})
 

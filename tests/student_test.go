@@ -129,7 +129,7 @@ func tStudentRegAsMentor(db *gorm.DB, t *testing.T) {
 func TestStudentRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -247,7 +247,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 func TestStudentBlogLink(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -284,7 +284,7 @@ func TestStudentDashboardInvalidAuth(t *testing.T) {
 func TestStudentDashboardNoReg(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -313,7 +313,7 @@ func TestStudentDashboardNoReg(t *testing.T) {
 func TestStudentDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

@@ -83,7 +83,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 
 func TestFetchAllProjects(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	testProjects := generateTestProjects(10, true, true)
 
@@ -98,6 +98,7 @@ func TestFetchAllProjects(t *testing.T) {
 	// Check if any projects with status false (not approved) are returned in the request
 	var areAllProjectsApproved bool = true
 
+	fmt.Println(len(resProjects))
 	for _, proj := range resProjects {
 		// Assuming projects are created in order
 		testProj := testProjects[proj.Id-1]
@@ -151,7 +152,7 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 // Try fetching a project that does not exist
 func TestFetchProjDetailsDNE(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -176,7 +177,7 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 // Try to fetch a valid project
 func TestFetchProjDetailsOK(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

@@ -40,7 +40,7 @@ func findProjIndex(repo_link string, list []models.Project) int {
 
 func TestFetchAllProjectStats(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	test_projects := generateTestProjects(10, true, true)
 
