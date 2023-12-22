@@ -190,9 +190,14 @@ func TestFetchProjDetailsOK(t *testing.T) {
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	testProjects := generateTestProjects(5, false, true)
-	for i, proj := range testProjects {
-		proj.Mentor = models.Mentor{Username: testUsername}
-		testProjects[i] = proj
+	modelMentor := models.Mentor{Username: testUsername}
+	db.Table("mentors").Create(&modelMentor)
+	mentorId := int32(modelMentor.ID)
+
+	for i := range testProjects {
+		testProjects[i].Mentor = modelMentor
+		testProjects[i].MentorId = mentorId
+		testProjects[i].SecondaryMentorId = &mentorId
 	}
 
 	_ = db.Table("projects").Create(testProjects)
