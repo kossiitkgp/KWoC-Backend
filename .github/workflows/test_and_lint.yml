@@ -22,7 +22,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Test
-        run: go test -v ./...
+        run: ./tests/run_tests.sh
 
       - name: Lint
         uses: golangci/golangci-lint-action@v3
