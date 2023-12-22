@@ -325,7 +325,20 @@ func TestStudentDashboardOK(t *testing.T) {
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
+	modelMentor := models.Mentor{
+		Name:     "TestMentor",
+		Email:    "iamamentor@cool.com",
+		Username: testUsername,
+	}
+
+	db.Table("mentors").Create(&modelMentor)
+
+	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
+	for i := range testProjects {
+		testProjects[i].MentorId = mentorID
+		testProjects[i].SecondaryMentorId = &mentorID
+	}
 	_ = db.Table("projects").Create(testProjects)
 
 	var project_ids []string
