@@ -302,9 +302,10 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
-	testProjects[1].MentorId = int32(modelMentor.ID)
-	testProjects[3].SecondaryMentorId = &mentorID
-
+	for i := range testProjects {
+		testProjects[i].MentorId = mentorID
+		testProjects[i].SecondaryMentorId = &mentorID
+	}
 	var projects []controllers.ProjectInfo
 	var students []controllers.StudentInfo
 
