@@ -99,8 +99,6 @@ All controllers except `/oauth/` are tested. New controllers should include test
 
 The file `tests/common_test.go` exports functions commonly used in controller tests.
 
-The file `tests/run_tests.sh` sets up a PostgreSQL docker container and runs all tests.
-
 ## Project Structure
 
 ### Libraries Used
