@@ -68,9 +68,10 @@
 - Clone this repository.
 - Run `go mod download` in the cloned repository to download all the dependencies.
 - Create a `.env` file to store all the [environment variables](#environment-variables). You can use the `.env.template` file for this.
+- Run `docker compose up -d` to start the PostgreSQL database container. (Make sure all the required [environment variables](#environment-variables) are set)
 - Optionally set up [Github OAuth](#github-oauth) to test the endpoints which require login. (See also: [Endpoints](#endpoints))
 - Run `go run cmd/backend.go` to start the server.
-- Optionally install [SQLiteStudio](https://sqlitestudio.pl/) or a similar tool to help manage the local database `devDB.db` (sqlite3).
+- Optionally install [pgAdmin](https://www.pgadmin.org/) or [DBeaver](https://dbeaver.io/) or a similar tool to help manage the local database `devDB.db` (postgresql).
 - Optionally install [Postman](https://www.postman.com/) or a similar tool to test the API endpoints.
 - Optionally (but **recommended**) [set up pre-commit hooks](#setting-up-pre-commit-hooks).
 
