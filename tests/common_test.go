@@ -55,7 +55,7 @@ func expectResponseJSONBodyToBe[T comparable](t *testing.T, res *httptest.Respon
 }
 
 func setTestDB() *gorm.DB {
-	_ = godotenv.Load(".env")
+	_ = godotenv.Load("../.env")
 	db, _ := utils.GetDB()
 	_ = utils.MigrateModels(db)
 
