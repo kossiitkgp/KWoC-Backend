@@ -98,7 +98,6 @@ func TestFetchAllProjects(t *testing.T) {
 	// Check if any projects with status false (not approved) are returned in the request
 	var areAllProjectsApproved bool = true
 
-	fmt.Println(len(resProjects))
 	for _, proj := range resProjects {
 		// Assuming projects are created in order
 		testProj := testProjects[proj.Id-1]
