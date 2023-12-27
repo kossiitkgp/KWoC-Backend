@@ -1,3 +1,4 @@
 ./backend
-.env
+/.env
 *.db
+vendor/

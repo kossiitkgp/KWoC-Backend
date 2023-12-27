@@ -80,8 +80,7 @@ func tProjectUpdateNonExistent(db *gorm.DB, testUsername string, testJwt string,
 func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t *testing.T) {
 	// Register a test project
 	projRegFields := createTestProjectRegFields(testUsername, "")
-
-	db.Create(&models.Project{
+	proj := models.Project{
 		Name:          projRegFields.Name,
 		Description:   projRegFields.Description,
 		Tags:          strings.Join(projRegFields.Tags, ","),
@@ -96,11 +95,12 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		SecondaryMentor: models.Mentor{
 			Username: projRegFields.SecondaryMentorUsername,
 		},
-	})
+	}
+	db.Table("projects").Create(&proj)
 
 	// Create updated fields
 	projUpdateFields := &controllers.UpdateProjectReqFields{
-		Id:             1,
+		Id:             proj.ID,
 		Name:           fmt.Sprintf("Nename %d", rand.Int()),
 		Description:    "New description.",
 		Tags:           strings.Split("New,Tags,Test", ","),
@@ -163,7 +163,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 func TestProjectUpdateOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

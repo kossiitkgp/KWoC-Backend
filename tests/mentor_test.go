@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gorm.io/gorm"
 	"net/http"
 	"reflect"
 	"strings"
 	"testing"
+
+	"gorm.io/gorm"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -133,7 +134,7 @@ func tMentorRegAsStudent(db *gorm.DB, t *testing.T) {
 func TestMentorRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -178,7 +179,7 @@ func TestMentorDashboardInvalidAuth(t *testing.T) {
 func TestMentorDashboardNoReg(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -207,7 +208,7 @@ func TestMentorDashboardNoReg(t *testing.T) {
 func TestMentorDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -229,9 +230,10 @@ func TestMentorDashboardOK(t *testing.T) {
 
 	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
-	testProjects[1].MentorId = int32(modelMentor.ID)
-	testProjects[3].SecondaryMentorId = &mentorID
-
+	for i := range testProjects {
+		testProjects[i].MentorId = mentorID
+		testProjects[i].SecondaryMentorId = &mentorID
+	}
 	var projects []controllers.ProjectInfo
 	var students []controllers.StudentInfo
 

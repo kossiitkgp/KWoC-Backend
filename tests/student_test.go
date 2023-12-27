@@ -129,7 +129,7 @@ func tStudentRegAsMentor(db *gorm.DB, t *testing.T) {
 func TestStudentRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -247,7 +247,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 func TestStudentBlogLink(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -284,7 +284,7 @@ func TestStudentDashboardInvalidAuth(t *testing.T) {
 func TestStudentDashboardNoReg(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -313,7 +313,7 @@ func TestStudentDashboardNoReg(t *testing.T) {
 func TestStudentDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -325,7 +325,20 @@ func TestStudentDashboardOK(t *testing.T) {
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
+	modelMentor := models.Mentor{
+		Name:     "TestMentor",
+		Email:    "iamamentor@cool.com",
+		Username: testUsername,
+	}
+
+	db.Table("mentors").Create(&modelMentor)
+
+	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
+	for i := range testProjects {
+		testProjects[i].MentorId = mentorID
+		testProjects[i].SecondaryMentorId = &mentorID
+	}
 	_ = db.Table("projects").Create(testProjects)
 
 	var project_ids []string

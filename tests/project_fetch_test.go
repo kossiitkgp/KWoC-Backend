@@ -83,7 +83,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 
 func TestFetchAllProjects(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	testProjects := generateTestProjects(10, true, true)
 
@@ -151,7 +151,7 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 // Try fetching a project that does not exist
 func TestFetchProjDetailsDNE(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -176,7 +176,7 @@ func TestFetchProjDetailsDNE(t *testing.T) {
 // Try to fetch a valid project
 func TestFetchProjDetailsOK(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -189,9 +189,14 @@ func TestFetchProjDetailsOK(t *testing.T) {
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	testProjects := generateTestProjects(5, false, true)
-	for i, proj := range testProjects {
-		proj.Mentor = models.Mentor{Username: testUsername}
-		testProjects[i] = proj
+	modelMentor := models.Mentor{Username: testUsername}
+	db.Table("mentors").Create(&modelMentor)
+	mentorId := int32(modelMentor.ID)
+
+	for i := range testProjects {
+		testProjects[i].Mentor = modelMentor
+		testProjects[i].MentorId = mentorId
+		testProjects[i].SecondaryMentorId = &mentorId
 	}
 
 	_ = db.Table("projects").Create(testProjects)

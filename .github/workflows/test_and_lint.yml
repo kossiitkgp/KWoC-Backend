@@ -8,6 +8,14 @@ on:
 
 jobs:
   test_and_lint:
+    env:
+      BACKEND_PORT: 8080
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_NAME: testDb
+      DATABASE_USERNAME: user
+      DATABASE_PASSWORD: pass
+
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -22,7 +30,10 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Test
-        run: go test -v ./...
+        run: |
+          docker compose -f docker-compose.yaml up --build -d
+          go test ./... -p 1
+          docker compose -f docker-compose.yaml down
 
       - name: Lint
         uses: golangci/golangci-lint-action@v3
