@@ -358,6 +358,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		LinesAdded:     uint(rand.Int()),
 		LinesRemoved:   uint(rand.Int()),
 		LanguagesUsed:  "Python,JavaScript,Java,C/C++,C#",
+		Pulls:          "https://github.com/kossiitkgp/KWoC-Backend/pulls/1,https://github.com/kossiitkgp/KWoC-Frontend/pull/5",
 	}
 
 	_ = db.Table("students").Create(&modelStudent)
@@ -382,6 +383,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		LinesRemoved:   modelStudent.LinesRemoved,
 		LanguagesUsed:  languages,
 		ProjectsWorked: projects,
+		Pulls:          strings.Split("https://github.com/kossiitkgp/KWoC-Backend/pulls/1,https://github.com/kossiitkgp/KWoC-Frontend/pull/5", ","),
 	}
 	req, _ := http.NewRequest(
 		"GET",
