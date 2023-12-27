@@ -49,6 +49,7 @@ type StudentDashboard struct {
 
 	LanguagesUsed  []string           `json:"languages_used"`
 	ProjectsWorked []ProjectDashboard `json:"projects_worked"`
+	Pulls          []string           `json:"pulls"`
 }
 
 // RegisterStudent godoc
@@ -219,16 +220,27 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
 	var projects []ProjectDashboard = make([]ProjectDashboard, 0)
 
-	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
-		var project ProjectDashboard
-		db.Table("projects").
-			Where("id = ?", proj_id).
-			Select("name", "repo_link").
-			First(&project)
-		projects = append(projects, project)
+	if len(modelStudent.ProjectsWorked) != 0 {
+		for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
+			var project ProjectDashboard
+			db.Table("projects").
+				Where("id = ?", proj_id).
+				Select("name", "repo_link").
+				First(&project)
+			projects = append(projects, project)
+		}
 	}
 
-	languages := strings.Split(modelStudent.LanguagesUsed, ",")
+	languages := make([]string, 0)
+	if len(modelStudent.LanguagesUsed) != 0 {
+		languages = strings.Split(modelStudent.LanguagesUsed, ",")
+	}
+
+	pulls := make([]string, 0)
+	if len(modelStudent.Pulls) != 0 {
+		pulls = strings.Split(modelStudent.Pulls, ",")
+	}
+
 	return StudentDashboard{
 		Name:           modelStudent.Name,
 		Username:       modelStudent.Username,
@@ -241,6 +253,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 		LinesRemoved:   modelStudent.LinesRemoved,
 		LanguagesUsed:  languages,
 		ProjectsWorked: projects,
+		Pulls:          pulls,
 	}
 }
 
