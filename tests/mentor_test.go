@@ -58,7 +58,7 @@ func TestMentorRegSessionHijacking(t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
-//Test unauthenticated request to /mentor/form/ [put]
+// Test unauthenticated request to /mentor/form/ [put]
 func TestMentorUpdateNoAuth(t *testing.T) {
 	testRequestNoAuth(t, "PUT", "/mentor/form/")
 }

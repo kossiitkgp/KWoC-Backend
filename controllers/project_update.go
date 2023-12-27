@@ -33,28 +33,28 @@ type UpdateProjectReqFields struct {
 	ReadmeLink string `json:"readme_link"`
 }
 
-// 	UpdateProject godoc
+// UpdateProject godoc
 //
-//	@Summary		Update Project Details
-//	@Description	Update project details for the provided project ID.
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		UpdateProjectReqFields	true	"Fields required for Project update."
-//	@Success		200		{object}	utils.HTTPMessage	"Project successfully updated."
-//	@Failure		401		{object}	utils.HTTPMessage	"Login username and mentor username do not match."
-//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding request JSON body."
-//	@Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
-//	@Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
-//	@Failure		400		{object}	utils.HTTPMessage	"Error: Project `repo_link` does not exist."
-//	@Failure		400		{object}	utils.HTTPMessage	"Error: Mentor `username` does not own the project with ID `id`."
-// 	@Failure		400		{object}	utils.HTTPMessage	"Error: Secondary mentor `secondary_mentor_username` cannot be same as primary mentor."
-//	@Failure		500		{object}	utils.HTTPMessage	"Error updating the project."
-//	@Failure		500		{object}	utils.HTTPMessage	"Database error."
-//	@Failure		500		{object}	utils.HTTPMessage	"Error fetching secondary mentor `secondary_mentor_username`."
+// @Summary		Update Project Details
+// @Description	Update project details for the provided project ID.
+// @Accept			json
+// @Produce		json
+// @Param			request	body		UpdateProjectReqFields	true	"Fields required for Project update."
+// @Success		200		{object}	utils.HTTPMessage	"Project successfully updated."
+// @Failure		401		{object}	utils.HTTPMessage	"Login username and mentor username do not match."
+// @Failure		400		{object}	utils.HTTPMessage	"Error decoding request JSON body."
+// @Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+// @Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Project `repo_link` does not exist."
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Mentor `username` does not own the project with ID `id`."
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Secondary mentor `secondary_mentor_username` cannot be same as primary mentor."
+// @Failure		500		{object}	utils.HTTPMessage	"Error updating the project."
+// @Failure		500		{object}	utils.HTTPMessage	"Database error."
+// @Failure		500		{object}	utils.HTTPMessage	"Error fetching secondary mentor `secondary_mentor_username`."
 //
-//	@Security		JWT
+// @Security		JWT
 //
-//	@Router			/project/ [put]
+// @Router			/project/ [put]
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
