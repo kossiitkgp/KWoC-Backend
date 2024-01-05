@@ -53,11 +53,7 @@ jobs:
           git merge -S 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
-        run: |
-          swag init --parseDependency --parseInternal -g cmd/backend.go --ot yaml
-          if [ -z "$(git status --porcelain docs/swagger.yaml docs/redocly.yaml)" ]; then
-            exit 0 
-          fi
+        run: swag init --parseDependency --parseInternal -g cmd/backend.go --ot yaml
 
       - name: Generate the html doc
         run: |
