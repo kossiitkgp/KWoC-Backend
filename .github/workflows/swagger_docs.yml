@@ -8,6 +8,7 @@ on:
       - "controllers/*.go"
       - "cmd/backend.go"
       - "docs/redocly.yaml"
+      - ".github/workflows/swagger_docs.yml"
   workflow_dispatch:
 
 jobs:
