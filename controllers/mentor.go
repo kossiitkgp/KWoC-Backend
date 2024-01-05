@@ -32,6 +32,7 @@ type ProjectInfo struct {
 	ReadmeLink    string   `json:"readme_link"`
 	Tags          []string `json:"tags"`
 	ProjectStatus bool     `json:"project_status"`
+	StatusRemark  string   `json:"status_remark"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
@@ -71,17 +72,8 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	// Check if the JWT login username is the same as the mentor's given username
 	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
-	if reqFields.Username != login_username {
-		utils.LogWarn(
-			r,
-			fmt.Sprintf(
-				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
-				login_username,
-				reqFields.Username,
-			),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
+	if err != nil {
 		return
 	}
 
@@ -148,25 +140,6 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
-func FetchAllMentors(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-
-	var mentors []Mentor
-
-	tx := db.
-		Table("mentors").
-		Select("name", "username").
-		Find(&mentors)
-
-	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, "Database Error fetching mentors", http.StatusInternalServerError)
-		return
-	}
-
-	utils.RespondWithJson(r, w, mentors)
-}
-
 // /mentor/dashboard/ functions
 
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
@@ -199,6 +172,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			ReadmeLink:    project.ReadmeLink,
 			Tags:          tags,
 			ProjectStatus: project.ProjectStatus,
+			StatusRemark:  project.StatusRemark,
 
 			CommitCount:  project.CommitCount,
 			PullCount:    project.PullCount,
@@ -234,6 +208,17 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 	}
 }
 
+// FetchMentorDashboard godoc
+//
+//	@Summary		Fetches the mentor dashboard
+//	@Description	Fetches the required details for the mentor dashboard
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200	{object}	MentorDashboard	    "Mentor dashboard details fetched successfuly."
+//	@Failure		400	{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentor with username `username`"
+//	@Security		JWT
+//	@Router			/mentor/dashboard/ [get]
 func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -273,6 +258,20 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, mentor)
 }
 
+// UpdateMentorDetails godoc
+//
+//	@Summary		Update Mentor Details
+//	@Description	Update mentor details for logged in mentor
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		UpdateMentorReqFields	true	"Fields required for Mentor update."
+//	@Success		200		{object}	[]string	"Succesfully updated mentor details."
+//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body."
+//	@Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+//	@Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
+//	@Security		JWT
+//
+//	@Router			/mentor/form [put]
 func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -324,6 +323,16 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
 }
 
+// GetMentorDetails godoc
+//
+//	@Summary		Fetch Mentor Details
+//	@Description	Get mentor details for logged in mentor
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	models.Mentor				"Mentor details fetched successfuly."
+//	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
+//	@Security		JWT
+//	@Router			/mentor/ [get]
 func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db

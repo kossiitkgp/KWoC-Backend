@@ -9,7 +9,6 @@ import (
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -34,6 +33,28 @@ type UpdateProjectReqFields struct {
 	ReadmeLink string `json:"readme_link"`
 }
 
+// UpdateProject godoc
+//
+// @Summary		Update Project Details
+// @Description	Update project details for the provided project ID.
+// @Accept			json
+// @Produce		json
+// @Param			request	body		UpdateProjectReqFields	true	"Fields required for Project update."
+// @Success		200		{object}	utils.HTTPMessage	"Project successfully updated."
+// @Failure		401		{object}	utils.HTTPMessage	"Login username and mentor username do not match."
+// @Failure		400		{object}	utils.HTTPMessage	"Error decoding request JSON body."
+// @Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
+// @Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Project `repo_link` does not exist."
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Mentor `username` does not own the project with ID `id`."
+// @Failure		400		{object}	utils.HTTPMessage	"Error: Secondary mentor `secondary_mentor_username` cannot be same as primary mentor."
+// @Failure		500		{object}	utils.HTTPMessage	"Error updating the project."
+// @Failure		500		{object}	utils.HTTPMessage	"Database error."
+// @Failure		500		{object}	utils.HTTPMessage	"Error fetching secondary mentor `secondary_mentor_username`."
+//
+// @Security		JWT
+//
+// @Router			/project/ [put]
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -48,17 +69,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
 
-	if reqFields.MentorUsername != login_username {
-		log.Warn().Msgf(
-			"%s %s %s\n%s %s",
-			r.Method,
-			r.RequestURI,
-			"POSSIBLE SESSION HIJACKING.",
-			fmt.Sprintf("JWT Username: %s", login_username),
-			fmt.Sprintf("Given Username: %s", reqFields.MentorUsername),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and mentor username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_username.(string), "Login username and mentor username do not match.")
+	if err != nil {
 		return
 	}
 
@@ -114,7 +126,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 		tx = db.Table("mentors").Where("username = ?", reqFields.SecondaryMentorUsername).First(&secondaryMentor)
 
-		if tx.Error != nil && err != gorm.ErrRecordNotFound {
+		if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 			utils.LogErrAndRespond(
 				r,
 				w,

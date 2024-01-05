@@ -58,6 +58,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 				CommChannel:   fmt.Sprintf("https://link%d", rand.Int()),
 				ReadmeLink:    fmt.Sprintf("https://readme%d", rand.Int()),
 				ProjectStatus: projectStatus,
+				StatusRemark:  fmt.Sprintf("Status remark %d", rand.Int()),
 
 				// Stats
 				CommitCount:  uint(rand.Int()),
@@ -82,7 +83,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 
 func TestFetchAllProjects(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	testProjects := generateTestProjects(10, true, true)
 
@@ -131,7 +132,16 @@ func TestFetchAllProjects(t *testing.T) {
 
 // Try fetching a project with an invalid id
 func TestFetchProjDetailsInvalidID(t *testing.T) {
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
 	req := createFetchProjDetailsRequest("kekw")
+	req.Header.Add("Bearer", testJwt)
 	res := executeRequest(req, nil)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
@@ -141,44 +151,59 @@ func TestFetchProjDetailsInvalidID(t *testing.T) {
 // Try fetching a project that does not exist
 func TestFetchProjDetailsDNE(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	testProjId := rand.Int()
 
 	req := createFetchProjDetailsRequest(testProjId)
+	req.Header.Add("Bearer", testJwt)
 	res := executeRequest(req, db)
 
 	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", testProjId)})
 }
 
-// Try to fetch an unapproved project
-func TestFetchProjDetailsUnapproved(t *testing.T) {
-	db := setTestDB()
-	defer unsetTestDB()
-
-	testProj := generateTestProjects(1, false, false)[0]
-
-	_ = db.Table("projects").Create(&testProj)
-
-	req := createFetchProjDetailsRequest(1)
-	res := executeRequest(req, db)
-
-	expectStatusCodeToBe(t, res, http.StatusBadRequest)
-	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Project with id `%d` does not exist.", 1)})
-}
-
 // Try to fetch a valid project
 func TestFetchProjDetailsOK(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
+
+	// Generate a jwt secret key for testing
+	setTestJwtSecretKey()
+	defer unsetTestJwtSecretKey()
+
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	testProjects := generateTestProjects(5, false, true)
+	modelMentor := models.Mentor{Username: testUsername}
+	db.Table("mentors").Create(&modelMentor)
+	mentorId := int32(modelMentor.ID)
+
+	for i := range testProjects {
+		testProjects[i].Mentor = modelMentor
+		testProjects[i].MentorId = mentorId
+		testProjects[i].SecondaryMentorId = &mentorId
+	}
 
 	_ = db.Table("projects").Create(testProjects)
 
 	for i, proj := range testProjects {
-		req := createFetchProjDetailsRequest(i + 1)
+		req := createFetchProjDetailsRequest(proj.ID)
+		req.Header.Add("Bearer", testJwt)
 		res := executeRequest(req, db)
 
 		var resProj controllers.Project

@@ -55,7 +55,7 @@ func areStudentStatsEquivalent(stats *controllers.StudentBriefStats, student *mo
 
 func TestFetchAllStudentsStats(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	testStudents := generateTestStudents(10)
 

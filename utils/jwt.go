@@ -48,11 +48,11 @@ func ParseLoginJwtString(tokenString string) (*jwt.Token, *LoginJwtClaims, error
 	var loginClaims = LoginJwtClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, &loginClaims, jwtKeyFunc)
 
-	if err.Error() == fmt.Sprintf("%s: %s", jwt.ErrTokenInvalidClaims.Error(), jwt.ErrTokenExpired.Error()) {
-		return nil, nil, ErrJwtTokenExpired
-	}
-
 	if err != nil {
+		if err.Error() == fmt.Sprintf("%s: %s", jwt.ErrTokenInvalidClaims.Error(), jwt.ErrTokenExpired.Error()) {
+			return nil, nil, ErrJwtTokenExpired
+		}
+
 		return nil, nil, err
 	}
 
@@ -72,7 +72,7 @@ func GenerateLoginJwtString(loginJwtFields LoginJwtFields) (string, error) {
 
 	if err != nil {
 		// Default of 30 days
-		jwtValidityTime = 0
+		jwtValidityTime = 24 * 30
 
 		log.Warn().Msgf("Could not parse JWT validity time from the environment. Set to default of %d hours.", jwtValidityTime)
 	}

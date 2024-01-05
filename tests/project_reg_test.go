@@ -9,23 +9,11 @@ import (
 	"strings"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
-
-	"gorm.io/gorm"
 )
-
-func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *http.Request {
-	reqBody, _ := json.Marshal(reqFields)
-
-	req, _ := http.NewRequest(
-		"POST",
-		"/project/",
-		bytes.NewReader(reqBody),
-	)
-
-	return req
-}
 
 func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername string) *controllers.RegisterProjectReqFields {
 	return &controllers.RegisterProjectReqFields{
@@ -38,6 +26,18 @@ func createTestProjectRegFields(mentorUsername string, secondaryMentorUsername s
 		CommChannel:             "comm-channel",
 		ReadmeLink:              "readme",
 	}
+}
+
+func createProjctRegRequest(reqFields *controllers.RegisterProjectReqFields) *http.Request {
+	reqBody, _ := json.Marshal(reqFields)
+
+	req, _ := http.NewRequest(
+		"POST",
+		"/project/",
+		bytes.NewReader(reqBody),
+	)
+
+	return req
 }
 
 // Test unauthenticated request to /project/
@@ -75,7 +75,7 @@ func TestProjectRegSessionHijacking(t *testing.T) {
 func TestProjectRegInvalidMentor(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -136,7 +136,7 @@ func tProjectRegExisting(db *gorm.DB, testUsername string, testJwt string, t *te
 func TestProjectRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()

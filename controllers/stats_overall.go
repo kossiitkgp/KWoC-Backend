@@ -16,6 +16,16 @@ type OverallStats struct {
 	GenTime int64 `json:"gen_time"`
 }
 
+// FetchOverallStats godoc
+//
+//	@Summary		Fetches Overall Stats
+//	@Description	Fetches overall stats from the database.
+//	@Accept			plain
+//	@Produce		json
+//	@Success		200		{object}	[]OverallStats	    "Fetched overall stats successfully."
+//	@Failure		500		{object}	utils.HTTPMessage	"Error fetching stats from the database."
+//
+//	@Router			/stats/overall/ [get]
 func FetchOverallStats(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db

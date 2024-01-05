@@ -15,7 +15,7 @@ func TestPing(t *testing.T) {
 
 func TestHealthCheck(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	req, _ := http.NewRequest("GET", "/healthcheck/", nil)
 	res := executeRequest(req, db)

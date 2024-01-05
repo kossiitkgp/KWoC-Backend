@@ -129,7 +129,7 @@ func tStudentRegAsMentor(db *gorm.DB, t *testing.T) {
 func TestStudentRegOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -210,16 +210,12 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
-	reqFieldsReg := controllers.RegisterStudentReqFields{Username: testUsername}
 
-	req := createStudentRegRequest(&reqFieldsReg)
-	req.Header.Add("Bearer", testJwt)
-
-	_ = executeRequest(req, db)
+	db.Table("students").Create(&models.Student{Username: testUsername})
 
 	// Execute the bloglink request
 	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
-	req = createStudentBlogLinkRequest(&reqFields)
+	req := createStudentBlogLinkRequest(&reqFields)
 	req.Header.Add("Bearer", testJwt)
 
 	res := executeRequest(req, db)
@@ -251,7 +247,7 @@ func tStudentBlogLinkNonExistingUser(db *gorm.DB, t *testing.T) {
 func TestStudentBlogLink(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -288,7 +284,7 @@ func TestStudentDashboardInvalidAuth(t *testing.T) {
 func TestStudentDashboardNoReg(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -317,7 +313,7 @@ func TestStudentDashboardNoReg(t *testing.T) {
 func TestStudentDashboardOK(t *testing.T) {
 	// Set up a local test database path
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	// Generate a jwt secret key for testing
 	setTestJwtSecretKey()
@@ -329,7 +325,20 @@ func TestStudentDashboardOK(t *testing.T) {
 
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
+	modelMentor := models.Mentor{
+		Name:     "TestMentor",
+		Email:    "iamamentor@cool.com",
+		Username: testUsername,
+	}
+
+	db.Table("mentors").Create(&modelMentor)
+
+	mentorID := int32(modelMentor.ID)
 	testProjects := generateTestProjects(5, false, true)
+	for i := range testProjects {
+		testProjects[i].MentorId = mentorID
+		testProjects[i].SecondaryMentorId = &mentorID
+	}
 	_ = db.Table("projects").Create(testProjects)
 
 	var project_ids []string
@@ -349,6 +358,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		LinesAdded:     uint(rand.Int()),
 		LinesRemoved:   uint(rand.Int()),
 		LanguagesUsed:  "Python,JavaScript,Java,C/C++,C#",
+		Pulls:          "https://github.com/kossiitkgp/KWoC-Backend/pulls/1,https://github.com/kossiitkgp/KWoC-Frontend/pull/5",
 	}
 
 	_ = db.Table("students").Create(&modelStudent)
@@ -373,6 +383,7 @@ func TestStudentDashboardOK(t *testing.T) {
 		LinesRemoved:   modelStudent.LinesRemoved,
 		LanguagesUsed:  languages,
 		ProjectsWorked: projects,
+		Pulls:          strings.Split("https://github.com/kossiitkgp/KWoC-Backend/pulls/1,https://github.com/kossiitkgp/KWoC-Frontend/pull/5", ","),
 	}
 	req, _ := http.NewRequest(
 		"GET",

@@ -64,7 +64,7 @@ func areOverallStatsEquivalent(stats *controllers.OverallStats, dbStats *models.
 
 func TestFetchOverallStats(t *testing.T) {
 	db := setTestDB()
-	defer unsetTestDB()
+	defer unsetTestDB(db)
 
 	testStats := generateTestStats(10)
 

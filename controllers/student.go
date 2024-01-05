@@ -49,6 +49,7 @@ type StudentDashboard struct {
 
 	LanguagesUsed  []string           `json:"languages_used"`
 	ProjectsWorked []ProjectDashboard `json:"projects_worked"`
+	Pulls          []string           `json:"pulls"`
 }
 
 // RegisterStudent godoc
@@ -78,17 +79,8 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	// Check if the JWT login username is the same as the student's given username
 	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
-	if reqFields.Username != login_username {
-		utils.LogWarn(
-			r,
-			fmt.Sprintf(
-				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
-				login_username,
-				reqFields.Username,
-			),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
+	if err != nil {
 		return
 	}
 
@@ -183,17 +175,8 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	// Check if the JWT login username is the same as the student's given username
 	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
-	if reqFields.Username != login_username {
-		utils.LogWarn(
-			r,
-			fmt.Sprintf(
-				"POSSIBLE SESSION HIJACKING\nJWT Username: %s, Given Username: %s",
-				login_username,
-				reqFields.Username,
-			),
-		)
-
-		utils.RespondWithHTTPMessage(r, w, http.StatusUnauthorized, "Login username and given username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
+	if err != nil {
 		return
 	}
 
@@ -237,16 +220,27 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDashboard {
 	var projects []ProjectDashboard = make([]ProjectDashboard, 0)
 
-	for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
-		var project ProjectDashboard
-		db.Table("projects").
-			Where("id = ?", proj_id).
-			Select("name", "repo_link").
-			First(&project)
-		projects = append(projects, project)
+	if len(modelStudent.ProjectsWorked) != 0 {
+		for _, proj_id := range strings.Split(modelStudent.ProjectsWorked, ",") {
+			var project ProjectDashboard
+			db.Table("projects").
+				Where("id = ?", proj_id).
+				Select("name", "repo_link").
+				First(&project)
+			projects = append(projects, project)
+		}
 	}
 
-	languages := strings.Split(modelStudent.LanguagesUsed, ",")
+	languages := make([]string, 0)
+	if len(modelStudent.LanguagesUsed) != 0 {
+		languages = strings.Split(modelStudent.LanguagesUsed, ",")
+	}
+
+	pulls := make([]string, 0)
+	if len(modelStudent.Pulls) != 0 {
+		pulls = strings.Split(modelStudent.Pulls, ",")
+	}
+
 	return StudentDashboard{
 		Name:           modelStudent.Name,
 		Username:       modelStudent.Username,
@@ -259,6 +253,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 		LinesRemoved:   modelStudent.LinesRemoved,
 		LanguagesUsed:  languages,
 		ProjectsWorked: projects,
+		Pulls:          pulls,
 	}
 }
 
