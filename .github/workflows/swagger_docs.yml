@@ -54,7 +54,10 @@ jobs:
           git merge -S 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
-        run: swag init --parseDependency --parseInternal -g cmd/backend.go --ot yaml
+        run: |
+          go mod download
+          go mod tidy
+          swag init --parseDependency --parseInternal -g cmd/backend.go --ot yaml
 
       - name: Generate the html doc
         run: |
