@@ -1,4 +1,28 @@
 definitions:
+  controllers.Mentor:
+    properties:
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  controllers.MentorDashboard:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      projects:
+        items:
+          $ref: '#/definitions/controllers.ProjectInfo'
+        type: array
+      students:
+        items:
+          $ref: '#/definitions/controllers.StudentInfo'
+        type: array
+      username:
+        type: string
+    type: object
   controllers.OAuthReqBodyFields:
     properties:
       code:
@@ -28,6 +52,19 @@ definitions:
       username:
         type: string
     type: object
+  controllers.OverallStats:
+    properties:
+      gen_time:
+        type: integer
+      total_commit_count:
+        type: integer
+      total_lines_added:
+        type: integer
+      total_lines_removed:
+        type: integer
+      total_pull_count:
+        type: integer
+    type: object
   controllers.ProfileResBodyFields:
     properties:
       email:
@@ -40,12 +77,116 @@ definitions:
       username:
         type: string
     type: object
+  controllers.Project:
+    properties:
+      comm_channel:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      mentor:
+        $ref: '#/definitions/controllers.Mentor'
+      name:
+        type: string
+      readme_link:
+        type: string
+      repo_link:
+        type: string
+      secondary_mentor:
+        $ref: '#/definitions/controllers.Mentor'
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
   controllers.ProjectDashboard:
     properties:
       name:
         type: string
       repo_link:
         type: string
+    type: object
+  controllers.ProjectInfo:
+    properties:
+      commit_count:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      lines_added:
+        type: integer
+      lines_removed:
+        type: integer
+      mentor:
+        $ref: '#/definitions/controllers.Mentor'
+      name:
+        type: string
+      project_status:
+        type: boolean
+      pull_count:
+        type: integer
+      pulls:
+        items:
+          type: string
+        type: array
+      readme_link:
+        type: string
+      repo_link:
+        type: string
+      secondary_mentor:
+        $ref: '#/definitions/controllers.Mentor'
+      status_remark:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  controllers.ProjectStats:
+    properties:
+      commit_count:
+        type: integer
+      lines_added:
+        type: integer
+      lines_removed:
+        type: integer
+      name:
+        type: string
+      pull_count:
+        type: integer
+      repo_link:
+        type: string
+    type: object
+  controllers.RegisterProjectReqFields:
+    properties:
+      comm_channel:
+        description: Link to a communication channel/platform
+        type: string
+      description:
+        description: Description for the project
+        type: string
+      mentor_username:
+        description: Mentor's username
+        type: string
+      name:
+        description: Name of the project
+        type: string
+      readme_link:
+        description: Link to the project's README file
+        type: string
+      repo_link:
+        description: Link to the repository of the project
+        type: string
+      secondary_mentor_username:
+        description: Secondary mentor's username
+        type: string
+      tags:
+        description: List of tags for the project
+        items:
+          type: string
+        type: array
     type: object
   controllers.RegisterStudentReqFields:
     properties:
@@ -62,6 +203,21 @@ definitions:
     properties:
       blog_link:
         type: string
+      username:
+        type: string
+    type: object
+  controllers.StudentBriefStats:
+    properties:
+      commit_count:
+        type: integer
+      lines_added:
+        type: integer
+      lines_removed:
+        type: integer
+      name:
+        type: string
+      pull_count:
+        type: integer
       username:
         type: string
     type: object
@@ -91,6 +247,81 @@ definitions:
         type: array
       pull_count:
         type: integer
+      pulls:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+  controllers.StudentInfo:
+    properties:
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  controllers.UpdateMentorReqFields:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  controllers.UpdateProjectReqFields:
+    properties:
+      comm_channel:
+        description: Link to a communication channel/platform
+        type: string
+      description:
+        description: Description for the project
+        type: string
+      id:
+        description: Id of the project in the database (required)
+        type: integer
+      mentor_username:
+        description: Mentor's username
+        type: string
+      name:
+        description: Name of the project
+        type: string
+      readme_link:
+        description: Link to the project's README file
+        type: string
+      repo_link:
+        description: Link to the repository of the project
+        type: string
+      secondary_mentor_username:
+        description: Secondary mentor's username (if updated)
+        type: string
+      tags:
+        description: List of tags for the project
+        items:
+          type: string
+        type: array
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Mentor:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
       username:
         type: string
     type: object
@@ -108,6 +339,19 @@ info:
   title: KWoC Backend
   version: 2.0.0
 paths:
+  /api:
+    get:
+      consumes:
+      - text/plain
+      description: Returns a simple string to check if the api is up and running
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Hello from KOSS Backend!
+          schema:
+            type: string
+      summary: Checks api health
   /healthcheck/:
     get:
       consumes:
@@ -139,6 +383,76 @@ paths:
           schema:
             type: string
       summary: ping
+  /mentor/:
+    get:
+      consumes:
+      - text/plain
+      description: Get mentor details for logged in mentor
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mentor details fetched successfuly.
+          schema:
+            $ref: '#/definitions/models.Mentor'
+        "400":
+          description: Mentor `username` does not exists.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Fetch Mentor Details
+  /mentor/dashboard/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches the required details for the mentor dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mentor dashboard details fetched successfuly.
+          schema:
+            $ref: '#/definitions/controllers.MentorDashboard'
+        "400":
+          description: Mentor `username` does not exists.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Database Error fetching mentor with username `username`
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Fetches the mentor dashboard
+  /mentor/form:
+    put:
+      consumes:
+      - application/json
+      description: Update mentor details for logged in mentor
+      parameters:
+      - description: Fields required for Mentor update.
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateMentorReqFields'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succesfully updated mentor details.
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: 'Invalid Details: Could not update mentor details'
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Update Mentor Details
   /oauth:
     post:
       consumes:
@@ -197,6 +511,180 @@ paths:
       security:
       - JWT: []
       summary: Fetches user profile
+  /project/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches the public details for all the Projects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Projects fetched successfully.
+          schema:
+            items:
+              $ref: '#/definitions/controllers.Project'
+            type: array
+        "500":
+          description: Error fetching projects from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Fetches all Projects
+    post:
+      consumes:
+      - application/json
+      description: Register a new project with the provided details.
+      parameters:
+      - description: Fields required for project registeration
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RegisterProjectReqFields'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "400":
+          description: 'Error: Secondary mentor `secondary_mentor` cannot be same
+            as primary mentor.'
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "401":
+          description: Login username and mentor username do not match.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Database error.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Register a Project
+    put:
+      consumes:
+      - application/json
+      description: Update project details for the provided project ID.
+      parameters:
+      - description: Fields required for Project update.
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateProjectReqFields'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project successfully updated.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "400":
+          description: 'Error: Secondary mentor `secondary_mentor_username` cannot
+            be same as primary mentor.'
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "401":
+          description: Login username and mentor username do not match.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Error fetching secondary mentor `secondary_mentor_username`.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Update Project Details
+  /project/{id}:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches all the details for the Project with the provided ID provided
+        the logged in user owns the project.
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project fetched successfully.
+          schema:
+            $ref: '#/definitions/controllers.Project'
+        "400":
+          description: 'Error: Mentor `mentor` does not own the project with ID `id`.'
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+        "500":
+          description: Error fetching project from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      security:
+      - JWT: []
+      summary: Fetches Project Details
+  /stats/overall/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches overall stats from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Fetched overall stats successfully.
+          schema:
+            items:
+              $ref: '#/definitions/controllers.OverallStats'
+            type: array
+        "500":
+          description: Error fetching stats from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Fetches Overall Stats
+  /stats/projects/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches all project stats from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Fetch project stats successfully.
+          schema:
+            items:
+              $ref: '#/definitions/controllers.ProjectStats'
+            type: array
+        "500":
+          description: Error fetching project stats from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Fetches all Project Stats
+  /stats/students/:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches all student stats from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success.
+          schema:
+            items:
+              $ref: '#/definitions/controllers.StudentBriefStats'
+            type: array
+        "500":
+          description: Error fetching student stats from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Fetches all Student Stats
   /student/bloglink/:
     post:
       consumes:
