@@ -50,11 +50,10 @@ jobs:
           git config user.signingkey ~/.ssh/koss-service.pub
           git checkout -b docs || git checkout docs
           git pull -S origin docs
-          git reset --hard 'origin/${{ github.ref_name }}'
+          git merge -S 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
-          ls -R
           swag init --parseDependency --parseInternal -g cmd/backend.go --ot yaml
           if [ -z "$(git status --porcelain docs/swagger.yaml docs/redocly.yaml)" ]; then
             exit 0 
