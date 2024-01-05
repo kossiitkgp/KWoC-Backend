@@ -50,7 +50,7 @@ jobs:
           git config user.signingkey ~/.ssh/koss-service.pub
           git checkout -b docs || git checkout docs
           git pull -S origin docs
-          git merge -S 'origin/${{ github.ref_name }}'
+          git reset --hard 'origin/${{ github.ref_name }}'
 
       - name: Generate swagger.yaml and exit if no changes
         run: |
