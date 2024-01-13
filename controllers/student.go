@@ -41,6 +41,7 @@ type StudentDashboard struct {
 	College        string `json:"college"`
 	PassedMidEvals bool   `json:"passed_mid_evals"`
 	PassedEndEvals bool   `json:"passed_end_evals"`
+	BlogLink       string `json:"blog_link"`
 
 	CommitCount  uint `json:"commit_count"`
 	PullCount    uint `json:"pull_count"`
@@ -258,6 +259,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 		College:        modelStudent.College,
 		PassedMidEvals: modelStudent.PassedMidEvals,
 		PassedEndEvals: modelStudent.PassedEndEvals,
+		BlogLink:       modelStudent.BlogLink,
 		CommitCount:    modelStudent.CommitCount,
 		PullCount:      modelStudent.PullCount,
 		LinesAdded:     modelStudent.LinesAdded,
