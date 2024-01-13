@@ -223,6 +223,8 @@ definitions:
     type: object
   controllers.StudentDashboard:
     properties:
+      blog_link:
+        type: string
       college:
         type: string
       commit_count:
