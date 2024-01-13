@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
@@ -57,7 +58,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/student/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Update Student Details",
@@ -85,7 +86,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/mentor/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Update Mentor Details",
@@ -120,7 +121,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/project/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Fetch All Projects",
