@@ -201,6 +201,17 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
+
+	if !student.PassedEndEvals {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Student `%s` has not passed end evaluations.", reqFields.Username),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
 	tx = tx.Update("BlogLink", reqFields.BlogLink)
 
 	if tx.Error != nil {
