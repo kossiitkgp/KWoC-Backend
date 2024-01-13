@@ -220,7 +220,7 @@ func tStudentBlogLinkExistingUserNotPassed(db *gorm.DB, t *testing.T) {
 
 	res := executeRequest(req, db)
 
-	expectStatusCodeToBe(t, res, http.StatusOK)
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` has not passed end evaluations.", testUsername)})
 }
 
