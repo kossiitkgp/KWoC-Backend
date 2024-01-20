@@ -72,7 +72,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/student/bloglink/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.StudentBlogLink)),
-			false,
+			os.Getenv("REPORT_SUBMISSION_OPEN") == "true",
 		},
 		{
 			"Student Dashboard",
