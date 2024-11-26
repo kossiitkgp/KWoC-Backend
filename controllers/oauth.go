@@ -87,7 +87,8 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	if isOrganiser {
 
 		jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
-			Username: "organiser!" + userInfo.Username,
+			Username: userInfo.Username,
+			UserType: OAUTH_TYPE_ORGANISER,
 		})
 
 		if err != nil {
@@ -143,6 +144,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Generate a JWT string for the user
 	jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
 		Username: userInfo.Username,
+		UserType: userType,
 	})
 	if err != nil {
 		utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
