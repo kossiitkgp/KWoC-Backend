@@ -129,6 +129,12 @@ func getRoutes(app *middleware.App) []Route {
 			"/project/",
 			middleware.WrapApp(app, controllers.FetchAllProjects),
 			false,
+		}, {
+			"Get All Projects For Admins",
+			"GET",
+			"/project/all",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.OrgFetchAllProjectDetails)),
+			false,
 		},
 		{
 			"Update Project Details",

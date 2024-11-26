@@ -32,6 +32,7 @@ type OAuthResBodyFields struct {
 
 const OAUTH_TYPE_STUDENT string = "student"
 const OAUTH_TYPE_MENTOR string = "mentor"
+const OAUTH_TYPE_ORGANISER string = "organiser"
 
 // OAuth godoc
 //
@@ -77,6 +78,33 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo.Username == "" {
 		utils.LogWarnAndRespond(r, w, "Could not get username from the Github API.", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if the user is a organiser
+
+	isOrganiser := utils.CheckUserOrgs(accessToken, userInfo.Username)
+	if isOrganiser {
+
+		jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
+			Username: "organiser!" + userInfo.Username,
+		})
+
+		if err != nil {
+			utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
+			return
+		}
+		resFields := OAuthResBodyFields{
+			Username:  userInfo.Username,
+			Name:      userInfo.Name,
+			Email:     userInfo.Email,
+			College:   "",
+			Type:      OAUTH_TYPE_ORGANISER,
+			IsNewUser: false,
+			Jwt:       jwtString,
+		}
+
+		utils.RespondWithJson(r, w, resFields)
 		return
 	}
 

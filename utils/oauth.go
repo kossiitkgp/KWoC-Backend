@@ -133,12 +133,17 @@ func GetOauthUserInfo(accessToken string) (*GHUserInfo, error) {
 func CheckUserOrgs(accessToken string, username string) bool {
 
 	client := http.Client{}
-	url := fmt.Sprintf("https://api.github.com/orgs/kossiitkgp/teams/Executives/memberships/%s", username)
+	url := fmt.Sprintf("https://api.github.com/orgs/kossiitkgp/teams/executies/memberships/%s", username)
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Add(
+		"Authorization",
+		fmt.Sprintf("Bearer %s", accessToken),
+	)
 	resp, _ := client.Do(req)
 
-	LogWarn(resp.Request, "Error getting orgs")
-
-	return true
+	if resp.StatusCode == 200 {
+		return true
+	} else {
+		return false
+	}
 }

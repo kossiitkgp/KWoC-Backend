@@ -169,6 +169,12 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
+	username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+
+	if !strings.Contains(username, "organiser!") {
+		utils.LogErrAndRespond(r, w, nil, fmt.Sprintf("Error '%s' is not an organiser", username), 400)
+		return
+	}
 
 	var projects []models.Project
 
@@ -176,7 +182,7 @@ func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
 		Table("projects").
 		Preload("Mentor").
 		Preload("SecondaryMentor").
-		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id", "project_status", "status_remark").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id", "project_status", "status_remark", "pull_count").
 		Find(&projects)
 
 	if tx.Error != nil {
