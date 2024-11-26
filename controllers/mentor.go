@@ -70,7 +70,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the JWT login username is the same as the mentor's given username
-	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields).Username
 
 	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
 	if err != nil {
@@ -225,7 +225,7 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 
 	var modelMentor models.Mentor
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
@@ -278,7 +278,7 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 
 	var modelMentor models.Mentor
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
@@ -337,7 +337,7 @@ func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 
 	mentor := models.Mentor{}
 	tx := db.

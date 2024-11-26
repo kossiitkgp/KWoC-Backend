@@ -37,6 +37,7 @@ func jwtKeyFunc(*jwt.Token) (interface{}, error) {
 
 type LoginJwtFields struct {
 	Username string `json:"username"`
+	UserType string `json:"type"`
 }
 
 type LoginJwtClaims struct {

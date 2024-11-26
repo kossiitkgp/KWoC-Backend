@@ -127,7 +127,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 
 	project := models.Project{}
 	tx := db.
@@ -169,10 +169,10 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
-	username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	user_details := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields)
 
-	if !strings.Contains(username, "organiser!") {
-		utils.LogErrAndRespond(r, w, nil, fmt.Sprintf("Error '%s' is not an organiser", username), 400)
+	if user_details.UserType != "organiser" {
+		utils.LogErrAndRespond(r, w, nil, fmt.Sprintf("Error '%s' is not an organiser", user_details.Username), 400)
 		return
 	}
 
