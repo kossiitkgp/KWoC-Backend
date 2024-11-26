@@ -171,5 +171,12 @@ func getRoutes(app *middleware.App) []Route {
 			middleware.WrapApp(app, controllers.FetchAllProjectStats),
 			false,
 		},
+		{
+			"Accept/Reject Project",
+			"POST",
+			"/project/updt_status",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.UpdateStatusProject)),
+			false,
+		},
 	}
 }

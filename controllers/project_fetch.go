@@ -165,36 +165,3 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 	response := newProject(&project)
 	utils.RespondWithJson(r, w, response)
 }
-
-func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-	user_details := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields)
-
-	if user_details.UserType != "organiser" {
-		utils.LogErrAndRespond(r, w, nil, fmt.Sprintf("Error '%s' is not an organiser", user_details.Username), 400)
-		return
-	}
-
-	var projects []models.Project
-
-	tx := db.
-		Table("projects").
-		Preload("Mentor").
-		Preload("SecondaryMentor").
-		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id", "project_status", "status_remark", "pull_count").
-		Find(&projects)
-
-	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, tx.Error, "Error fetching projects from the database.", http.StatusInternalServerError)
-		return
-	}
-
-	var response []Project = make([]Project, 0)
-
-	for _, project := range projects {
-		response = append(response, newProject(&project))
-	}
-
-	utils.RespondWithJson(r, w, response)
-}
