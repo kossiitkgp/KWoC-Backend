@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -16,6 +17,41 @@ type AcceptRejectProject struct {
 	ProjectStatus bool `json:"project_status"`
 	// Status Remark to be set of the project
 	StatusRemark string `json:"status_remark"`
+}
+
+type ProjectOrg struct {
+	Id              uint     `json:"id"`
+	Name            string   `json:"name"`
+	Description     string   `json:"description"`
+	Tags            []string `json:"tags"`
+	RepoLink        string   `json:"repo_link"`
+	CommChannel     string   `json:"comm_channel"`
+	ReadmeLink      string   `json:"readme_link"`
+	Mentor          Mentor   `json:"mentor"`
+	SecondaryMentor Mentor   `json:"secondary_mentor"`
+	ProjectStatus   bool     `json:"project_status"`
+	StatusRemark    string   `json:"status_remark"`
+}
+
+func newProjectOrg(dbProject *models.Project) ProjectOrg {
+	tags := make([]string, 0)
+	if len(dbProject.Tags) != 0 {
+		tags = strings.Split(dbProject.Tags, ",")
+	}
+
+	return ProjectOrg{
+		Id:              dbProject.ID,
+		Name:            dbProject.Name,
+		Description:     dbProject.Description,
+		Tags:            tags,
+		RepoLink:        dbProject.RepoLink,
+		CommChannel:     dbProject.CommChannel,
+		ReadmeLink:      dbProject.ReadmeLink,
+		Mentor:          newMentor(&dbProject.Mentor),
+		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
+		ProjectStatus:   dbProject.ProjectStatus,
+		StatusRemark:    dbProject.StatusRemark,
+	}
 }
 
 func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
@@ -42,10 +78,10 @@ func OrgFetchAllProjectDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []Project = make([]Project, 0)
+	var response []ProjectOrg = make([]ProjectOrg, 0)
 
 	for _, project := range projects {
-		response = append(response, newProject(&project))
+		response = append(response, newProjectOrg(&project))
 	}
 
 	utils.RespondWithJson(r, w, response)
