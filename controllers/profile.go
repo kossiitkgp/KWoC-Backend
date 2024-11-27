@@ -35,7 +35,7 @@ func FetchProfile(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields).Username
 
 	// Check if the student already exists in the db
 	student := models.Student{}

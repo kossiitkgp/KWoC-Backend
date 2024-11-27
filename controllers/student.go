@@ -78,7 +78,7 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the JWT login username is the same as the student's given username
-	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields).Username
 
 	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
 	if err != nil {
@@ -174,7 +174,7 @@ func StudentBlogLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the JWT login username is the same as the student's given username
-	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields).Username
 
 	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
 	if err != nil {
@@ -287,7 +287,7 @@ func FetchStudentDashboard(w http.ResponseWriter, r *http.Request) {
 
 	var modelStudent models.Student
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 	tx := db.
 		Table("students").
 		Where("username = ?", login_username).
@@ -323,7 +323,7 @@ func UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 
 	var modelStudent models.Student
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 	tx := db.
 		Table("students").
 		Where("username = ?", login_username).
@@ -373,7 +373,7 @@ func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
 
 	student := models.Student{}
 	tx := db.
