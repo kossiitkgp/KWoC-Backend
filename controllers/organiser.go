@@ -97,9 +97,9 @@ func UpdateStatusProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectDetails := AcceptRejectProject{}
+	projectDetails := &AcceptRejectProject{}
 
-	err := utils.DecodeJSONBody(r, &projectDetails)
+	err := utils.DecodeJSONBody(r, projectDetails)
 	if err != nil {
 		utils.LogErrAndRespond(r, w, err, "Error decoding request JSON body.", http.StatusBadRequest)
 		return
@@ -108,6 +108,7 @@ func UpdateStatusProject(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("projects").
 		Where("id = ?", projectDetails.Id).
+		Select("*").
 		Updates(projectDetails)
 
 	if tx.Error != nil {
