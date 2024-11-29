@@ -99,7 +99,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 			Username:  userInfo.Username,
 			Name:      userInfo.Name,
 			Email:     userInfo.Email,
-			College:   "",
+			College:   "IIT Kharagpur",
 			Type:      OAUTH_TYPE_ORGANISER,
 			IsNewUser: false,
 			Jwt:       jwtString,
