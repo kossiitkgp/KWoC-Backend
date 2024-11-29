@@ -144,25 +144,30 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	updatedProj := &models.Project{
-		Name:            reqFields.Name,
-		Description:     reqFields.Description,
-		Tags:            strings.Join(reqFields.Tags, ","),
-		RepoLink:        reqFields.RepoLink,
-		CommChannel:     reqFields.CommChannel,
-		ReadmeLink:      reqFields.ReadmeLink,
-		SecondaryMentor: secondaryMentor,
-	}
-
 	if login_details.UserType == OAUTH_TYPE_ORGANISER {
-		updatedProj.ProjectStatus = reqFields.ProjectStatus
-		updatedProj.StatusRemark = reqFields.StatusRemark
-	}
 
-	tx = db.
-		Table("projects").
-		Where("id = ?", reqFields.Id).
-		Updates(updatedProj)
+		updateDet := map[string]interface{}{"status_remark": reqFields.StatusRemark, "project_status": reqFields.ProjectStatus}
+		tx = db.
+			Table("projects").
+			Where("id = ?", reqFields.Id).
+			Updates(updateDet)
+
+	} else {
+		updatedProj := &models.Project{
+			Name:            reqFields.Name,
+			Description:     reqFields.Description,
+			Tags:            strings.Join(reqFields.Tags, ","),
+			RepoLink:        reqFields.RepoLink,
+			CommChannel:     reqFields.CommChannel,
+			ReadmeLink:      reqFields.ReadmeLink,
+			SecondaryMentor: secondaryMentor,
+		}
+
+		tx = db.
+			Table("projects").
+			Where("id = ?", reqFields.Id).
+			Updates(updatedProj)
+	}
 
 	if tx.Error != nil {
 		utils.LogErrAndRespond(r, w, tx.Error, "Error updating the project.", http.StatusInternalServerError)
