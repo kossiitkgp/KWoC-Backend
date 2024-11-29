@@ -39,7 +39,7 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 		}
 
 		reqContext := r.Context()
-		newContext := context.WithValue(reqContext, LoginCtxKey(LOGIN_CTX_USERNAME_KEY), claims.LoginJwtFields.Username)
+		newContext := context.WithValue(reqContext, LoginCtxKey(LOGIN_CTX_USERNAME_KEY), claims.LoginJwtFields)
 
 		inner.ServeHTTP(w, r.WithContext(newContext))
 	})

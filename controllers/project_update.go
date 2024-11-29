@@ -31,6 +31,10 @@ type UpdateProjectReqFields struct {
 	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
 	ReadmeLink string `json:"readme_link"`
+	// Status to be set of the project
+	ProjectStatus bool `json:"project_status"`
+	// Status Remark to be set of the project
+	StatusRemark string `json:"status_remark"`
 }
 
 // UpdateProject godoc
@@ -67,11 +71,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
+	login_details := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields)
 
-	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_username.(string), "Login username and mentor username do not match.")
-	if err != nil {
-		return
+	if login_details.UserType != OAUTH_TYPE_ORGANISER {
+		err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_details.Username, "Login username and mentor username do not match.")
+		if err != nil {
+			return
+		}
 	}
 
 	// Check if the project already exists
@@ -99,12 +105,12 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if project.Mentor.Username != login_username {
+	if project.Mentor.Username != login_details.Username && login_details.UserType != OAUTH_TYPE_ORGANISER {
 		utils.LogErrAndRespond(
 			r,
 			w,
 			tx.Error,
-			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_username, project.ID),
+			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_details.Username, project.ID),
 			http.StatusBadRequest,
 		)
 		return
@@ -138,20 +144,30 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	updatedProj := &models.Project{
-		Name:            reqFields.Name,
-		Description:     reqFields.Description,
-		Tags:            strings.Join(reqFields.Tags, ","),
-		RepoLink:        reqFields.RepoLink,
-		CommChannel:     reqFields.CommChannel,
-		ReadmeLink:      reqFields.ReadmeLink,
-		SecondaryMentor: secondaryMentor,
-	}
+	if login_details.UserType == OAUTH_TYPE_ORGANISER {
 
-	tx = db.
-		Table("projects").
-		Where("id = ?", reqFields.Id).
-		Updates(updatedProj)
+		updateDet := map[string]interface{}{"status_remark": reqFields.StatusRemark, "project_status": reqFields.ProjectStatus}
+		tx = db.
+			Table("projects").
+			Where("id = ?", reqFields.Id).
+			Updates(updateDet)
+
+	} else {
+		updatedProj := &models.Project{
+			Name:            reqFields.Name,
+			Description:     reqFields.Description,
+			Tags:            strings.Join(reqFields.Tags, ","),
+			RepoLink:        reqFields.RepoLink,
+			CommChannel:     reqFields.CommChannel,
+			ReadmeLink:      reqFields.ReadmeLink,
+			SecondaryMentor: secondaryMentor,
+		}
+
+		tx = db.
+			Table("projects").
+			Where("id = ?", reqFields.Id).
+			Updates(updatedProj)
+	}
 
 	if tx.Error != nil {
 		utils.LogErrAndRespond(r, w, tx.Error, "Error updating the project.", http.StatusInternalServerError)

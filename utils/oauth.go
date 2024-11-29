@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/kossiitkgp/kwoc-backend/v2/models"
+	"gorm.io/gorm"
 )
 
 var ErrClientIdNotFound = errors.New("ERROR: GITHUB OAUTH CLIENT ID NOT FOUND")
@@ -128,4 +131,48 @@ func GetOauthUserInfo(accessToken string) (*GHUserInfo, error) {
 	}
 
 	return &userInfo, nil
+}
+
+func IsUserExecutive(accessToken string, username string) bool {
+
+	client := http.Client{}
+	url := fmt.Sprintf("https://api.github.com/orgs/kossiitkgp/teams/executies/memberships/%s", username)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add(
+		"Authorization",
+		fmt.Sprintf("Bearer %s", accessToken),
+	)
+	resp, _ := client.Do(req)
+
+	if resp.StatusCode == 200 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func GenMentorOrganiser(w http.ResponseWriter, r *http.Request, db *gorm.DB, ghUser *GHUserInfo) {
+	mentor := models.Mentor{}
+	tx := db.
+		Table("mentors").
+		Where("username = ?", ghUser.Username).
+		First(&mentor)
+
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+		LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
+		return
+	}
+
+	if tx.Error == gorm.ErrRecordNotFound {
+		tx = db.Create(&models.Mentor{
+			Username: ghUser.Username,
+			Name:     ghUser.Name,
+			Email:    ghUser.Email,
+		})
+
+		if tx.Error != nil {
+			LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
+			return
+		}
+	}
 }

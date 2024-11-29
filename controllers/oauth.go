@@ -2,6 +2,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
@@ -32,6 +33,7 @@ type OAuthResBodyFields struct {
 
 const OAUTH_TYPE_STUDENT string = "student"
 const OAUTH_TYPE_MENTOR string = "mentor"
+const OAUTH_TYPE_ORGANISER string = "organiser"
 
 // OAuth godoc
 //
@@ -80,6 +82,36 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if the user is a organiser
+
+	isOrganiser := utils.IsUserExecutive(accessToken, userInfo.Username)
+	if isOrganiser {
+		fmt.Println("Is organiser: ", isOrganiser)
+		// Generate a mentor profile for a organiser
+		utils.GenMentorOrganiser(w, r, db, userInfo)
+
+		jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
+			Username: userInfo.Username,
+			UserType: OAUTH_TYPE_ORGANISER,
+		})
+		if err != nil {
+			utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
+			return
+		}
+
+		resFields := OAuthResBodyFields{
+			Username: userInfo.Username,
+			Name:     userInfo.Name,
+			Email:    userInfo.Email,
+			College:  "",
+			Type:     OAUTH_TYPE_ORGANISER,
+			Jwt:      jwtString,
+		}
+
+		utils.RespondWithJson(r, w, resFields)
+		return
+	}
+
 	// Check if the user has already registered
 	var isNewUser bool = true
 	var userType string = reqFields.Type
@@ -115,6 +147,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Generate a JWT string for the user
 	jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
 		Username: userInfo.Username,
+		UserType: userType,
 	})
 	if err != nil {
 		utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
