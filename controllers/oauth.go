@@ -2,6 +2,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
@@ -85,24 +86,26 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 
 	isOrganiser := utils.IsUserExecutive(accessToken, userInfo.Username)
 	if isOrganiser {
+		fmt.Println("Is organiser: ", isOrganiser)
+		// Generate a mentor profile for a organiser
+		utils.GenMentorOrganiser(w, r, db, userInfo)
 
 		jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
 			Username: userInfo.Username,
 			UserType: OAUTH_TYPE_ORGANISER,
 		})
-
 		if err != nil {
 			utils.LogErrAndRespond(r, w, err, "Error generating a JWT string.", http.StatusInternalServerError)
 			return
 		}
+
 		resFields := OAuthResBodyFields{
-			Username:  userInfo.Username,
-			Name:      userInfo.Name,
-			Email:     userInfo.Email,
-			College:   "IIT Kharagpur",
-			Type:      OAUTH_TYPE_ORGANISER,
-			IsNewUser: false,
-			Jwt:       jwtString,
+			Username: userInfo.Username,
+			Name:     userInfo.Name,
+			Email:    userInfo.Email,
+			College:  "",
+			Type:     OAUTH_TYPE_ORGANISER,
+			Jwt:      jwtString,
 		}
 
 		utils.RespondWithJson(r, w, resFields)

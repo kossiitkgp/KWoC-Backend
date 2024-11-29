@@ -35,13 +35,13 @@ func FetchProfile(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
 
-	username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields).Username
+	user_details := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(utils.LoginJwtFields)
 
 	// Check if the student already exists in the db
 	student := models.Student{}
 	tx := db.
 		Table("students").
-		Where("username = ?", username).
+		Where("username = ?", user_details.Username).
 		First(&student)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
@@ -49,7 +49,7 @@ func FetchProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	student_exists := student.Username == username
+	student_exists := student.Username == user_details.Username
 	if student_exists {
 		utils.RespondWithJson(r, w, ProfileResBodyFields{
 			Username: student.Username,
@@ -64,20 +64,27 @@ func FetchProfile(w http.ResponseWriter, r *http.Request) {
 	mentor := models.Mentor{}
 	tx = db.
 		Table("mentors").
-		Where("username = ?", username).
+		Where("username = ?", user_details.Username).
 		First(&mentor)
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
-	mentor_exists := mentor.Username == username
+	mentor_exists := mentor.Username == user_details.Username
 
 	if mentor_exists {
+
+		userType := "mentor"
+
+		if user_details.UserType == OAUTH_TYPE_ORGANISER {
+			userType = OAUTH_TYPE_ORGANISER
+		}
+
 		utils.RespondWithJson(r, w, ProfileResBodyFields{
 			Username: mentor.Username,
 			Name:     mentor.Name,
 			Email:    mentor.Email,
-			Type:     "mentor",
+			Type:     userType,
 		})
 		return
 	}
