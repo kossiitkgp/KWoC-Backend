@@ -31,6 +31,10 @@ type UpdateProjectReqFields struct {
 	CommChannel string `json:"comm_channel"`
 	// Link to the project's README file
 	ReadmeLink string `json:"readme_link"`
+	// Status to be set of the project
+	ProjectStatus bool `json:"project_status"`
+	// Status Remark to be set of the project
+	StatusRemark string `json:"status_remark"`
 }
 
 // UpdateProject godoc
@@ -67,9 +71,9 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields).Username
+	login_details := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields)
 
-	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_username, "Login username and mentor username do not match.")
+	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_details.Username, "Login username and mentor username do not match.")
 	if err != nil {
 		return
 	}
@@ -99,12 +103,12 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if project.Mentor.Username != login_username {
+	if project.Mentor.Username != login_details.Username {
 		utils.LogErrAndRespond(
 			r,
 			w,
 			tx.Error,
-			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_username, project.ID),
+			fmt.Sprintf("Error: Mentor `%s` does not own the project with ID `%d`.", login_details.Username, project.ID),
 			http.StatusBadRequest,
 		)
 		return
@@ -148,8 +152,14 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		SecondaryMentor: secondaryMentor,
 	}
 
+	if login_details.UserType == OAUTH_TYPE_ORGANISER {
+		updatedProj.ProjectStatus = reqFields.ProjectStatus
+		updatedProj.StatusRemark = reqFields.StatusRemark
+	}
+
 	tx = db.
 		Table("projects").
+		Select("*").
 		Where("id = ?", reqFields.Id).
 		Updates(updatedProj)
 
