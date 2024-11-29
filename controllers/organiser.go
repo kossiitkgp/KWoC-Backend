@@ -20,17 +20,9 @@ type AcceptRejectProject struct {
 }
 
 type ProjectOrg struct {
-	Id              uint     `json:"id"`
-	Name            string   `json:"name"`
-	Description     string   `json:"description"`
-	Tags            []string `json:"tags"`
-	RepoLink        string   `json:"repo_link"`
-	CommChannel     string   `json:"comm_channel"`
-	ReadmeLink      string   `json:"readme_link"`
-	Mentor          Mentor   `json:"mentor"`
-	SecondaryMentor Mentor   `json:"secondary_mentor"`
-	ProjectStatus   bool     `json:"project_status"`
-	StatusRemark    string   `json:"status_remark"`
+	ProjectStatus bool   `json:"project_status"`
+	StatusRemark  string `json:"status_remark"`
+	Project
 }
 
 func newProjectOrg(dbProject *models.Project) ProjectOrg {
@@ -40,17 +32,19 @@ func newProjectOrg(dbProject *models.Project) ProjectOrg {
 	}
 
 	return ProjectOrg{
-		Id:              dbProject.ID,
-		Name:            dbProject.Name,
-		Description:     dbProject.Description,
-		Tags:            tags,
-		RepoLink:        dbProject.RepoLink,
-		CommChannel:     dbProject.CommChannel,
-		ReadmeLink:      dbProject.ReadmeLink,
-		Mentor:          newMentor(&dbProject.Mentor),
-		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
-		ProjectStatus:   dbProject.ProjectStatus,
-		StatusRemark:    dbProject.StatusRemark,
+		Project: Project{
+			Id:              dbProject.ID,
+			Name:            dbProject.Name,
+			Description:     dbProject.Description,
+			Tags:            tags,
+			RepoLink:        dbProject.RepoLink,
+			CommChannel:     dbProject.CommChannel,
+			ReadmeLink:      dbProject.ReadmeLink,
+			Mentor:          newMentor(&dbProject.Mentor),
+			SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
+		},
+		ProjectStatus: dbProject.ProjectStatus,
+		StatusRemark:  dbProject.StatusRemark,
 	}
 }
 

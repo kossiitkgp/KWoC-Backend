@@ -130,7 +130,7 @@ func GetOauthUserInfo(accessToken string) (*GHUserInfo, error) {
 	return &userInfo, nil
 }
 
-func CheckUserOrgs(accessToken string, username string) bool {
+func IsUserExecutive(accessToken string, username string) bool {
 
 	client := http.Client{}
 	url := fmt.Sprintf("https://api.github.com/orgs/kossiitkgp/teams/executies/memberships/%s", username)

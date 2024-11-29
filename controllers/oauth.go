@@ -83,7 +83,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 
 	// Check if the user is a organiser
 
-	isOrganiser := utils.CheckUserOrgs(accessToken, userInfo.Username)
+	isOrganiser := utils.IsUserExecutive(accessToken, userInfo.Username)
 	if isOrganiser {
 
 		jwtString, err := utils.GenerateLoginJwtString(utils.LoginJwtFields{
