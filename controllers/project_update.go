@@ -73,9 +73,11 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	login_details := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY)).(utils.LoginJwtFields)
 
-	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_details.Username, "Login username and mentor username do not match.")
-	if err != nil {
-		return
+	if login_details.UserType != OAUTH_TYPE_ORGANISER {
+		err = utils.DetectSessionHijackAndRespond(r, w, reqFields.MentorUsername, login_details.Username, "Login username and mentor username do not match.")
+		if err != nil {
+			return
+		}
 	}
 
 	// Check if the project already exists
@@ -103,7 +105,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if project.Mentor.Username != login_details.Username {
+	if project.Mentor.Username != login_details.Username && login_details.UserType != OAUTH_TYPE_ORGANISER {
 		utils.LogErrAndRespond(
 			r,
 			w,
@@ -159,7 +161,6 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	tx = db.
 		Table("projects").
-		Select("*").
 		Where("id = ?", reqFields.Id).
 		Updates(updatedProj)
 
