@@ -31,10 +31,16 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Test
+      - name: Start DB
         run: |
           docker compose -f docker-compose.yaml up --build -d
+
+      - name: Test
+        run: |
           go test ./... -p 1
+
+      - name: Stop DB
+        run: |
           docker compose -f docker-compose.yaml down -v
 
       - name: Lint
