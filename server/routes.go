@@ -54,6 +54,20 @@ func getRoutes(app *middleware.App) []Route {
 			false,
 		},
 		{
+			"Is Admin",
+			"GET",
+			"/isadmin/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.IsAdmin)),
+			false,
+		},
+		{
+			"Fetch Unapproved Projects",
+			"GET",
+			"/project/unapproved/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchUnapprovedProjects)),
+			false,
+		},
+		{
 			"Student Registration",
 			"POST",
 			"/student/form/",
@@ -142,6 +156,13 @@ func getRoutes(app *middleware.App) []Route {
 			"GET",
 			"/project/{id}",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchProjectDetails)),
+			false,
+		},
+		{
+			"Approve Project",
+			"POST",
+			"/project/{id}/approve/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.ApproveProject)),
 			false,
 		},
 		{
