@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres
+    image: postgres:18
     restart: always
     environment:
       - POSTGRES_USER=${DATABASE_USERNAME}
