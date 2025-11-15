@@ -34,6 +34,9 @@ jobs:
       - name: Start DB
         run: |
           docker compose -f docker-compose.yaml up --build -d
+          until docker compose exec -T database pg_isready -U "${DATABASE_USERNAME}" -d "${DATABASE_NAME}"; do
+            sleep 1
+          done
 
       - name: Test
         run: |
