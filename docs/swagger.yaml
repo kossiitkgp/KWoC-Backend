@@ -385,6 +385,21 @@ paths:
           schema:
             type: string
       summary: ping
+  /isadmin:
+    get:
+      consumes:
+      - text/plain
+      description: Returns true if the logged in user is an admin, false otherwise
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: is_admin status fetched successfully.
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      summary: Checks if the logged in user is an admin
   /mentor/:
     get:
       consumes:
@@ -630,6 +645,44 @@ paths:
       security:
       - JWT: []
       summary: Fetches Project Details
+  /project/{id}/approve:
+    post:
+      consumes:
+      - text/plain
+      description: Approves a project given its ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project approved successfully.
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Error approving project.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Approves a project
+  /project/unapproved:
+    get:
+      consumes:
+      - text/plain
+      description: Fetches the list of unapproved Projects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Projects fetched successfully.
+          schema:
+            items:
+              $ref: '#/definitions/controllers.Project'
+            type: array
+        "500":
+          description: Error fetching projects from the database.
+          schema:
+            $ref: '#/definitions/utils.HTTPMessage'
+      summary: Fetches all unapproved Projects
   /stats/overall/:
     get:
       consumes:
