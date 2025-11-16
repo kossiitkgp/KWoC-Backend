@@ -334,6 +334,8 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 - `GITHUB_OAUTH_CLIENT_SECRET`: The client secret used for Github OAuth. (See [Github OAuth](#github-oauth))
 - `JWT_SECRET_KEY`: The secret key used to create a JWT token. (It can be a randomly generated string)
 - `JWT_VALIDITY_TIME`: The amount of time (in hours) for which the generated JWT tokens should be valid.
+- `REGISTRATIONS_OPEN`: Set to `true` to enable the registration endpoints.
+- `REPORT_SUBMISSION_OPEN`: Set to `true` to enable the blog link / final report submission endpoint.
 
 ### Github OAuth
 

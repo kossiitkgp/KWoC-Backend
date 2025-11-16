@@ -129,3 +129,47 @@ func GetOauthUserInfo(accessToken string) (*GHUserInfo, error) {
 
 	return &userInfo, nil
 }
+
+func IsUserAdmin(username string) (bool, error) {
+	orgname := os.Getenv("GITHUB_ORG_NAME")
+	token := os.Getenv("GITHUB_TOKEN")
+
+	if orgname == "" {
+		return false, errors.New("ERROR: GITHUB ORG NAME NOT FOUND")
+	}
+
+	if token == "" {
+		return false, errors.New("ERROR: GITHUB TOKEN NOT FOUND")
+	}
+
+	httpClient := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("https://api.github.com/orgs/%s/members/%s", orgname, username),
+		nil,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("User-Agent", "KWoC-Backend")
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusNoContent:
+		return true, nil
+	case http.StatusNotFound:
+		return false, nil
+	default:
+		return false, ErrGithubAPIError
+	}
+}

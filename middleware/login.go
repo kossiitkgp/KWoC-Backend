@@ -8,8 +8,10 @@ import (
 )
 
 type LoginCtxKey string
+type AdminCtxKey string
 
 const LOGIN_CTX_USERNAME_KEY LoginCtxKey = "login_username"
+const LOGIN_CTX_IS_ADMIN_KEY AdminCtxKey = "login_is_admin"
 
 // Session login middleware for incoming requests
 func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
@@ -38,9 +40,18 @@ func WithLogin(inner http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		reqContext := r.Context()
-		newContext := context.WithValue(reqContext, LoginCtxKey(LOGIN_CTX_USERNAME_KEY), claims.LoginJwtFields.Username)
+		username := claims.LoginJwtFields.Username
 
-		inner.ServeHTTP(w, r.WithContext(newContext))
+		isAdmin, adminErr := utils.IsUserAdmin(username)
+		if adminErr != nil {
+			utils.LogErrAndRespond(r, w, adminErr, "Error checking if user is admin.", http.StatusInternalServerError)
+			return
+		}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, LOGIN_CTX_USERNAME_KEY, username)
+		ctx = context.WithValue(ctx, LOGIN_CTX_IS_ADMIN_KEY, isAdmin)
+
+		inner.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

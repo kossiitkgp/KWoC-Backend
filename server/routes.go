@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
@@ -53,11 +54,25 @@ func getRoutes(app *middleware.App) []Route {
 			false,
 		},
 		{
+			"Is Admin",
+			"GET",
+			"/isadmin/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.IsAdmin)),
+			false,
+		},
+		{
+			"Fetch Unapproved Projects",
+			"GET",
+			"/project/unapproved/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchUnapprovedProjects)),
+			false,
+		},
+		{
 			"Student Registration",
 			"POST",
 			"/student/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterStudent)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Update Student Details",
@@ -71,7 +86,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/student/bloglink/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.StudentBlogLink)),
-			false,
+			os.Getenv("REPORT_SUBMISSION_OPEN") == "true",
 		},
 		{
 			"Student Dashboard",
@@ -85,7 +100,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/mentor/form/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterMentor)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Update Mentor Details",
@@ -120,7 +135,7 @@ func getRoutes(app *middleware.App) []Route {
 			"POST",
 			"/project/",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
-			true,
+			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{
 			"Fetch All Projects",
@@ -141,6 +156,13 @@ func getRoutes(app *middleware.App) []Route {
 			"GET",
 			"/project/{id}",
 			middleware.WithLogin(middleware.WrapApp(app, controllers.FetchProjectDetails)),
+			false,
+		},
+		{
+			"Approve Project",
+			"POST",
+			"/project/{id}/approve/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.ApproveProject)),
 			false,
 		},
 		{

@@ -15,6 +15,8 @@ jobs:
       DATABASE_NAME: testDb
       DATABASE_USERNAME: user
       DATABASE_PASSWORD: pass
+      GITHUB_ORG_NAME: kossiitkgp
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     runs-on: ubuntu-latest
     strategy:
@@ -29,11 +31,20 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Test
+      - name: Start DB
         run: |
           docker compose -f docker-compose.yaml up --build -d
+          until docker compose exec -T database pg_isready -U "${DATABASE_USERNAME}" -d "${DATABASE_NAME}"; do
+            sleep 1
+          done
+
+      - name: Test
+        run: |
           go test ./... -p 1
-          docker compose -f docker-compose.yaml down
+
+      - name: Stop DB
+        run: |
+          docker compose -f docker-compose.yaml down -v
 
       - name: Lint
         uses: golangci/golangci-lint-action@v3

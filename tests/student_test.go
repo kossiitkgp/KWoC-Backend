@@ -203,8 +203,8 @@ func TestStudentBloglinkSessionHijacking(t *testing.T) {
 	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusUnauthorized, Message: "Login username and given username do not match."})
 }
 
-// Test an existing user request to /student/bloglink/ with proper authentication and input
-func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
+// Test an existing user request to /student/bloglink/ with proper authentication and input but with end evals failed.
+func tStudentBlogLinkExistingUserNotPassed(db *gorm.DB, t *testing.T) {
 	// Test login fields
 	testUsername := getTestUsername()
 	testLoginFields := utils.LoginJwtFields{Username: testUsername}
@@ -212,6 +212,27 @@ func tStudentBlogLinkExistingUser(db *gorm.DB, t *testing.T) {
 	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
 
 	db.Table("students").Create(&models.Student{Username: testUsername})
+
+	// Execute the bloglink request
+	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
+	req := createStudentBlogLinkRequest(&reqFields)
+	req.Header.Add("Bearer", testJwt)
+
+	res := executeRequest(req, db)
+
+	expectStatusCodeToBe(t, res, http.StatusBadRequest)
+	expectResponseJSONBodyToBe(t, res, utils.HTTPMessage{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Student `%s` has not passed end evaluations.", testUsername)})
+}
+
+// Test an existing user request to /student/bloglink/ with proper authentication and input and with passed end evals
+func tStudentBlogLinkExistingUserPassed(db *gorm.DB, t *testing.T) {
+	// Test login fields
+	testUsername := getTestUsername()
+	testLoginFields := utils.LoginJwtFields{Username: testUsername}
+
+	testJwt, _ := utils.GenerateLoginJwtString(testLoginFields)
+
+	db.Table("students").Create(&models.Student{Username: testUsername, PassedEndEvals: true})
 
 	// Execute the bloglink request
 	reqFields := controllers.StudentBlogLinkReqFields{Username: testUsername, BlogLink: "https://grugbrain.dev/"}
@@ -253,11 +274,19 @@ func TestStudentBlogLink(t *testing.T) {
 	setTestJwtSecretKey()
 	defer unsetTestJwtSecretKey()
 
-	// Existing student test
+	// Failed existing student test
 	t.Run(
-		"Test: existing student bloglink request",
+		"Test: existing student bloglink request with end evals failed",
 		func(t *testing.T) {
-			tStudentBlogLinkExistingUser(db, t)
+			tStudentBlogLinkExistingUserNotPassed(db, t)
+		},
+	)
+
+	// Passed existing student test
+	t.Run(
+		"Test: existing student bloglink request with end evals passed",
+		func(t *testing.T) {
+			tStudentBlogLinkExistingUserPassed(db, t)
 		},
 	)
 

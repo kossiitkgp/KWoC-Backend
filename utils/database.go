@@ -61,7 +61,10 @@ func GetDB() (db *gorm.DB, err error) {
 
 	dialector = postgres.Open(dsn)
 
-	db, err = gorm.Open(dialector, &gorm.Config{})
+	// Disable prepared statements if using Supabase
+	db, err = gorm.Open(dialector, &gorm.Config{
+		PrepareStmt: false,
+	})
 
 	if err != nil {
 		log.Err(err).Msg("Database open error.")
