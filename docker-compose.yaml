@@ -30,6 +30,7 @@ services:
       - "9091:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
 
   grafana:
     image: grafana/grafana
@@ -47,6 +48,13 @@ services:
     restart: unless-stopped
     volumes:
       - '/:/host:ro'
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - "9094:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
 
 volumes:
   db:
