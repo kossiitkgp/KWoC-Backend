@@ -41,6 +41,7 @@ func NewRouter(db *gorm.DB, testMode bool) *mux.Router {
 
 		// logger middleware to log incoming requests
 		handler = route.HandlerFunc
+		handler = middleware.PrometheusMiddleware(handler)
 		handler = middleware.Logger(handler, route.Name)
 
 		// register route
