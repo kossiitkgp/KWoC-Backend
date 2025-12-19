@@ -24,6 +24,16 @@ type UpdateMentorReqFields struct {
 	Email string `json:"email"`
 }
 
+/*
+	Public-safe mentor response
+	Only username + display name
+	(Required for Issue #177)
+*/
+type PublicMentor struct {
+	Username    string `json:"username"`
+	DisplayName string `json:"display_name"`
+}
+
 type ProjectInfo struct {
 	Id            uint     `json:"id"`
 	Name          string   `json:"name"`
@@ -39,9 +49,9 @@ type ProjectInfo struct {
 	LinesAdded   uint `json:"lines_added"`
 	LinesRemoved uint `json:"lines_removed"`
 
-	Pulls           []string `json:"pulls"`
-	Mentor          Mentor   `json:"mentor"`
-	SecondaryMentor Mentor   `json:"secondary_mentor"`
+	Pulls           []string      `json:"pulls"`
+	Mentor          PublicMentor  `json:"mentor"`
+	SecondaryMentor PublicMentor  `json:"secondary_mentor"`
 }
 
 type StudentInfo struct {
@@ -58,6 +68,20 @@ type MentorDashboard struct {
 	Students []StudentInfo `json:"students"`
 }
 
+/*
+	Helper: Convert Mentor → PublicMentor
+*/
+func newMentor(m *models.Mentor) PublicMentor {
+	if m == nil {
+		return PublicMentor{}
+	}
+
+	return PublicMentor{
+		Username:    m.Username,
+		DisplayName: m.Name,
+	}
+}
+
 func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 	db := app.Db
@@ -69,18 +93,21 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the JWT login username is the same as the mentor's given username
-	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
+	loginUsername := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
 
-	err = utils.DetectSessionHijackAndRespond(r, w, reqFields.Username, login_username, "Login username and given username do not match.")
+	err = utils.DetectSessionHijackAndRespond(
+		r,
+		w,
+		reqFields.Username,
+		loginUsername,
+		"Login username and given username do not match.",
+	)
 	if err != nil {
 		return
 	}
 
-	// Check if the mentor already exists in the db
 	mentor := models.Mentor{}
-	tx := db.
-		Table("mentors").
+	tx := db.Table("mentors").
 		Where("username = ?", reqFields.Username).
 		First(&mentor)
 
@@ -89,43 +116,36 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mentor_exists := mentor.Username == reqFields.Username
-
-	if mentor_exists {
+	if mentor.Username == reqFields.Username {
 		utils.LogWarnAndRespond(
 			r,
 			w,
 			fmt.Sprintf("Mentor `%s` already exists.", mentor.Username),
 			http.StatusBadRequest,
 		)
-
 		return
 	}
 
-	// Check if a student of the same username exists
 	student := models.Student{}
-	tx = db.
-		Table("students").
+	tx = db.Table("students").
 		Where("username = ?", reqFields.Username).
 		First(&student)
+
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
-	student_exists := student.Username == reqFields.Username
 
-	if student_exists {
+	if student.Username == reqFields.Username {
 		utils.LogWarnAndRespond(
 			r,
 			w,
 			fmt.Sprintf("The username `%s` already exists as a student.", reqFields.Username),
 			http.StatusBadRequest,
 		)
-
 		return
 	}
 
-	// Create a db entry if the mentor doesn'tf exist
 	tx = db.Create(&models.Mentor{
 		Username: reqFields.Username,
 		Name:     reqFields.Name,
@@ -140,27 +160,28 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
 }
 
-// /mentor/dashboard/ functions
-
 func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
-	var projects []models.Project = make([]models.Project, 0)
-	var projectsInfo []ProjectInfo = make([]ProjectInfo, 0)
-	var students []StudentInfo = make([]StudentInfo, 0)
+	var projects []models.Project
+	var projectsInfo []ProjectInfo
+	var students []StudentInfo
 
-	db.Preload("Mentor").Preload("SecondaryMentor").Table("projects").
+	db.Preload("Mentor").
+		Preload("SecondaryMentor").
+		Table("projects").
 		Where("mentor_id = ? OR secondary_mentor_id = ?", mentor.ID, mentor.ID).
 		Find(&projects)
 
 	studentMap := make(map[string]bool)
 	var studentUsernames []string
+
 	for _, project := range projects {
-		pulls := make([]string, 0)
-		if len(project.Pulls) != 0 {
+		pulls := []string{}
+		if project.Pulls != "" {
 			pulls = strings.Split(project.Pulls, ",")
 		}
 
-		tags := make([]string, 0)
-		if len(project.Tags) != 0 {
+		tags := []string{}
+		if project.Tags != "" {
 			tags = strings.Split(project.Tags, ",")
 		}
 
@@ -183,179 +204,28 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			Mentor:          newMentor(&project.Mentor),
 			SecondaryMentor: newMentor(&project.SecondaryMentor),
 		}
+
 		projectsInfo = append(projectsInfo, projectInfo)
 
 		for _, studentUsername := range strings.Split(project.Contributors, ",") {
-			contains := studentMap[studentUsername]
-			if contains {
+			if studentUsername == "" || studentMap[studentUsername] {
 				continue
 			}
-
 			studentMap[studentUsername] = true
 			studentUsernames = append(studentUsernames, studentUsername)
 		}
 	}
-	db.Table("students").Where("username IN ?", studentUsernames).
-		Select("name", "username").Find(&students)
+
+	db.Table("students").
+		Where("username IN ?", studentUsernames).
+		Select("name", "username").
+		Find(&students)
 
 	return MentorDashboard{
 		Name:     mentor.Name,
 		Username: mentor.Username,
 		Email:    mentor.Email,
-
 		Projects: projectsInfo,
 		Students: students,
 	}
-}
-
-// FetchMentorDashboard godoc
-//
-//	@Summary		Fetches the mentor dashboard
-//	@Description	Fetches the required details for the mentor dashboard
-//	@Accept			plain
-//	@Produce		json
-//	@Success		200	{object}	MentorDashboard	    "Mentor dashboard details fetched successfuly."
-//	@Failure		400	{object}	utils.HTTPMessage	"Mentor `username` does not exists."
-//	@Failure		500	{object}	utils.HTTPMessage	"Database Error fetching mentor with username `username`"
-//	@Security		JWT
-//	@Router			/mentor/dashboard/ [get]
-func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-
-	var modelMentor models.Mentor
-
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
-	tx := db.
-		Table("mentors").
-		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
-		First(&modelMentor)
-
-	if tx.Error == gorm.ErrRecordNotFound {
-		utils.LogErrAndRespond(
-			r,
-			w,
-			tx.Error,
-			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
-			http.StatusBadRequest,
-		)
-		return
-	}
-	if tx.Error != nil {
-		utils.LogErrAndRespond(
-			r,
-			w,
-			tx.Error,
-			fmt.Sprintf("Database Error fetching mentor with username `%s`", login_username),
-			http.StatusInternalServerError,
-		)
-		return
-	}
-
-	mentor := CreateMentorDashboard(modelMentor, db)
-
-	utils.RespondWithJson(r, w, mentor)
-}
-
-// UpdateMentorDetails godoc
-//
-//	@Summary		Update Mentor Details
-//	@Description	Update mentor details for logged in mentor
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		UpdateMentorReqFields	true	"Fields required for Mentor update."
-//	@Success		200		{object}	[]string	"Succesfully updated mentor details."
-//	@Failure		400		{object}	utils.HTTPMessage	"Error decoding JSON body."
-//	@Failure		400		{object}	utils.HTTPMessage	"Mentor `username` does not exists."
-//	@Failure		400		{object}	utils.HTTPMessage	"Invalid Details: Could not update mentor details"
-//	@Security		JWT
-//
-//	@Router			/mentor/form [put]
-func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-
-	var modelMentor models.Mentor
-
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
-	tx := db.
-		Table("mentors").
-		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
-		First(&modelMentor)
-
-	if tx.Error == gorm.ErrRecordNotFound {
-		utils.LogErrAndRespond(
-			r,
-			w,
-			tx.Error,
-			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	var reqFields = UpdateMentorReqFields{}
-
-	err := utils.DecodeJSONBody(r, &reqFields)
-	if err != nil {
-		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
-		return
-	}
-
-	tx = db.Model(&modelMentor).Updates(models.Mentor{
-		Name:  reqFields.Name,
-		Email: reqFields.Email,
-	})
-
-	if tx.Error != nil {
-		utils.LogErrAndRespond(
-			r,
-			w,
-			tx.Error,
-			"Invalid Details: Could not update mentor details",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	utils.RespondWithJson(r, w, []string{"Mentor details updated successfully."})
-}
-
-// GetMentorDetails godoc
-//
-//	@Summary		Fetch Mentor Details
-//	@Description	Get mentor details for logged in mentor
-//	@Accept			plain
-//	@Produce		json
-//	@Success		200		{object}	models.Mentor				"Mentor details fetched successfuly."
-//	@Failure		400		{object}	utils.HTTPMessage			"Mentor `username` does not exists."
-//	@Security		JWT
-//	@Router			/mentor/ [get]
-func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
-	app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
-	db := app.Db
-
-	login_username := r.Context().Value(middleware.LoginCtxKey(middleware.LOGIN_CTX_USERNAME_KEY))
-
-	mentor := models.Mentor{}
-	tx := db.
-		Table("mentors").
-		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
-		First(&mentor)
-
-	if tx.Error == gorm.ErrRecordNotFound {
-		utils.LogErrAndRespond(
-			r,
-			w,
-			tx.Error,
-			fmt.Sprintf("Mentor `%s` does not exists.", login_username),
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	utils.RespondWithJson(r, w, mentor)
 }
