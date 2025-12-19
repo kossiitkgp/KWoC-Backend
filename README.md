@@ -68,12 +68,26 @@
 - Clone this repository.
 - Run `go mod download` in the cloned repository to download all the dependencies.
 - Create a `.env` file to store all the [environment variables](#environment-variables). You can use the `.env.template` file for this.
-- Run `docker compose up -d` to start the PostgreSQL database container. (Make sure all the required [environment variables](#environment-variables) are set)
+- Run `docker compose up -d` to start the PostgreSQL database, Prometheus, Grafana, and Alertmanager containers. (Make sure all the required [environment variables](#environment-variables) are set). _Note: This acts as a full deployment and also starts the backend container on port 8080. If you wish to run the backend locally using `go run`, you should stop the backend container (`docker compose stop backend`)._
+- Prometheus will be available at `http://localhost:9091`, Grafana at `http://localhost:3000`, and Alertmanager at `http://localhost:9094`.
 - Optionally set up [Github OAuth](#github-oauth) to test the endpoints which require login. (See also: [Endpoints](#endpoints))
-- Run `go run cmd/backend.go` to start the server.
+- Run `go run cmd/backend.go` to start the server (Ensure port 8080 is free).
 - Optionally install [pgAdmin](https://www.pgadmin.org/) or [DBeaver](https://dbeaver.io/) or a similar tool to help manage the local database (PostgreSQL).
 - Optionally install [Postman](https://www.postman.com/) or a similar tool to test the API endpoints.
 - Optionally (but **recommended**) [set up pre-commit hooks](#setting-up-pre-commit-hooks).
+
+
+#### Setting Up Grafana
+
+1. Open Grafana at [http://localhost:3000](http://localhost:3000).
+2. Login with default credentials (user: `admin`, password: `admin`). You will be asked to change the password.
+3. Add a Data Source:
+   - Go to **Configuration** -> **Data Sources**.
+   - Click **Add data source**.
+   - Select **Prometheus**.
+   - In the **URL** field, enter `http://prometheus:9090` (this is the internal Docker network URL).
+   - Click **Save & Test**.
+4. Create or Import Dashboards to visualize the metrics.
 
 #### Setting Up Pre-Commit Hooks
 
@@ -108,6 +122,8 @@ The file `tests/common_test.go` exports functions commonly used in controller te
 - [gorm.io/gorm](https://gorm.io): Used for database modelling.
 - [joho/godotenv](https://github.com/joho/godotenv): Used for loading environment variables from a `.env` file.
 - [rs/zerolog](https://github.com/rs/zerolog): Used for logging information, errors, and warnings.
+- [prometheus/client_golang](https://github.com/prometheus/client_golang): Used for Prometheus metrics.
+- [gorm.io/plugin/prometheus](https://github.com/go-gorm/prometheus): Used for GORM Prometheus plugin.
 
 ### File Structure
 
