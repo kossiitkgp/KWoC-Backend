@@ -20,7 +20,8 @@ services:
     depends_on:
       - database
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - DATABASE_HOST=database
 
