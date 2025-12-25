@@ -71,7 +71,7 @@
 - Run `docker compose up -d` to start the PostgreSQL database, Prometheus, Grafana, and Alertmanager containers. (Make sure all the required [environment variables](#environment-variables) are set). _Note: This acts as a full deployment and also starts the backend container on port 8080. If you wish to run the backend locally using `go run`, you should stop the backend container (`docker compose stop backend`)._
 - Prometheus will be available at `http://localhost:9091`, Grafana at `http://localhost:3000`, and Alertmanager at `http://localhost:9094`.
 - Optionally set up [Github OAuth](#github-oauth) to test the endpoints which require login. (See also: [Endpoints](#endpoints))
-- Run `go run cmd/backend.go` to start the server (Ensure port 8080 is free).
+- Run `go run cmd/backend.go` to start the server (Ensure port 8080 is free). Alternatively, you can run `docker compose up -d` to start the database and the backend server.
 - Optionally install [pgAdmin](https://www.pgadmin.org/) or [DBeaver](https://dbeaver.io/) or a similar tool to help manage the local database (PostgreSQL).
 - Optionally install [Postman](https://www.postman.com/) or a similar tool to test the API endpoints.
 - Optionally (but **recommended**) [set up pre-commit hooks](#setting-up-pre-commit-hooks).
