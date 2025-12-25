@@ -6,6 +6,7 @@ import (
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Route struct {
@@ -184,6 +185,15 @@ func getRoutes(app *middleware.App) []Route {
 			"GET",
 			"/stats/projects/",
 			middleware.WrapApp(app, controllers.FetchAllProjectStats),
+			false,
+		},
+		{
+			"Metrics",
+			"GET",
+			"/metrics",
+			func(w http.ResponseWriter, r *http.Request) {
+				promhttp.Handler().ServeHTTP(w, r)
+			},
 			false,
 		},
 	}

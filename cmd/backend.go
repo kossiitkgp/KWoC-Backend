@@ -15,6 +15,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gorm.io/plugin/prometheus"
 )
 
 // main function
@@ -55,6 +56,22 @@ func main() {
 	mig_err := utils.MigrateModels(db)
 	if mig_err != nil {
 		log.Fatal().Err(mig_err).Msg("Database migration error.")
+	}
+
+	// Initialize GORM Prometheus plugin
+	if err := db.Use(prometheus.New(prometheus.Config{
+		DBName:          "kwoc_backend", // using DBName as metrics label
+		RefreshInterval: 15,
+		PushAddr:        "", // push metrics if necessary
+		StartServer:     false,
+		HTTPServerPort:  8080, // port for separate server (unused)
+		MetricsCollector: []prometheus.MetricsCollector{
+			&prometheus.Postgres{
+				VariableNames: []string{"Threads_running"},
+			},
+		},
+	})); err != nil {
+		log.Error().Err(err).Msg("Failed to register GORM Prometheus plugin")
 	}
 
 	log.Info().Msg("Creating mux router")
