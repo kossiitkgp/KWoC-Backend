@@ -89,6 +89,14 @@
    - Click **Save & Test**.
 4. Create or Import Dashboards to visualize the metrics.
 
+#### Setting Up Alertmanager
+
+1. Create a file named `slack_api_url.txt` in the root directory of the project.
+2. Paste your Slack Incoming Webhook URL into this file.
+   - The file `slack_api_url.txt` is gitignored to ensure your secret URL is not committed to the repository.
+   - The `alertmanager` service in `docker-compose.yaml` mounts this file to `/etc/alertmanager/slack_api_url.txt`.
+   - The `alertmanager.yml` configuration uses `slack_api_url_file` to read the URL from this file.
+
 #### Setting Up Pre-Commit Hooks
 
 - Check if `golangci-lint` is installed. If not, install from [golangci-lint](https://golangci-lint.run/usage/install/).
