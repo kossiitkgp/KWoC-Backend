@@ -56,6 +56,7 @@ services:
       - "9094:9093"
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./slack_api_url.txt:/etc/alertmanager/slack_api_url.txt
 
 volumes:
   db:

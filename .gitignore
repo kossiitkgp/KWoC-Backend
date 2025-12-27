@@ -2,3 +2,4 @@
 /.env
 *.db
 vendor/
+slack_api_url.txt
