@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -35,8 +34,6 @@ func createFetchProjDetailsRequest(id any) *http.Request {
 }
 
 func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultProjectStatus bool) []models.Project {
-	rand.Seed(time.Now().Unix())
-
 	var projects []models.Project = make([]models.Project, 0)
 
 	for i := 0; i < numProjects; i++ {

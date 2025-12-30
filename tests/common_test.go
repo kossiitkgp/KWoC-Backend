@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -70,8 +69,6 @@ func unsetTestDB(db *gorm.DB) {
 }
 
 func setTestJwtSecretKey() {
-	rand.Seed(time.Now().UnixMilli())
-
 	os.Setenv("JWT_SECRET_KEY", fmt.Sprintf("testkey%d", rand.Int()))
 }
 

@@ -22,8 +22,6 @@ func createFetchOverallStatsRequest() *http.Request {
 }
 
 func generateTestStats(numStatsEntries int) []models.Stats {
-	rand.Seed(time.Now().Unix())
-
 	var stats []models.Stats = make([]models.Stats, 0)
 
 	stats = append(
