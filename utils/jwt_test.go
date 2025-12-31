@@ -5,14 +5,11 @@ import (
 	"math/rand"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/utils"
 )
 
 func TestJwtUtils(t *testing.T) {
-	rand.Seed(time.Now().UnixMilli())
-
 	testLoginFields := utils.LoginJwtFields{
 		Username: fmt.Sprintf("testuser%d", rand.Int()),
 	}

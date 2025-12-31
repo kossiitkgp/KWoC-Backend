@@ -13,5 +13,50 @@ services:
     volumes:
       - db:/var/lib/postgresql
 
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - DATABASE_HOST=database
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro'
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - "9094:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./slack_api_url.txt:/etc/alertmanager/slack_api_url.txt
+
 volumes:
   db:

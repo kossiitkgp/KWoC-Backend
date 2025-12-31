@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/kossiitkgp/kwoc-backend/v2/controllers"
 	"github.com/kossiitkgp/kwoc-backend/v2/models"
@@ -23,7 +22,6 @@ func createFetchAllStudentsStatsRequest() *http.Request {
 }
 
 func generateTestStudents(numStudents int) []models.Student {
-	rand.Seed(time.Now().Unix())
 
 	var students []models.Student = make([]models.Student, 0)
 
