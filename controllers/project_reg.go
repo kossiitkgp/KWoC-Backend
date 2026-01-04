@@ -27,8 +27,6 @@ type RegisterProjectReqFields struct {
 	RepoLink string `json:"repo_link"`
 	// Link to a communication channel/platform
 	CommChannel string `json:"comm_channel"`
-	// Link to the project's README file
-	ReadmeLink string `json:"readme_link"`
 }
 
 // RegisterProject godoc
@@ -154,7 +152,6 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		Tags:            strings.Join(reqFields.Tags, ","),
 		RepoLink:        reqFields.RepoLink,
 		CommChannel:     reqFields.CommChannel,
-		ReadmeLink:      reqFields.ReadmeLink,
 		Mentor:          mentor,
 		SecondaryMentor: secondaryMentor,
 	})
