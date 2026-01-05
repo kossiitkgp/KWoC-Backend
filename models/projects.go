@@ -14,7 +14,7 @@ type Project struct {
 	RepoLink      string `gorm:"column:repo_link"`
 	CommChannel   string `gorm:"column:comm_channel"`
 	ReadmeLink    string `gorm:"column:readme_link"`
-	ProjectStatus bool   `gorm:"default:false;column:project_status"`
+	ProjectStatus int    `gorm:"default:0;column:project_status"`
 	StatusRemark  string `gorm:"default:null;column:status_remark"`
 
 	// for stats
