@@ -13,7 +13,7 @@ type Project struct {
 	Tags          string `gorm:"column:tags"`
 	RepoLink      string `gorm:"column:repo_link"`
 	CommChannel   string `gorm:"column:comm_channel"`
-	// remove unused readme_link field from projects model
+	
 	ProjectStatus bool   `gorm:"default:false;column:project_status"`
 	StatusRemark  string `gorm:"default:null;column:status_remark"`
 
