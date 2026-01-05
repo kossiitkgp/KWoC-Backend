@@ -25,7 +25,6 @@ type Project struct {
 	Tags            []string `json:"tags"`
 	RepoLink        string   `json:"repo_link"`
 	CommChannel     string   `json:"comm_channel"`
-	ReadmeLink      string   `json:"readme_link"`
 	Mentor          Mentor   `json:"mentor"`
 	SecondaryMentor Mentor   `json:"secondary_mentor"`
 }
@@ -49,7 +48,6 @@ func newProject(dbProject *models.Project) Project {
 		Tags:            tags,
 		RepoLink:        dbProject.RepoLink,
 		CommChannel:     dbProject.CommChannel,
-		ReadmeLink:      dbProject.ReadmeLink,
 		Mentor:          newMentor(&dbProject.Mentor),
 		SecondaryMentor: newMentor(&dbProject.SecondaryMentor),
 	}
@@ -75,7 +73,7 @@ func FetchAllProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", true).
-		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {
@@ -135,7 +133,7 @@ func FetchProjectDetails(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("id = ?", project_id).
-		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "mentor_id", "secondary_mentor_id").
 		First(&project)
 
 	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
