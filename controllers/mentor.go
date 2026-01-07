@@ -13,6 +13,52 @@ import (
 	"gorm.io/gorm"
 )
 
+// ✅ VALIDATION HELPERS (NEW)
+// ValidateMentorInput validates the mentor registration/update input
+func ValidateMentorInput(name, email string) []string {
+	var validationErrors []string
+
+	// Validate Name
+	name = strings.TrimSpace(name)
+	if name == "" {
+		validationErrors = append(validationErrors, "Name is required")
+	} else if len(name) < 2 {
+		validationErrors = append(validationErrors, "Name must be at least 2 characters long")
+	} else if len(name) > 100 {
+		validationErrors = append(validationErrors, "Name cannot exceed 100 characters")
+	}
+
+	// Validate Email
+	email = strings.TrimSpace(email)
+	if email == "" {
+		validationErrors = append(validationErrors, "Email is required")
+	} else if len(email) > 255 {
+		validationErrors = append(validationErrors, "Email cannot exceed 255 characters")
+	} else if !IsValidEmail(email) {
+		validationErrors = append(validationErrors, "Invalid email format")
+	}
+
+	return validationErrors
+}
+
+// IsValidEmail validates the email format
+func IsValidEmail(email string) bool {
+	// Simple email validation - checks for @ and domain structure
+	parts := strings.Split(strings.TrimSpace(email), "@")
+	if len(parts) != 2 {
+		return false
+	}
+	if parts[0] == "" || parts[1] == "" {
+		return false
+	}
+	if !strings.Contains(parts[1], ".") {
+		return false
+	}
+	return true
+}
+
+// ✅ END OF VALIDATION HELPERS
+
 type RegisterMentorReqFields struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
@@ -68,6 +114,22 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		return
 	}
+
+	// ✅ NEW: Validate input fields
+	validationErrors := ValidateMentorInput(reqFields.Name, reqFields.Email)
+	if len(validationErrors) > 0 {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Validation failed: %s", strings.Join(validationErrors, "; ")),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	// ✅ NEW: Trim spaces from input
+	reqFields.Name = strings.TrimSpace(reqFields.Name)
+	reqFields.Email = strings.TrimSpace(reqFields.Email)
 
 	// Check if the JWT login username is the same as the mentor's given username
 	login_username := r.Context().Value(middleware.LOGIN_CTX_USERNAME_KEY).(string)
@@ -125,7 +187,7 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a db entry if the mentor doesn'tf exist
+	// Create a db entry if the mentor doesn't exist
 	tx = db.Create(&models.Mentor{
 		Username: reqFields.Username,
 		Name:     reqFields.Name,
@@ -303,6 +365,22 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 		utils.LogErrAndRespond(r, w, err, "Error decoding JSON body.", http.StatusBadRequest)
 		return
 	}
+
+	// ✅ NEW: Validate input fields
+	validationErrors := ValidateMentorInput(reqFields.Name, reqFields.Email)
+	if len(validationErrors) > 0 {
+		utils.LogWarnAndRespond(
+			r,
+			w,
+			fmt.Sprintf("Validation failed: %s", strings.Join(validationErrors, "; ")),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	// ✅ NEW: Trim spaces from input
+	reqFields.Name = strings.TrimSpace(reqFields.Name)
+	reqFields.Email = strings.TrimSpace(reqFields.Email)
 
 	tx = db.Model(&modelMentor).Updates(models.Mentor{
 		Name:  reqFields.Name,
