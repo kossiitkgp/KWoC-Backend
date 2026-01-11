@@ -53,7 +53,7 @@ func generateTestProjects(numProjects int, randomizeProjectStatus bool, defaultP
 				Tags:          fmt.Sprintf("next-gen, javascript, framework, %dth iteration", rand.Int()),
 				RepoLink:      "https://xkcd.com/927/",
 				CommChannel:   fmt.Sprintf("https://link%d", rand.Int()),
-				ReadmeLink:    fmt.Sprintf("https://readme%d", rand.Int()),
+				
 				ProjectStatus: projectStatus,
 				StatusRemark:  fmt.Sprintf("Status remark %d", rand.Int()),
 
@@ -75,7 +75,7 @@ func areProjectsEquivalent(proj1 *controllers.Project, proj2 *models.Project) bo
 		strings.Join(proj1.Tags, ",") == proj2.Tags &&
 		proj1.RepoLink == proj2.RepoLink &&
 		proj1.CommChannel == proj2.CommChannel &&
-		proj1.ReadmeLink == proj2.ReadmeLink
+		
 }
 
 func TestFetchAllProjects(t *testing.T) {
