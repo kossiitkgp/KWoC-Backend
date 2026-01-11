@@ -34,7 +34,7 @@ func FetchUnapprovedProjects(w http.ResponseWriter, r *http.Request) {
 		Preload("Mentor").
 		Preload("SecondaryMentor").
 		Where("project_status = ?", false).
-		Select("id", "name", "description", "tags", "repo_link", "comm_channel", "readme_link", "mentor_id", "secondary_mentor_id").
+		Select("id", "name", "description", "tags", "repo_link", "comm_channel",  "mentor_id", "secondary_mentor_id").
 		Find(&projects)
 
 	if tx.Error != nil {
