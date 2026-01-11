@@ -282,7 +282,7 @@ func TestMentorDashboardOK(t *testing.T) {
 			Name:          p.Name,
 			Description:   p.Description,
 			RepoLink:      p.RepoLink,
-			ReadmeLink:    p.ReadmeLink,
+			
 			Tags:          tags,
 			ProjectStatus: p.ProjectStatus,
 			StatusRemark:  p.StatusRemark,
