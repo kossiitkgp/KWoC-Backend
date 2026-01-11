@@ -29,7 +29,7 @@ type ProjectInfo struct {
 	Name          string   `json:"name"`
 	Description   string   `json:"description"`
 	RepoLink      string   `json:"repo_link"`
-	ReadmeLink    string   `json:"readme_link"`
+	
 	Tags          []string `json:"tags"`
 	ProjectStatus bool     `json:"project_status"`
 	StatusRemark  string   `json:"status_remark"`
@@ -169,7 +169,7 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 			Name:          project.Name,
 			Description:   project.Description,
 			RepoLink:      project.RepoLink,
-			ReadmeLink:    project.ReadmeLink,
+			
 			Tags:          tags,
 			ProjectStatus: project.ProjectStatus,
 			StatusRemark:  project.StatusRemark,
