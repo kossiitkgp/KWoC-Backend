@@ -86,7 +86,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		Tags:          strings.Join(projRegFields.Tags, ","),
 		RepoLink:      projRegFields.RepoLink,
 		CommChannel:   projRegFields.CommChannel,
-		ReadmeLink:    projRegFields.ReadmeLink,
+		
 		ProjectStatus: true,
 
 		Mentor: models.Mentor{
@@ -107,7 +107,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		MentorUsername: testUsername,
 		RepoLink:       "http://NewRepoLink",
 		CommChannel:    "totallynewcomchannel",
-		ReadmeLink:     "http://NewRepoLink/README",
+		
 	}
 
 	// Test with a valid new secondary mentor
@@ -150,9 +150,7 @@ func tProjectUpdateExistent(db *gorm.DB, testUsername string, testJwt string, t 
 		t.Errorf("Project CommChannel field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.CommChannel, updatedProj.CommChannel)
 	}
 
-	if updatedProj.ReadmeLink != projUpdateFields.ReadmeLink {
-		t.Errorf("Project ReadmeLink field did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.ReadmeLink, updatedProj.ReadmeLink)
-	}
+	
 
 	if updatedProj.SecondaryMentor.Username != projUpdateFields.SecondaryMentorUsername {
 		t.Errorf("Project secondary mentor username did not get updated\n Expected: `%s`. Received: `%s`", projUpdateFields.SecondaryMentorUsername, updatedProj.SecondaryMentor.Username)
