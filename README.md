@@ -297,7 +297,7 @@ The `models/` directory contains database models for the KWoC database tables. (
   - `description` (string): Description for the project.
   - `tags` (string): A list of tags for the project.
   - `comm_channel` (string): A link to the project's official communication channel.
-  - `readme_link` (string): A link to the project's README file.
+ 
   - `project_status` (bool): Whether the project is approved.
   - `status_remark` (string): Message that states the reason for rejection/suggested changes for project approval
   - `last_pull_time` (int64): The timestamp of merging the last tracked pull request (for statistics).
