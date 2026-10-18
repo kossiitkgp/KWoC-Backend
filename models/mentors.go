@@ -8,7 +8,8 @@ import "gorm.io/gorm"
 type Mentor struct {
 	gorm.Model
 
-	Name     string `gorm:"column:name"`
-	Email    string `gorm:"column:email"`
-	Username string `gorm:"column:username"`
+	Name          string `gorm:"column:name"`
+	Email         string `gorm:"column:email"`
+	Username      string `gorm:"column:username"`
+	EmailVerified bool   `gorm:"default:false;column:email_verified"`
 }

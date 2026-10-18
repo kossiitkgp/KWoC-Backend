@@ -148,7 +148,7 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tx = db.Create(&models.Project{
+	newProject := models.Project{
 		Name:            reqFields.Name,
 		Description:     reqFields.Description,
 		Tags:            strings.Join(reqFields.Tags, ","),
@@ -157,12 +157,21 @@ func RegisterProject(w http.ResponseWriter, r *http.Request) {
 		ReadmeLink:      reqFields.ReadmeLink,
 		Mentor:          mentor,
 		SecondaryMentor: secondaryMentor,
-	})
+	}
+	newProject.MentorId = int32(mentor.ID)
+	if secondaryMentor.ID != 0 {
+		secondaryMentorID := int32(secondaryMentor.ID)
+		newProject.SecondaryMentorId = &secondaryMentorID
+	}
+
+	tx = db.Create(&newProject)
 
 	if tx.Error != nil {
 		utils.LogErrAndRespond(r, w, err, "Error adding the project in the database.", http.StatusInternalServerError)
 		return
 	}
+
+	notifyProjectSubmitted(r, db, newProject)
 
 	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Success.")
 }
