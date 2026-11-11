@@ -65,5 +65,7 @@ func ApproveProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	notifyProjectApproved(r, db, project)
+
 	utils.RespondWithJson(r, w, map[string]string{"message": "Project approved successfully."})
 }

@@ -34,6 +34,27 @@ func getRoutes(app *middleware.App) []Route {
 			false,
 		},
 		{
+			"Verify Email",
+			"POST",
+			"/verify/email/",
+			middleware.WrapApp(app, controllers.VerifyEmail),
+			false,
+		},
+		{
+			"Verify Email Link",
+			"GET",
+			"/verify/email/",
+			middleware.WrapApp(app, controllers.VerifyEmailLink),
+			false,
+		},
+		{
+			"Resend Verification Email",
+			"POST",
+			"/verify/email/resend/",
+			middleware.WithLogin(middleware.WrapApp(app, controllers.ResendVerificationEmail)),
+			false,
+		},
+		{
 			"Profile",
 			"GET",
 			"/profile/",
@@ -86,7 +107,7 @@ func getRoutes(app *middleware.App) []Route {
 			"Student Blog Submission",
 			"POST",
 			"/student/bloglink/",
-			middleware.WithLogin(middleware.WrapApp(app, controllers.StudentBlogLink)),
+			middleware.WithLogin(middleware.WrapApp(app, middleware.WithVerifiedEmail(controllers.StudentBlogLink))),
 			os.Getenv("REPORT_SUBMISSION_OPEN") == "true",
 		},
 		{
@@ -135,7 +156,7 @@ func getRoutes(app *middleware.App) []Route {
 			"Project Registration",
 			"POST",
 			"/project/",
-			middleware.WithLogin(middleware.WrapApp(app, controllers.RegisterProject)),
+			middleware.WithLogin(middleware.WrapApp(app, middleware.WithVerifiedEmail(controllers.RegisterProject))),
 			os.Getenv("REGISTRATIONS_OPEN") == "true",
 		},
 		{

@@ -38,6 +38,12 @@ func MigrateModels(db *gorm.DB) error {
 		return stats_mig_err
 	}
 
+	email_verification_mig_err := db.AutoMigrate(&models.EmailVerification{})
+	if email_verification_mig_err != nil {
+		log.Err(email_verification_mig_err).Msg("Email verifications table automigrate error.")
+		return email_verification_mig_err
+	}
+
 	return nil
 }
 

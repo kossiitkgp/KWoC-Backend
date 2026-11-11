@@ -26,6 +26,8 @@ type OAuthResBodyFields struct {
 	Type string `json:"type"`
 	// Whether the user has newly registered or was registered before
 	IsNewUser bool `json:"is_new_user"`
+	// Whether the user has verified their email address
+	EmailVerified bool `json:"email_verified"`
 	// The generated JWT string for the user
 	Jwt string `json:"jwt"`
 }
@@ -83,6 +85,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	// Check if the user has already registered
 	var isNewUser bool = true
 	var userType string = reqFields.Type
+	var emailVerified bool
 
 	college := ""
 	student := models.Student{}
@@ -97,6 +100,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		userInfo.Email = student.Email
 		userInfo.Name = student.Name
 		college = student.College
+		emailVerified = student.EmailVerified
 	}
 
 	mentor := models.Mentor{}
@@ -110,6 +114,7 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 		userInfo.Email = mentor.Email
 		userInfo.Name = mentor.Name
 		userType = "mentor"
+		emailVerified = mentor.EmailVerified
 	}
 
 	// Generate a JWT string for the user
@@ -122,13 +127,14 @@ func OAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resFields := OAuthResBodyFields{
-		Username:  userInfo.Username,
-		Name:      userInfo.Name,
-		Email:     userInfo.Email,
-		College:   college,
-		Type:      userType,
-		IsNewUser: isNewUser,
-		Jwt:       jwtString,
+		Username:      userInfo.Username,
+		Name:          userInfo.Name,
+		Email:         userInfo.Email,
+		College:       college,
+		Type:          userType,
+		IsNewUser:     isNewUser,
+		EmailVerified: emailVerified,
+		Jwt:           jwtString,
 	}
 
 	utils.RespondWithJson(r, w, resFields)

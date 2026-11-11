@@ -12,6 +12,7 @@ type Student struct {
 	Email          string `gorm:"column:email"`
 	College        string `gorm:"column:college"`
 	Username       string `gorm:"column:username"`
+	EmailVerified  bool   `gorm:"default:false;column:email_verified"`
 	PassedMidEvals bool   `gorm:"column:passed_mid_evals"`
 	PassedEndEvals bool   `gorm:"column:passed_end_evals"`
 	BlogLink       string `gorm:"size:2550;column:blog_link"`

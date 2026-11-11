@@ -66,6 +66,7 @@ func unsetTestDB(db *gorm.DB) {
 	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Student{})
 	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Stats{})
 	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.Mentor{})
+	db.Session(&gorm.Session{AllowGlobalUpdate: true}).Unscoped().Delete(&models.EmailVerification{})
 }
 
 func setTestJwtSecretKey() {

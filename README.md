@@ -224,6 +224,16 @@ app := r.Context().Value(middleware.APP_CTX_KEY).(*middleware.App)
 db := app.Db
 ```
 
+#### Email Verification
+
+File: `middleware/email_verified.go`
+
+Blocks requests from users whose email address is not verified. This middleware only takes effect when `EMAIL_VERIFICATION_REQUIRED` is set to `true` and email verification is enabled. It must be placed inside `WrapApp` and `WithLogin` so that the database and logged-in username are available.
+
+```go
+middleware.WithLogin(middleware.WrapApp(app, middleware.WithVerifiedEmail(handler)))
+```
+
 ### Utils
 
 The `utils/` directory contains utility functions reused in multiple controllers. (See also: [File Structure](#file-structure))
@@ -277,6 +287,23 @@ Contains functions for authenticating a user via [Github OAuth](#github-oauth). 
 - `GetOauthAccessToken()`: Gets an access token from the Github API using the given code generated during the authentication process. (See [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github) for more information)
 - `GetOauthUserInfo()`: Gets basic information about the user from the Github API using an access token. (See: [this](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#3-use-the-access-token-to-access-the-api) for more information)
 
+#### Email
+
+Files: `utils/email.go`, `utils/email_templates.go`, `utils/email_verification.go`
+
+Contains utilities for sending emails over SMTP and for verifying user email addresses.
+
+- `Mailer.Send()`: Sends an email using the SMTP settings from the environment variables. Supports STARTTLS, implicit TLS, and unauthenticated SMTP.
+- `SendVerificationEmail()`: Sends a verification code and link.
+- `SendRegistrationSuccessEmail()`: Sent after an email address is verified.
+- `SendRegistrationFailedEmail()`: Sent when a registration cannot be completed.
+- `SendActionRequiredEmail()`: Sent when a user has to take an action, such as waiting for or reviewing a project.
+- `CreateVerificationChallenge()`: Generates and stores a hashed verification code and token.
+- `ConsumeEmailVerification()`: Validates a token, or a username and code pair.
+- `MarkUserEmailVerified()`: Marks a student or mentor as verified.
+
+When `SMTP_HOST` is empty, email sending is skipped and registration continues to work as before. This is useful for local development and tests.
+
 ### Database Models
 
 The `models/` directory contains database models for the KWoC database tables. (See also: [File Structure](#file-structure) and [File Naming Convention](#file-naming-convention))
@@ -288,6 +315,7 @@ The `models/` directory contains database models for the KWoC database tables. (
   - `name` (string): Name of the mentor.
   - `email` (string): Email of the mentor.
   - `username` (string): Username of the mentor.
+  - `email_verified` (bool): Whether the mentor's email address has been verified.
 
 #### Projects
 
@@ -327,6 +355,7 @@ The `models/` directory contains database models for the KWoC database tables. (
   - `email` (string): The email of the KWoC student.
   - `college` (string): The college in which the KWoC student is enrolled.
   - `username` (string): The username of the KWoC student.
+  - `email_verified` (bool): Whether the student's email address has been verified.
   - `passed_mid_evals` (bool): Whether the student has passed the mid-evals.
   - `passed_end_evals` (bool): Whether the student has passed the end-evals.
   - `blog_link` (string): A link to the student's final KWoC blog.
@@ -337,6 +366,18 @@ The `models/` directory contains database models for the KWoC database tables. (
   - `languages_used` (string): A list of languages used by the student in KWoC contributions, separated by comma(,).
   - `projects_worked` (string): A list of IDs of projects the student contributed to during KWoC.
   - `pulls` (string): A list of links to pull requests contributed by the student during KWoC, separated by a comma(,).
+
+#### Email Verifications
+
+- Table: `email_verifications`
+- Structure:
+  - `username` (string): Username of the student or mentor being verified.
+  - `email` (string): Email address the verification code was sent to.
+  - `code_hash` (string): Hash of the verification code. The plaintext code is never stored.
+  - `token_hash` (string): Hash of the verification link token. The plaintext token is never stored.
+  - `expires_at` (time): When the code and link expire.
+  - `used_at` (time): When the code or link was successfully used.
+  - `attempts` (uint): Number of incorrect code submissions.
 
 ### Command-Line Arguments
 
@@ -360,6 +401,22 @@ Environment variables can be set using a `.env` (See [Command-Line Arguments](#c
 - `JWT_VALIDITY_TIME`: The amount of time (in hours) for which the generated JWT tokens should be valid.
 - `REGISTRATIONS_OPEN`: Set to `true` to enable the registration endpoints.
 - `REPORT_SUBMISSION_OPEN`: Set to `true` to enable the blog link / final report submission endpoint.
+- `SMTP_HOST`: Hostname of the SMTP server used to send emails. Email sending is disabled when this is empty.
+- `SMTP_PORT`: Port of the SMTP server. (Default: `587`)
+- `SMTP_ENCRYPTION`: SMTP connection security. One of `starttls`, `ssl`, or `none`. (Default: `starttls`)
+- `SMTP_USERNAME`: Username used to authenticate with the SMTP server. Leave empty for servers that do not require authentication.
+- `SMTP_PASSWORD`: Password used to authenticate with the SMTP server.
+- `EMAIL_FROM_ADDRESS`: From address used in outgoing emails. Falls back to `SMTP_USERNAME`.
+- `EMAIL_FROM_NAME`: Display name used in outgoing emails. (Default: `KWoC`)
+- `SUPPORT_EMAIL`: Address users can contact for help. (Default: `kwoc@kossiitkgp.org`)
+- `FRONTEND_URL`: Public URL of the frontend, used in dashboard and action links in emails.
+- `BACKEND_PUBLIC_URL`: Public URL of the backend, used in verification links when `EMAIL_VERIFICATION_LINK` is not set.
+- `EMAIL_VERIFICATION_LINK`: Optional frontend page that accepts a `token` query parameter for email verification. When empty, verification links point to the backend `GET /verify/email/` page.
+- `EMAIL_VERIFICATION_ENABLED`: Set to `false` to stop sending email verification codes. (Default: `true`)
+- `EMAIL_VERIFICATION_REQUIRED`: Set to `true` to block project registration and report submission until the email address is verified. (Default: `false`)
+- `EMAIL_VERIFICATION_EXPIRY_MINUTES`: Number of minutes a verification code or link stays valid. (Default: `30`)
+- `EMAIL_VERIFICATION_MAX_ATTEMPTS`: Maximum number of incorrect code attempts before a new code has to be requested. (Default: `5`)
+- `EMAIL_VERIFICATION_SECRET`: Secret used to hash verification codes and tokens. Falls back to `JWT_SECRET_KEY`.
 
 ### Github OAuth
 

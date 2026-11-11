@@ -39,6 +39,7 @@ type StudentDashboard struct {
 	Name           string `json:"name"`
 	Username       string `json:"username"`
 	College        string `json:"college"`
+	EmailVerified  bool   `json:"email_verified"`
 	PassedMidEvals bool   `json:"passed_mid_evals"`
 	PassedEndEvals bool   `json:"passed_end_evals"`
 	BlogLink       string `json:"blog_link"`
@@ -100,6 +101,17 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	student_exists := student.Username == reqFields.Username
 
 	if student_exists {
+		if strings.EqualFold(student.Email, reqFields.Email) {
+			sendRegistrationFailedEmail(
+				r,
+				reqFields.Email,
+				student.Name,
+				reqFields.Username,
+				"student",
+				"A student account with this username already exists. Sign in to your account or contact support if you need help.",
+			)
+		}
+
 		utils.LogWarnAndRespond(
 			r,
 			w,
@@ -122,6 +134,17 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	mentor_exists := mentor.Username == reqFields.Username
 
 	if mentor_exists {
+		if strings.EqualFold(mentor.Email, reqFields.Email) {
+			sendRegistrationFailedEmail(
+				r,
+				reqFields.Email,
+				mentor.Name,
+				reqFields.Username,
+				"student",
+				"This username is already registered as a mentor. A user cannot register as both a student and a mentor.",
+			)
+		}
+
 		utils.LogWarnAndRespond(
 			r,
 			w,
@@ -141,11 +164,33 @@ func RegisterStudent(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if tx.Error != nil {
-		utils.LogErrAndRespond(r, w, err, "Database error.", http.StatusInternalServerError)
+		sendRegistrationFailedEmail(
+			r,
+			reqFields.Email,
+			reqFields.Name,
+			reqFields.Username,
+			"student",
+			"Your registration could not be saved because of a server error. Please try again later.",
+		)
+		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
 
-	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Student registration successful.")
+	verificationEmailSent := sendVerificationEmailAfterRegistration(
+		r,
+		db,
+		reqFields.Username,
+		reqFields.Name,
+		reqFields.Email,
+		"student",
+	)
+
+	message := "Student registration successful."
+	if verificationEmailSent {
+		message = "Student registration successful. Please check your email to verify your account."
+	}
+
+	utils.RespondWithHTTPMessage(r, w, http.StatusOK, message)
 }
 
 // StudentBlogLink godoc
@@ -257,6 +302,7 @@ func CreateStudentDashboard(modelStudent models.Student, db *gorm.DB) StudentDas
 		Name:           modelStudent.Name,
 		Username:       modelStudent.Username,
 		College:        modelStudent.College,
+		EmailVerified:  modelStudent.EmailVerified,
 		PassedMidEvals: modelStudent.PassedMidEvals,
 		PassedEndEvals: modelStudent.PassedEndEvals,
 		BlogLink:       modelStudent.BlogLink,
@@ -327,7 +373,7 @@ func UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("students").
 		Where("username = ?", login_username).
-		Select("name", "username", "email", "college", "ID").
+		Select("name", "username", "email", "email_verified", "college", "ID").
 		First(&modelStudent)
 
 	if tx.Error == gorm.ErrRecordNotFound {
@@ -349,6 +395,9 @@ func UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	emailChanged := strings.TrimSpace(reqFields.Email) != "" &&
+		!strings.EqualFold(strings.TrimSpace(modelStudent.Email), strings.TrimSpace(reqFields.Email))
+
 	tx = db.Model(&modelStudent).Updates(models.Student{
 		Name:    reqFields.Name,
 		Email:   reqFields.Email,
@@ -363,6 +412,36 @@ func UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 			"Invalid Details: Could not update student details",
 			http.StatusBadRequest,
 		)
+		return
+	}
+
+	if emailChanged {
+		if err := db.Model(&modelStudent).Update("email_verified", false).Error; err != nil {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				"Invalid Details: Could not update student details",
+				http.StatusBadRequest,
+			)
+			return
+		}
+
+		verificationEmailSent := sendVerificationEmailAfterRegistration(
+			r,
+			db,
+			modelStudent.Username,
+			reqFields.Name,
+			reqFields.Email,
+			"student",
+		)
+
+		message := "Student details updated successfully."
+		if verificationEmailSent {
+			message = "Student details updated successfully. Please check your new email address to verify it."
+		}
+
+		utils.RespondWithJson(r, w, []string{message})
 		return
 	}
 

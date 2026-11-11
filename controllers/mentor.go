@@ -50,9 +50,10 @@ type StudentInfo struct {
 }
 
 type MentorDashboard struct {
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Name          string `json:"name"`
+	Username      string `json:"username"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
 
 	Projects []ProjectInfo `json:"projects"`
 	Students []StudentInfo `json:"students"`
@@ -92,6 +93,17 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	mentor_exists := mentor.Username == reqFields.Username
 
 	if mentor_exists {
+		if strings.EqualFold(mentor.Email, reqFields.Email) {
+			sendRegistrationFailedEmail(
+				r,
+				reqFields.Email,
+				mentor.Name,
+				reqFields.Username,
+				"mentor",
+				"A mentor account with this username already exists. Sign in to your account or contact support if you need help.",
+			)
+		}
+
 		utils.LogWarnAndRespond(
 			r,
 			w,
@@ -115,6 +127,17 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	student_exists := student.Username == reqFields.Username
 
 	if student_exists {
+		if strings.EqualFold(student.Email, reqFields.Email) {
+			sendRegistrationFailedEmail(
+				r,
+				reqFields.Email,
+				student.Name,
+				reqFields.Username,
+				"mentor",
+				"This username is already registered as a student. A user cannot register as both a student and a mentor.",
+			)
+		}
+
 		utils.LogWarnAndRespond(
 			r,
 			w,
@@ -133,11 +156,33 @@ func RegisterMentor(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if tx.Error != nil {
+		sendRegistrationFailedEmail(
+			r,
+			reqFields.Email,
+			reqFields.Name,
+			reqFields.Username,
+			"mentor",
+			"Your registration could not be saved because of a server error. Please try again later.",
+		)
 		utils.LogErrAndRespond(r, w, tx.Error, "Database error.", http.StatusInternalServerError)
 		return
 	}
 
-	utils.RespondWithHTTPMessage(r, w, http.StatusOK, "Mentor registration successful.")
+	verificationEmailSent := sendVerificationEmailAfterRegistration(
+		r,
+		db,
+		reqFields.Username,
+		reqFields.Name,
+		reqFields.Email,
+		"mentor",
+	)
+
+	message := "Mentor registration successful."
+	if verificationEmailSent {
+		message = "Mentor registration successful. Please check your email to verify your account."
+	}
+
+	utils.RespondWithHTTPMessage(r, w, http.StatusOK, message)
 }
 
 // /mentor/dashboard/ functions
@@ -199,9 +244,10 @@ func CreateMentorDashboard(mentor models.Mentor, db *gorm.DB) MentorDashboard {
 		Select("name", "username").Find(&students)
 
 	return MentorDashboard{
-		Name:     mentor.Name,
-		Username: mentor.Username,
-		Email:    mentor.Email,
+		Name:          mentor.Name,
+		Username:      mentor.Username,
+		Email:         mentor.Email,
+		EmailVerified: mentor.EmailVerified,
 
 		Projects: projectsInfo,
 		Students: students,
@@ -229,7 +275,7 @@ func FetchMentorDashboard(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
+		Select("name", "username", "email", "email_verified", "ID").
 		First(&modelMentor)
 
 	if tx.Error == gorm.ErrRecordNotFound {
@@ -282,7 +328,7 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
+		Select("name", "username", "email", "email_verified", "ID").
 		First(&modelMentor)
 
 	if tx.Error == gorm.ErrRecordNotFound {
@@ -304,6 +350,9 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	emailChanged := strings.TrimSpace(reqFields.Email) != "" &&
+		!strings.EqualFold(strings.TrimSpace(modelMentor.Email), strings.TrimSpace(reqFields.Email))
+
 	tx = db.Model(&modelMentor).Updates(models.Mentor{
 		Name:  reqFields.Name,
 		Email: reqFields.Email,
@@ -317,6 +366,36 @@ func UpdateMentorDetails(w http.ResponseWriter, r *http.Request) {
 			"Invalid Details: Could not update mentor details",
 			http.StatusBadRequest,
 		)
+		return
+	}
+
+	if emailChanged {
+		if err := db.Model(&modelMentor).Update("email_verified", false).Error; err != nil {
+			utils.LogErrAndRespond(
+				r,
+				w,
+				err,
+				"Invalid Details: Could not update mentor details",
+				http.StatusBadRequest,
+			)
+			return
+		}
+
+		verificationEmailSent := sendVerificationEmailAfterRegistration(
+			r,
+			db,
+			modelMentor.Username,
+			reqFields.Name,
+			reqFields.Email,
+			"mentor",
+		)
+
+		message := "Mentor details updated successfully."
+		if verificationEmailSent {
+			message = "Mentor details updated successfully. Please check your new email address to verify it."
+		}
+
+		utils.RespondWithJson(r, w, []string{message})
 		return
 	}
 
@@ -343,7 +422,7 @@ func GetMentorDetails(w http.ResponseWriter, r *http.Request) {
 	tx := db.
 		Table("mentors").
 		Where("username = ?", login_username).
-		Select("name", "username", "email", "ID").
+		Select("name", "username", "email", "email_verified", "ID").
 		First(&mentor)
 
 	if tx.Error == gorm.ErrRecordNotFound {
